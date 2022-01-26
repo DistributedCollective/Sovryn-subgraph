@@ -28,7 +28,7 @@ dataSources:
       abis:
         - name: ConverterRegistry
           file: ./abis/ConverterRegistry.json
-        - name: SmartTokenContract
+        - name: SmartToken
           file: ./abis/SmartToken.json
         - name: LiquidityPoolV1Converter
           file: ./abis/LiquidityPoolV1Converter.json
@@ -74,6 +74,10 @@ templates:
       abis:
         - name: SmartToken
           file: ./abis/SmartToken.json
+        - name: LiquidityPoolV1Converter
+          file: ./abis/LiquidityPoolV1Converter.json
+        - name: ERC20Token
+          file: ./abis/ERC20Token.json
       eventHandlers:
         # - event: Issuance(uint256)
         #   handler: handleIssuance
