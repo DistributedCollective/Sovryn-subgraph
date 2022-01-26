@@ -46,19 +46,19 @@ type OwnerUpdate @entity {
   _newOwner: Bytes! # address
 }
 
-type ContractRegistry @entity {
-  id: ID!
-  converterRegistries: [ConverterRegistry!]
-  # contracts: [BancorContract!] @derivedFrom(field: "registry")
-  owner: String
-}
+# type ContractRegistry @entity {
+#   id: ID!
+#   converterRegistries: [ConverterRegistry!]
+#   # contracts: [BancorContract!] @derivedFrom(field: "registry")
+#   owner: String
+# }
 
 type ConverterRegistry @entity {
   id: ID!
   converters: [LiquidityPoolV1Converter!] @derivedFrom(field: "currentConverterRegistry") # possibly v2 converter, how to handle?
   smartTokens: [SmartToken!] @derivedFrom(field: "currentConverterRegistry")
   connectorTokens: [Token!] @derivedFrom(field: "currentConverterRegistry")
-  owner: String
+  owner: Bytes! # address
   addedToContractRegistryAtBlockTimestamp: BigInt
   addedToContractRegistryAtTransactionHash: String
   addedToContractRegistryAtBlockNumber: BigInt
@@ -81,7 +81,7 @@ type Token @entity {
   smartTokens: [TokenSmartToken!] @derivedFrom(field: "token")
   # shortestQuickBuyPath: [QuickBuyPathMember!]
   # converterWithShortestQuickBuyPath: Converter
-  owner: String
+  # owner: String
   # tokenSwapTotals: [TokenSwapTotal!] @derivedFrom(field: "toToken")
   currentConverterRegistry: ConverterRegistry
   # addedToRegistryBlockNumber: BigInt
@@ -101,7 +101,7 @@ type SmartToken @entity {
   connectorTokens: [TokenSmartToken!] @derivedFrom(field: "smartToken")
   # shortestQuickBuyPath: [QuickBuyPathMember!]
   # converterWithShortestQuickBuyPath: Converter
-  owner: Bytes
+  owner: Bytes!
   # tokenSwapTotals: [TokenSwapTotal!] @derivedFrom(field: "toToken")
   currentConverterRegistry: ConverterRegistry
   addedToRegistryBlockNumber: BigInt
@@ -113,7 +113,7 @@ type LiquidityPoolV1Converter @entity {
   version: Int
   type: Int
   smartToken: SmartToken
-  connectorTokens: [LiquidityPoolToken!] @derivedFrom(field: "liquidityPool")
+  connectorTokens: [LiquidityPoolToken!]! @derivedFrom(field: "liquidityPool")
   # connectors: [Connector!] @derivedFrom(field: "converter")
   # quickBuyPath: [QuickBuyPathMember!]
   # quickBuyPathLength: Int
@@ -128,7 +128,7 @@ type LiquidityPoolV1Converter @entity {
   firstAddedToRegistryBlockNumber: BigInt
   firstAddedToRegistryBlockTimestamp: BigInt
   currentConverterRegistry: ConverterRegistry
-  currentContractRegistry: ContractRegistry
+  # currentContractRegistry: ContractRegistry
   # tokenBalances: [ConverterTokenBalance!] @derivedFrom(field: "converter")
   # tokenSwapTotals: [ConverterTokenSwapTotal!] @derivedFrom(field: "converter")
 }
