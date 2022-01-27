@@ -1,9 +1,7 @@
 import { Address, log } from '@graphprotocol/graph-ts'
 import { LiquidityPoolV1Converter } from '../../generated/schema'
 import { LiquidityPoolV1Converter as LiquidityPoolV1ConverterContract } from '../../generated/templates/LiquidityPoolV1Converter/LiquidityPoolV1Converter'
-// import { SmartToken as SmartTokenContract } from '../../generated/templates/SmartToken/SmartToken'
-import { LiquidityPoolV1Converter as LiquidityPoolV1ConverterTemplate } from '../../generated//templates'
-// import { SmartToken as SmartTokenTemplate } from '../../generated/templates'
+import { LiquidityPoolV1Converter as LiquidityPoolV1ConverterTemplate } from '../../generated/templates'
 
 export class IGetLiquidityPool {
   liquidityPoolV1Converter: LiquidityPoolV1Converter
@@ -32,7 +30,7 @@ export function getLiquiditypool(converterAddress: Address): IGetLiquidityPool {
     // }
     let converterOwnerResult = converterContract.try_owner()
     if (!converterOwnerResult.reverted) {
-      liquidityPoolV1Converter.owner = converterOwnerResult.value.toHex()
+      liquidityPoolV1Converter.owner = converterOwnerResult.value
     }
     let converterMaxConversionFeeResult = converterContract.try_maxConversionFee()
     if (!converterMaxConversionFeeResult.reverted) {
@@ -42,8 +40,6 @@ export function getLiquiditypool(converterAddress: Address): IGetLiquidityPool {
     if (!converterTypeResult.reverted) {
       liquidityPoolV1Converter.type = converterTypeResult.value
     }
-    // liquidityPoolV1Converter.firstAddedToRegistryBlockNumber = event.block.number
-    // liquidityPoolV1Converter.firstAddedToRegistryBlockTimestamp = event.block.timestamp
   }
 
   liquidityPoolV1Converter.save()

@@ -1,4 +1,4 @@
-import { log, BigInt } from '@graphprotocol/graph-ts'
+import { log, BigInt, Address } from '@graphprotocol/graph-ts'
 import {
   ConverterAnchorAdded as ConverterAnchorAddedEvent,
   ConverterAnchorRemoved as ConverterAnchorRemovedEvent,
@@ -78,6 +78,11 @@ export function handleConvertibleTokenRemoved(event: ConvertibleTokenRemovedEven
   entity._convertibleToken = event.params._convertibleToken
   entity._smartToken = event.params._smartToken
   entity.save()
+
+  log.debug('Convertible token removed from registry: {}', [event.params._convertibleToken.toHex()])
+  let token = getToken(event.params._convertibleToken, event.address, event.params._smartToken)
+  token.currentConverterRegistry = null
+  token.save()
 }
 
 export function handleSmartTokenAdded(event: SmartTokenAddedEvent): void {
@@ -159,19 +164,12 @@ export function handleSmartTokenRemoved(event: SmartTokenRemovedEvent): void {
   entity.save()
 
   log.debug('Smart Token removed from registry: {}', [event.params._smartToken.toHex()])
-  let smartTokenEntity = SmartToken.load(event.params._smartToken.toHex())
-  if (smartTokenEntity === null) {
-    log.debug('Smart Token {} does not exist', [event.params._smartToken.toHex()])
-    smartTokenEntity = new SmartToken(event.params._smartToken.toHex())
-  }
+  let smartTokenEntity = getSmartToken(event.params._smartToken).smartToken
 
   smartTokenEntity.currentConverterRegistry = null
   smartTokenEntity.save()
 
-  let liquidityPoolV1Converter = LiquidityPoolV1Converter.load(smartTokenEntity.owner.toHex())
-  if (liquidityPoolV1Converter === null) {
-    liquidityPoolV1Converter = new LiquidityPoolV1Converter(smartTokenEntity.owner.toHex())
-  }
+  let liquidityPoolV1Converter = getLiquiditypool(smartTokenEntity.owner as Address).liquidityPoolV1Converter
   liquidityPoolV1Converter.smartToken = null
   liquidityPoolV1Converter.save()
 }

@@ -117,7 +117,7 @@ type LiquidityPoolV1Converter @entity {
   # connectors: [Connector!] @derivedFrom(field: "converter")
   # quickBuyPath: [QuickBuyPathMember!]
   # quickBuyPathLength: Int
-  owner: String
+  owner: Bytes
   # manager: String
   conversionFee: BigInt
   weight: BigInt
