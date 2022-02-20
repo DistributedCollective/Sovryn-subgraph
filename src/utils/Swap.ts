@@ -59,7 +59,7 @@ export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
 function updatePricingAndCandlesticks(event: ConversionEventForSwap): void {
   let BTCToken = Token.load(WRBTCAddress.toLowerCase())
 
-  if (BTCToken != null) {
+  if (BTCToken !== null) {
     const btcPrice = BTCToken.lastPriceUsd
     let token: Token | null
     let tokenAmount: BigInt
@@ -77,7 +77,7 @@ function updatePricingAndCandlesticks(event: ConversionEventForSwap): void {
       /** TODO: Handle case where neither token is rBTC for when AMM pools with non-rBTC tokens are introduced */
     }
 
-    if (token != null) {
+    if (token !== null) {
       const oldPriceBtc = token.lastPriceBtc
       const newPriceBtc = btcAmount.divDecimal(tokenAmount.toBigDecimal())
       const btcVolume = decimal.fromBigInt(btcAmount, BTCToken.decimals)
@@ -106,9 +106,11 @@ function updatePricingAndCandlesticks(event: ConversionEventForSwap): void {
         oldPrice: oldPriceBtc,
         newPrice: newPriceBtc,
         volume: btcVolume,
+        baseToken: token.id,
+        quoteToken: BTCToken.id,
       })
 
-      if (token.id.toLowerCase() != USDTAddress.toLowerCase()) {
+      if (token.id.toLowerCase() !== USDTAddress.toLowerCase()) {
         /** Update USD Candlesticks for token */
         handleCandlesticks({
           tradingPair: token.id.toLowerCase() + '_' + USDTAddress.toLowerCase(),
@@ -116,6 +118,8 @@ function updatePricingAndCandlesticks(event: ConversionEventForSwap): void {
           oldPrice: oldPriceUsd,
           newPrice: newPriceUsd,
           volume: usdVolume,
+          baseToken: token.id,
+          quoteToken: USDTAddress.toLowerCase(),
         })
       }
     }

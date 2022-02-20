@@ -1011,8 +1011,8 @@ type TokenConverted @entity {
 # Candlesticks
 
 type CandleSticksFifteenMinute @entity {
-  id: ID!  # fromToken + toToken + timestamp
-  tradingPair: String!  # baseToken_quoteToken
+  baseToken: Token
+  quoteToken: Token
   open: BigDecimal # opening price
   high: BigDecimal! # high price
   low: BigDecimal! # low price

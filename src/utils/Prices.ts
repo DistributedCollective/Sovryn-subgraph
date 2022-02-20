@@ -33,6 +33,8 @@ export function updateLastPriceUsdAll(newBtcPrice: BigDecimal, timestamp: BigInt
           newPrice: newUsdPrice,
           oldPrice: oldUsdPrice,
           tradingPair: tradingPair,
+          baseToken: token,
+          quoteToken: USDTAddress.toLowerCase(),
           volume: BigDecimal.zero(),
         })
       }

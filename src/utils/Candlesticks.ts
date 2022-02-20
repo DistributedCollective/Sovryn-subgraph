@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt } from '@graphprotocol/graph-ts'
+import { BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
 import { CandleSticksFifteenMinute } from '../../generated/schema'
 
 enum Interval {
@@ -15,9 +15,20 @@ export class ICandleSticks {
   oldPrice: BigDecimal
   newPrice: BigDecimal
   volume: BigDecimal
+  baseToken: string
+  quoteToken: string
 }
 
 export function handleCandlesticks(data: ICandleSticks): void {
+  log.debug('handleCandlesticks - data: tradingPair {}, blockTimestamp: {}, oldPrice: {}, newPrice: {}, volume: {}, baseToken: {}, quoteToken {}', [
+    data.tradingPair,
+    data.blockTimestamp.toString(),
+    data.oldPrice.toString(),
+    data.newPrice.toString(),
+    data.volume.toString(),
+    data.baseToken,
+    data.quoteToken,
+  ])
   handleCandlesticksFifteenMinutes(data)
 }
 
@@ -34,6 +45,8 @@ function handleCandlesticksFifteenMinutes(data: ICandleSticks): void {
     candleSticksFifteenMinutes.high = data.oldPrice
     candleSticksFifteenMinutes.txCount = BigInt.zero()
     candleSticksFifteenMinutes.totalVolume = BigDecimal.zero()
+    candleSticksFifteenMinutes.baseToken = data.baseToken
+    candleSticksFifteenMinutes.quoteToken = data.quoteToken
   }
 
   if (data.newPrice.gt(candleSticksFifteenMinutes.high)) {
