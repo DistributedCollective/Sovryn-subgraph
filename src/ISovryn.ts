@@ -312,7 +312,7 @@ export function handleTrade(event: TradeEvent): void {
   }
   entity.collateralToken = event.params.collateralToken
   entity.loanToken = event.params.loanToken
-  /** In Collteral tokens */
+  /** In Collateral tokens */
   entity.positionSize = event.params.positionSize
   /** In Loan tokens */
   entity.borrowedAmount = event.params.borrowedAmount
