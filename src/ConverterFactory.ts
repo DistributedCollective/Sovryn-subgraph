@@ -18,7 +18,7 @@ export function handleNewConverter(event: NewConverterEvent): void {
   /**
    * Create new LiquidityPool
    */
-  createAndReturnLiquidityPool(event.params._converter, event.block.timestamp, event.block.number, event.transaction.hash.toHexString())
+  createAndReturnLiquidityPool(event.params._converter, event)
 }
 
 export function handleOwnerUpdate(event: OwnerUpdateEvent): void {}

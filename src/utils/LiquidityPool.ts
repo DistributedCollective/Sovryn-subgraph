@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes, ethereum } from '@graphprotocol/graph-ts'
 import { LiquidityPool } from '../../generated/schema'
 import { LiquidityPoolV1Converter as LiquidityPoolV1ConverterContract } from '../../generated/templates/LiquidityPoolV1Converter/LiquidityPoolV1Converter'
 import { LiquidityPoolV2Converter as LiquidityPoolV2ConverterContract } from '../../generated/templates/LiquidityPoolV2Converter/LiquidityPoolV2Converter'
@@ -15,12 +15,11 @@ export class IGetLiquidityPool {
   isNew: boolean
 }
 
-export function createAndReturnLiquidityPool(
-  converterAddress: Address,
-  createdAtTimestamp: BigInt,
-  createdAtBlockNumber: BigInt,
-  createdAtTransaction: string,
-): IGetLiquidityPool {
+export function createAndReturnLiquidityPool(converterAddress: Address, event: ethereum.Event): IGetLiquidityPool {
+  const createdAtBlockNumber = event.block.number
+  const createdAtTimestamp = event.block.timestamp
+  const createdAtTransaction = event.transaction.hash
+
   let isNew = false
   let liquidityPool = LiquidityPool.load(converterAddress.toHex())
   if (liquidityPool === null) {
@@ -66,7 +65,7 @@ export function createAndReturnLiquidityPool(
     }
     liquidityPool.createdAtBlockNumber = createdAtBlockNumber
     liquidityPool.createdAtTimestamp = createdAtTimestamp
-    liquidityPool.createdAtTransaction = createdAtTransaction
+    liquidityPool.createdAtTransaction = createdAtTransaction.toHex()
     liquidityPool.save()
     isNew = true
   }
