@@ -794,7 +794,7 @@ type LoanToken @entity {
   underlyingAsset: Token!
 }
 
-# Vesting Resistry
+# Vesting Registry
 
 type VestingContract @entity {
   id: ID! # vesting contract id
