@@ -1,3 +1,4 @@
+import { BigInt, dataSource } from '@graphprotocol/graph-ts'
 import {
   PriceDataUpdate as PriceDataUpdateEvent,
   LiquidityAdded as LiquidityAddedEvent,
@@ -33,10 +34,10 @@ import { ConversionEventForSwap, createAndReturnSwap } from './utils/Swap'
 import { createAndReturnToken } from './utils/Token'
 
 import { loadTransaction } from './utils/Transaction'
-import { BigInt, dataSource } from '@graphprotocol/graph-ts'
 import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnPoolToken } from './utils/PoolToken'
 import { createAndReturnUser } from './utils/User'
+import { createAndReturnLiquidityPool } from './utils/LiquidityPool'
 
 export function handlePriceDataUpdate(event: PriceDataUpdateEvent): void {
   let entity = new PriceDataUpdate(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
@@ -114,15 +115,17 @@ export function handleActivation(event: ActivationEvent): void {
   entity.emittedBy = event.address
   entity.save()
 
-  let liquidityPool = LiquidityPool.load(dataSource.address().toHex())
+  // let liquidityPool = LiquidityPool.load(dataSource.address().toHex())
+  let liquidityPoolObj = createAndReturnLiquidityPool(dataSource.address(), event)
+  const isNew = liquidityPoolObj.isNew
+  const liquidityPool = liquidityPoolObj.liquidityPool
 
-  if (liquidityPool != null) {
-    liquidityPool.activated = event.params._activated
+  if (!isNew) {
     let smartToken = createAndReturnSmartToken(event.params._anchor)
     liquidityPool.smartToken = smartToken.smartToken.id
 
     if (event.params._type == 1) {
-      if (event.block.number < BigInt.fromString('2393856')) {
+      if (event.block.number < BigInt.fromI32(2393856)) {
         const contract = LiquidityPoolV1Contract.bind(event.address)
         let reserveTokenCountResult = contract.try_reserveTokenCount()
         if (!reserveTokenCountResult.reverted) {
@@ -163,9 +166,10 @@ export function handleActivation(event: ActivationEvent): void {
         }
       }
     }
-
-    liquidityPool.save()
   }
+
+  liquidityPool.activated = event.params._activated
+  liquidityPool.save()
 }
 
 export function handleConversionV1(event: ConversionEventV1): void {
