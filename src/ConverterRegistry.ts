@@ -115,6 +115,11 @@ export function handleSmartTokenRemoved(event: SmartTokenRemovedEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  const smartTokenAddress = event.params._smartToken
+  const smartToken = createAndReturnSmartToken(smartTokenAddress).smartToken
+  smartToken.currentConverterRegistry = null
+  smartToken.save()
 }
 
 export function handleOwnerUpdate(event: OwnerUpdateEvent): void {}
