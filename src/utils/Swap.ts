@@ -3,8 +3,10 @@ import { Swap, Token, User } from '../../generated/schema'
 import { createAndReturnUser } from './User'
 import { USDTAddress, WRBTCAddress } from '../contracts/contracts'
 import { updateLastPriceUsdAll } from './Prices'
-import { decimal } from '@protofire/subgraph-toolkit'
+import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
 import { handleCandlesticks } from './Candlesticks'
+import { createAndReturnProtocolStats } from './ProtocolStats'
+import { getTokenPriceConversions } from './Prices'
 
 export class ConversionEventForSwap {
   transactionHash: Bytes
@@ -15,9 +17,21 @@ export class ConversionEventForSwap {
   timestamp: BigInt
   user: Address
   trader: Address
+  lpFee: BigInt
+  protocolFee: BigInt
 }
 
 export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
+  let protocolStatsEntity = createAndReturnProtocolStats()
+  let toTokenPrices = getTokenPriceConversions(event.toToken)
+  const ammVolumeUsd = toTokenPrices.tokenToUsd.times(decimal.fromBigInt(event.toAmount, DEFAULT_DECIMALS)).truncate(2)
+  const lpFeeUsd = toTokenPrices.tokenToUsd.times(decimal.fromBigInt(event.lpFee, DEFAULT_DECIMALS)).truncate(2)
+  const stakerFeeUsd = toTokenPrices.tokenToUsd.times(decimal.fromBigInt(event.protocolFee, DEFAULT_DECIMALS))
+  protocolStatsEntity.totalAmmVolumeUsd = protocolStatsEntity.totalAmmVolumeUsd.plus(ammVolumeUsd)
+  protocolStatsEntity.totalAmmLpFeesUsd = protocolStatsEntity.totalAmmLpFeesUsd.plus(lpFeeUsd)
+  protocolStatsEntity.totalAmmStakerFeesUsd = protocolStatsEntity.totalAmmStakerFeesUsd.plus(stakerFeeUsd)
+  protocolStatsEntity.save()
+
   let userEntity: User | null = null
   /** Check if the trader property on the swap is the same as the caller of the tx. If it is, this is a user-instigated swap */
   if (event.user.toHexString() == event.trader.toHexString()) {

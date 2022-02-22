@@ -41,6 +41,8 @@ import { createAndReturnLoan, LoanStartState, updateLoanReturnPnL, ChangeLoanSta
 import { BigInt, DataSourceContext } from '@graphprotocol/graph-ts'
 import { createAndReturnUser } from './utils/User'
 import { integer } from '@protofire/subgraph-toolkit'
+import { createAndReturnProtocolStats } from './utils/ProtocolStats'
+import { convertToUsd } from './utils/Prices'
 
 export function handleBorrow(event: BorrowEvent): void {
   let entity = new Borrow(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
@@ -73,6 +75,11 @@ export function handleBorrow(event: BorrowEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  let protocolStatsEntity = createAndReturnProtocolStats()
+  let usdVolume = convertToUsd(event.params.collateralToken, event.params.newCollateral)
+  protocolStatsEntity.totalBorrowVolumeUsd = protocolStatsEntity.totalBorrowVolumeUsd.plus(usdVolume)
+  protocolStatsEntity.save()
 }
 
 /** Close from a Borrow Event */
@@ -105,6 +112,11 @@ export function handleCloseWithDeposit(event: CloseWithDepositEvent): void {
     type: 'Sell',
   }
   updateLoanReturnPnL(changeParams)
+
+  let protocolStatsEntity = createAndReturnProtocolStats()
+  let usdVolume = convertToUsd(event.params.collateralToken, event.params.collateralWithdrawAmount)
+  protocolStatsEntity.totalCloseWithDepositVolumeUsd = protocolStatsEntity.totalCloseWithDepositVolumeUsd.plus(usdVolume)
+  protocolStatsEntity.save()
 }
 
 /** Close from Trade Event */
@@ -137,6 +149,11 @@ export function handleCloseWithSwap(event: CloseWithSwapEvent): void {
     type: 'Sell',
   }
   updateLoanReturnPnL(changeParams)
+
+  let protocolStatsEntity = createAndReturnProtocolStats()
+  let usdVolume = convertToUsd(event.params.collateralToken, event.params.positionCloseSize)
+  protocolStatsEntity.totalCloseWithSwapVolumeUsd = protocolStatsEntity.totalCloseWithSwapVolumeUsd.plus(usdVolume)
+  protocolStatsEntity.save()
 }
 
 export function handleDepositCollateral(event: DepositCollateralEvent): void {
@@ -159,6 +176,8 @@ export function handleDepositCollateral(event: DepositCollateralEvent): void {
     type: null,
   }
   updateLoanReturnPnL(changeParams)
+
+  /** TODO: Update protocolStats. Need to return collateralToken from updateLoanReturnPnL */
 }
 
 export function handleDepositCollateralLegacy(event: DepositCollateralLegacyEvent): void {
@@ -180,6 +199,8 @@ export function handleDepositCollateralLegacy(event: DepositCollateralLegacyEven
     type: null,
   }
   updateLoanReturnPnL(changeParams)
+
+  /** TODO: Update protocolStats. Need to return collateralToken from updateLoanReturnPnL */
 }
 
 export function handleEarnReward(event: EarnRewardEvent): void {
@@ -257,6 +278,11 @@ export function handleLiquidate(event: LiquidateEvent): void {
     type: 'Sell',
   }
   updateLoanReturnPnL(changeParams)
+
+  let protocolStatsEntity = createAndReturnProtocolStats()
+  let usdVolume = convertToUsd(event.params.collateralToken, event.params.collateralWithdrawAmount)
+  protocolStatsEntity.totalLiquidateVolumeUsd = protocolStatsEntity.totalLiquidateVolumeUsd.plus(usdVolume)
+  protocolStatsEntity.save()
 }
 
 export function handleLoanSwap(event: LoanSwapEvent): void {
@@ -285,6 +311,11 @@ export function handlePayBorrowingFee(event: PayBorrowingFeeEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  let protocolStatsEntity = createAndReturnProtocolStats()
+  let usdVolume = convertToUsd(event.params.token, event.params.amount)
+  protocolStatsEntity.totalBorrowingFeesUsd = protocolStatsEntity.totalBorrowingFeesUsd.plus(usdVolume)
+  protocolStatsEntity.save()
 }
 
 export function handlePayLendingFee(event: PayLendingFeeEvent): void {
@@ -297,6 +328,11 @@ export function handlePayLendingFee(event: PayLendingFeeEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  let protocolStatsEntity = createAndReturnProtocolStats()
+  let usdVolume = convertToUsd(event.params.token, event.params.amount)
+  protocolStatsEntity.totalLendingFeesUsd = protocolStatsEntity.totalLendingFeesUsd.plus(usdVolume)
+  protocolStatsEntity.save()
 }
 
 export function handlePayInterestTransfer(event: PayInterestTransferEvent): void {}
@@ -312,6 +348,11 @@ export function handlePayTradingFee(event: PayTradingFeeEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  let protocolStatsEntity = createAndReturnProtocolStats()
+  let usdVolume = convertToUsd(event.params.token, event.params.amount)
+  protocolStatsEntity.totalTradingFeesUsd = protocolStatsEntity.totalTradingFeesUsd.plus(usdVolume)
+  protocolStatsEntity.save()
 }
 
 export function handleSetLoanPool(event: SetLoanPoolEvent): void {
@@ -384,4 +425,9 @@ export function handleTrade(event: TradeEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  let protocolStatsEntity = createAndReturnProtocolStats()
+  let usdTradeVolume = convertToUsd(event.params.collateralToken, event.params.positionSize)
+  protocolStatsEntity.totalMarginTradeVolumeUsd = protocolStatsEntity.totalMarginTradeVolumeUsd.plus(usdTradeVolume)
+  protocolStatsEntity.save()
 }

@@ -30,7 +30,7 @@ function setStartBlockForTesting(newStartBlock) {
 }
 
 function resetStartBlocks() {
-    const filePath = './utils/RSK.testnetBackup.json'
+    const filePath = './config/RSK.testnet.json'
     fs.stat(filePath, function (err, stat) {
         if (err == null) {
             const backupConfig = require('./RSK.testnetBackup.json')

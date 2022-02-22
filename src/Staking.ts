@@ -15,6 +15,8 @@ import { createAndReturnUser, createAndReturnUserStakeHistory } from './utils/Us
 import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
 import { Address, BigInt } from '@graphprotocol/graph-ts'
 import { genesisVestingStartBlock, genesisVestingEndBlock } from './blockNumbers/blockNumbers'
+import { createAndReturnProtocolStats } from './utils/ProtocolStats'
+import { convertToUsd } from './utils/Prices'
 
 export function handleDelegateChanged(event: DelegateChangedEvent): void {
   let user = User.load(event.params.delegator.toHexString())
@@ -92,6 +94,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     newVestingContract.currentBalance = BigInt.zero()
     newVestingContract.save()
   } else if (vestingContract == null) {
+    /** Tokens were staked by user. If tokens were staked by Vesting Contract, this is handled in VestingRegistry or VestingLogic */
     createAndReturnUser(event.params.staker)
 
     let userStakeHistory = createAndReturnUserStakeHistory(event.params.staker)
@@ -109,6 +112,10 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     stakeHistoryItem.amount = event.params.amount
     stakeHistoryItem.lockedUntil = event.params.lockedUntil
     stakeHistoryItem.save()
+
+    let protocolStatsEntity = createAndReturnProtocolStats()
+    protocolStatsEntity.totalVoluntarilyStakedSov = protocolStatsEntity.totalVoluntarilyStakedSov.plus(event.params.amount)
+    protocolStatsEntity.save()
   }
 }
 
@@ -141,6 +148,10 @@ function handleStakingOrTokensWithdrawn(transaction: Transaction, staker: Addres
     userStakeHistory.totalWithdrawn = userStakeHistory.totalWithdrawn.minus(amount)
     userStakeHistory.totalRemaining = userStakeHistory.totalRemaining.minus(amount)
     userStakeHistory.save()
+
+    let protocolStatsEntity = createAndReturnProtocolStats()
+    protocolStatsEntity.totalVoluntarilyStakedSov = protocolStatsEntity.totalVoluntarilyStakedSov.minus(amount)
+    protocolStatsEntity.save()
   } else if (vesting != null) {
     /** TODO: Don't hard code the addresses. They are GovernorAlpha, GovernorOwner and Multisig */
     const adminContracts = [
@@ -162,6 +173,10 @@ function handleStakingOrTokensWithdrawn(transaction: Transaction, staker: Addres
 
     vesting.currentBalance.minus(amount)
     vesting.save()
+
+    let protocolStatsEntity = createAndReturnProtocolStats()
+    protocolStatsEntity.totalStakedByVestingSov = protocolStatsEntity.totalStakedByVestingSov.minus(amount)
+    protocolStatsEntity.save()
   }
 }
 

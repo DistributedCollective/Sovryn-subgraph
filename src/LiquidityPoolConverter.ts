@@ -37,6 +37,9 @@ import { BigInt, dataSource } from '@graphprotocol/graph-ts'
 import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnPoolToken } from './utils/PoolToken'
 import { createAndReturnUser } from './utils/User'
+import { createAndReturnProtocolStats } from './utils/ProtocolStats'
+import { convertToUsd, getTokenPriceConversions } from './utils/Prices'
+import { integer, decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
 
 export function handlePriceDataUpdate(event: PriceDataUpdateEvent): void {
   let entity = new PriceDataUpdate(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
@@ -50,10 +53,6 @@ export function handlePriceDataUpdate(event: PriceDataUpdateEvent): void {
   entity.emittedBy = event.address
   entity.save()
 }
-
-/**
- * TODO: Dry and refactor this code
- */
 
 class LiquidityHistoryItemParams {
   id: string
@@ -281,6 +280,8 @@ export function handleConversionV1(event: ConversionEventV1): void {
     timestamp: event.block.timestamp,
     user: event.transaction.from,
     trader: event.params._trader,
+    lpFee: event.params._conversionFee,
+    protocolFee: BigInt.zero(),
   }
   createAndReturnSwap(parsedEvent)
 }
@@ -310,6 +311,8 @@ export function handleConversionV2(event: ConversionEventV2): void {
     timestamp: event.block.timestamp,
     user: event.transaction.from,
     trader: event.params._trader,
+    lpFee: event.params._conversionFee,
+    protocolFee: BigInt.zero(),
   }
   createAndReturnSwap(parsedEvent)
 }
@@ -338,6 +341,8 @@ export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void
     timestamp: event.block.timestamp,
     user: event.transaction.from,
     trader: event.params._trader,
+    lpFee: event.params._conversionFee,
+    protocolFee: event.params._protocolFee,
   }
   createAndReturnSwap(parsedEvent)
 }

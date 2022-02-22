@@ -15,14 +15,57 @@ type ProtocolStats @entity {
   Total number of users of the protocol. This number is incremented each time a user is created
   """
   totalUsers: BigInt!
+  """
+  Total of positionSize property in Trade event (in usd)
+  """
+  totalMarginTradeVolumeUsd: BigDecimal!
+  totalCloseWithSwapVolumeUsd: BigDecimal!
+  totalDepositCollateralVolumeUsd: BigDecimal!
+  totalLiquidateVolumeUsd: BigDecimal!
+  totalAmmVolumeUsd: BigDecimal!
+  totalAmmLpFeesUsd: BigDecimal!
+  totalAmmStakerFeesUsd: BigDecimal!
+  totalTradingFeesUsd: BigDecimal!
+  totalLendingFeesUsd: BigDecimal!
+  totalBorrowingFeesUsd: BigDecimal!
+  totalLendVolumeUsd: BigDecimal!
+  totalUnlendVolumeUsd: BigDecimal!
+  """
+  Total of collateral property in Trade event (in usd). This may be changed to borrowed amount volume, but collateral keeps it consistent with margin trading
+  """
+  totalBorrowVolumeUsd: BigDecimal!
+  totalCloseWithDepositVolumeUsd: BigDecimal!
+  """
+  This is SOV staked by users (not vesting contracts). It is incremented when users stake tokens, and decremented when users withdraw tokens from the staking contract
+  """
+  totalVoluntarilyStakedSov: BigInt!
+  """
+  This is SOV staked by vesting contracts. It in incremented when the contracts stake the tokens, and decremented when users claim their unlocked tokens
+  """
+  totalStakedByVestingSov: BigInt!
+}
 
-  # TODO: Implement these data points
-  totalMarginTradeVolumeUsd: BigInt
-  totalAmmVolumeUsd: BigInt
-  totalLendVolumeUsd: BigInt
-  totalBorrowVolumeUsd: BigInt
-  totalVoluntarilyStaked: BigInt
-  totalStakedByVesting: BigInt
+# TODO: Implement this totals entity for Users and move the protocol stats entity to one of these
+type UserTotals @entity {
+  id: ID! # User address or 0 for protocol stats
+  protocolStats: ProtocolStats
+  user: User
+  totalMarginTradeVolumeUsd: BigDecimal!
+  totalCloseWithSwapVolumeUsd: BigDecimal!
+  totalDepositCollateralVolumeUsd: BigDecimal!
+  totalLiquidateVolumeUsd: BigDecimal!
+  totalAmmVolumeUsd: BigDecimal!
+  totalAmmLpFeesUsd: BigDecimal!
+  totalAmmStakerFeesUsd: BigDecimal!
+  totalTradingFeesUsd: BigDecimal!
+  totalLendingFeesUsd: BigDecimal!
+  totalBorrowingFeesUsd: BigDecimal!
+  totalLendVolumeUsd: BigDecimal!
+  totalUnlendVolumeUsd: BigDecimal!
+  totalBorrowVolumeUsd: BigDecimal!
+  totalCloseWithDepositVolumeUsd: BigDecimal!
+  totalVoluntarilyStakedSov: BigInt!
+  totalStakedByVestingSov: BigInt!
 }
 
 type SmartToken @entity {
@@ -1121,47 +1164,6 @@ type Proposal @entity {
   description: String! # string
   timestamp: BigInt!
   emittedBy: Bytes! #address
-}
-
-type ProposalCanceled @entity {
-  id: ID!
-  proposalId: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type ProposalCreated @entity {
-  id: ID!
-  proposalId: BigInt! # uint256
-  proposer: Bytes! # address
-  targets: [String!]! # address[]
-  values: [BigInt!]! # uint256[]
-  signatures: [String!]! # string[]
-  # calldatas: [String!]! # bytes[]
-  startBlock: BigInt! # uint256
-  endBlock: BigInt! # uint256
-  description: String! # string
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type ProposalExecuted @entity {
-  id: ID!
-  proposalId: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type ProposalQueued @entity {
-  id: ID!
-  proposalId: BigInt! # uint256
-  eta: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
 }
 
 type VoteCast @entity {

@@ -4,11 +4,12 @@
  * 3. Update candlesticks for btc for ONE token
  */
 
-import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
+import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
 import { Token } from '../../generated/schema'
 import { createAndReturnProtocolStats } from './ProtocolStats'
 import { USDTAddress, WRBTCAddress } from '../contracts/contracts'
 import { handleCandlesticks, ICandleSticks } from './Candlesticks'
+import { decimal } from '@protofire/subgraph-toolkit'
 
 export function updateLastPriceUsdAll(newBtcPrice: BigDecimal, timestamp: BigInt, usdVolume: BigDecimal): void {
   let protocolStats = createAndReturnProtocolStats()
@@ -43,3 +44,34 @@ export function updateLastPriceUsdAll(newBtcPrice: BigDecimal, timestamp: BigInt
 export function updateTokenUsdCandlesticks(token: Address, newUsdPrice: BigDecimal): void {}
 
 export function updateTokenBtcCandlesticks(token: Address, newBtcPrice: BigDecimal): void {}
+
+export function convertToUsd(currency: Address, amount: BigInt): BigDecimal {
+  let token = Token.load(currency.toHexString())
+  if (token != null) {
+    let usdPrice = token.lastPriceUsd
+    return decimal.fromBigInt(amount, token.decimals).times(usdPrice).truncate(2)
+  } else {
+    log.debug('TOKEN WAS NULL: {}', [currency.toHexString()])
+    return BigDecimal.zero()
+  }
+}
+
+class PriceConversion {
+  tokenToUsd: BigDecimal
+  tokenToBtc: BigDecimal
+}
+
+export function getTokenPriceConversions(token: Address): PriceConversion {
+  let tokenEntity = Token.load(token.toHexString())
+  if (tokenEntity != null) {
+    return {
+      tokenToBtc: tokenEntity.lastPriceBtc,
+      tokenToUsd: tokenEntity.lastPriceUsd,
+    }
+  } else {
+    return {
+      tokenToBtc: BigDecimal.zero(),
+      tokenToUsd: BigDecimal.zero(),
+    }
+  }
+}

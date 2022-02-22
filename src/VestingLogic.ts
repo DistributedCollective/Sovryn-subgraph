@@ -7,6 +7,7 @@ import {
   OwnershipTransferred as OwnershipTransferredEvent,
 } from '../generated/templates/VestingLogic/VestingLogic'
 import { DividendsCollected, TokensWithdrawn_Vesting as TokensWithdrawn, VestingContract } from '../generated/schema'
+import { createAndReturnProtocolStats } from './utils/ProtocolStats'
 
 import { loadTransaction } from './utils/Transaction'
 
@@ -31,6 +32,10 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     vestingContract.currentBalance = vestingContract.currentBalance.plus(event.params.amount)
     vestingContract.save()
   }
+
+  let protocolStatsEntity = createAndReturnProtocolStats()
+  protocolStatsEntity.totalStakedByVestingSov = protocolStatsEntity.totalStakedByVestingSov.plus(event.params.amount)
+  protocolStatsEntity.save()
 }
 
 export function handleTokensWithdrawn(event: TokensWithdrawnEvent): void {
