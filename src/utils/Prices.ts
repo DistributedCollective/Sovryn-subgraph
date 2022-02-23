@@ -18,7 +18,7 @@ export function updateLastPriceUsdAll(newBtcPrice: BigDecimal, timestamp: BigInt
     let tokenEntity = Token.load(token)
     if (tokenEntity !== null) {
       if (tokenEntity.id.toLowerCase() == USDTAddress.toLowerCase()) {
-        tokenEntity.lastPriceUsd = BigDecimal.fromString('1').truncate(2)
+        tokenEntity.lastPriceUsd = BigDecimal.fromString('1')
         tokenEntity.save()
       } else if (tokenEntity.id.toLowerCase() != WRBTCAddress.toLowerCase()) {
         const oldUsdPrice = tokenEntity.lastPriceUsd
@@ -28,13 +28,13 @@ export function updateLastPriceUsdAll(newBtcPrice: BigDecimal, timestamp: BigInt
 
         const tradingPair = token + '_' + USDTAddress.toLowerCase()
 
-        handleCandlesticks({
-          blockTimestamp: timestamp,
-          newPrice: newUsdPrice,
-          oldPrice: oldUsdPrice,
-          tradingPair: tradingPair,
-          volume: BigDecimal.zero(),
-        })
+        // handleCandlesticks({
+        //   blockTimestamp: timestamp,
+        //   newPrice: newUsdPrice,
+        //   oldPrice: oldUsdPrice,
+        //   tradingPair: tradingPair,
+        //   volume: BigDecimal.zero(),
+        // })
       }
     }
   }

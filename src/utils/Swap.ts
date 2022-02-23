@@ -52,7 +52,7 @@ export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
   swapEntity.save()
 
   /** Only update candlesticks if swap is above 1000 sats to avoid rounding errors */
-  const threshold = 1e-15
+  const threshold = 0.0000000000000001
   if (event.fromAmount.gt(decimal.fromNumber(threshold)) && event.toAmount.gt(decimal.fromNumber(threshold))) {
     updatePricingAndCandlesticks(event)
   }
@@ -104,23 +104,23 @@ function updatePricingAndCandlesticks(event: ConversionEventForSwap): void {
       token.save()
 
       /** Update BTC Candlesticks for token */
-      handleCandlesticks({
-        tradingPair: token.id.toLowerCase() + '_' + WRBTCAddress.toLowerCase(),
-        blockTimestamp: event.timestamp,
-        oldPrice: oldPriceBtc,
-        newPrice: newPriceBtc,
-        volume: btcVolume,
-      })
+      // handleCandlesticks({
+      //   tradingPair: token.id.toLowerCase() + '_' + WRBTCAddress.toLowerCase(),
+      //   blockTimestamp: event.timestamp,
+      //   oldPrice: oldPriceBtc,
+      //   newPrice: newPriceBtc,
+      //   volume: btcVolume,
+      // })
 
       if (token.id.toLowerCase() != USDTAddress.toLowerCase()) {
         /** Update USD Candlesticks for token */
-        handleCandlesticks({
-          tradingPair: token.id.toLowerCase() + '_' + USDTAddress.toLowerCase(),
-          blockTimestamp: event.timestamp,
-          oldPrice: oldPriceUsd,
-          newPrice: newPriceUsd,
-          volume: usdVolume,
-        })
+        // handleCandlesticks({
+        //   tradingPair: token.id.toLowerCase() + '_' + USDTAddress.toLowerCase(),
+        //   blockTimestamp: event.timestamp,
+        //   oldPrice: oldPriceUsd,
+        //   newPrice: newPriceUsd,
+        //   volume: usdVolume,
+        // })
       }
     }
 
