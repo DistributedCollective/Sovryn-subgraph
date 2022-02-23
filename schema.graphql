@@ -221,8 +221,8 @@ type Swap @entity {
   numConversions: Int!
   fromToken: Token! 
   toToken: Token!
-  fromAmount: BigInt!
-  toAmount: BigInt!
+  fromAmount: BigDecimal!
+  toAmount: BigDecimal!
   rate: BigDecimal!
   user: User!
   isMarginTrade: Boolean!

@@ -10,8 +10,8 @@ export class ConversionEventForSwap {
   transactionHash: Bytes
   fromToken: Address
   toToken: Address
-  fromAmount: BigInt
-  toAmount: BigInt
+  fromAmount: BigDecimal
+  toAmount: BigDecimal
   timestamp: BigInt
   user: Address
   trader: Address
@@ -33,7 +33,7 @@ export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
     swapEntity.toToken = event.toToken.toHexString()
     swapEntity.fromAmount = event.fromAmount
     swapEntity.toAmount = event.toAmount
-    swapEntity.rate = event.fromAmount.divDecimal(event.toAmount.toBigDecimal()).truncate(8)
+    swapEntity.rate = event.fromAmount.div(event.toAmount).truncate(8)
     if (userEntity != null) {
       swapEntity.user = userEntity.id
       userEntity.numSwaps += 1
@@ -47,11 +47,15 @@ export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
     swapEntity.numConversions += 1
     swapEntity.toToken = event.toToken.toHexString()
     swapEntity.toAmount = event.toAmount
-    swapEntity.rate = event.fromAmount.divDecimal(event.toAmount.toBigDecimal()).truncate(8)
+    swapEntity.rate = swapEntity.fromAmount.div(event.toAmount).truncate(8)
   }
   swapEntity.save()
 
-  updatePricingAndCandlesticks(event)
+  /** Only update candlesticks if swap is above 1000 sats to avoid rounding errors */
+  const threshold = 1e-15
+  if (event.fromAmount.gt(decimal.fromNumber(threshold)) && event.toAmount.gt(decimal.fromNumber(threshold))) {
+    updatePricingAndCandlesticks(event)
+  }
 
   return swapEntity
 }
@@ -62,8 +66,8 @@ function updatePricingAndCandlesticks(event: ConversionEventForSwap): void {
   if (BTCToken != null) {
     const btcPrice = BTCToken.lastPriceUsd
     let token: Token | null
-    let tokenAmount: BigInt
-    let btcAmount: BigInt
+    let tokenAmount: BigDecimal
+    let btcAmount: BigDecimal
 
     if (event.fromToken.toHexString() == WRBTCAddress.toLowerCase()) {
       token = Token.load(event.toToken.toHexString())
@@ -79,21 +83,21 @@ function updatePricingAndCandlesticks(event: ConversionEventForSwap): void {
 
     if (token != null) {
       const oldPriceBtc = token.lastPriceBtc
-      const newPriceBtc = btcAmount.divDecimal(tokenAmount.toBigDecimal()).truncate(8)
-      const btcVolume = decimal.fromBigInt(btcAmount, BTCToken.decimals).truncate(8)
+      const newPriceBtc = btcAmount.div(tokenAmount).truncate(18)
+      const btcVolume = btcAmount.truncate(18)
 
       const oldPriceUsd = token.lastPriceUsd.truncate(2)
       const newPriceUsd = newPriceBtc.times(token.lastPriceUsd).truncate(2)
-      const usdVolume = decimal.fromBigInt(btcAmount, BTCToken.decimals).times(btcPrice).truncate(2)
+      const usdVolume = btcAmount.times(btcPrice).truncate(2)
 
       token.lastPriceBtc = newPriceBtc
       token.lastPriceUsd = newPriceUsd
 
-      token.btcVolume = token.btcVolume.plus(btcVolume).truncate(8)
+      token.btcVolume = token.btcVolume.plus(btcVolume).truncate(18)
       token.usdVolume = token.usdVolume.plus(usdVolume).truncate(2)
-      token.tokenVolume = token.tokenVolume.plus(decimal.fromBigInt(tokenAmount, token.decimals)).truncate(18)
+      token.tokenVolume = token.tokenVolume.plus(tokenAmount).truncate(18)
 
-      BTCToken.btcVolume = BTCToken.btcVolume.plus(btcVolume).truncate(8)
+      BTCToken.btcVolume = BTCToken.btcVolume.plus(btcVolume).truncate(18)
       BTCToken.usdVolume = BTCToken.usdVolume.plus(usdVolume).truncate(2)
       BTCToken.tokenVolume = BTCToken.btcVolume.plus(btcVolume).truncate(18)
 
@@ -120,26 +124,26 @@ function updatePricingAndCandlesticks(event: ConversionEventForSwap): void {
       }
     }
 
+    BTCToken.save()
+
     /** IF SWAP IS BTC/USDT: Update lastPriceUsd on BTC */
 
     let usdBtcPrice: BigDecimal
     if (event.fromToken.toHexString() == USDTAddress.toLowerCase() && event.toToken.toHexString() == WRBTCAddress.toLowerCase()) {
       if (BTCToken != null) {
-        usdBtcPrice = event.fromAmount.divDecimal(event.toAmount.toBigDecimal())
+        usdBtcPrice = event.fromAmount.div(event.toAmount)
         BTCToken.lastPriceUsd = usdBtcPrice.truncate(2)
         BTCToken.lastPriceBtc = BigDecimal.fromString('1')
-        updateLastPriceUsdAll(usdBtcPrice, event.timestamp, BigDecimal.zero())
+        updateLastPriceUsdAll(usdBtcPrice, event.timestamp)
       }
     } else if (event.toToken.toHexString() == USDTAddress.toLowerCase() && event.fromToken.toHexString() == WRBTCAddress.toLowerCase()) {
       let usdBtcPrice: BigDecimal
       if (BTCToken != null) {
-        usdBtcPrice = event.toAmount.divDecimal(event.fromAmount.toBigDecimal())
+        usdBtcPrice = event.toAmount.div(event.fromAmount)
         BTCToken.lastPriceUsd = usdBtcPrice.truncate(2)
         BTCToken.lastPriceBtc = BigDecimal.fromString('1')
-        updateLastPriceUsdAll(usdBtcPrice, event.timestamp, BigDecimal.zero())
+        updateLastPriceUsdAll(usdBtcPrice, event.timestamp)
       }
     }
-
-    BTCToken.save()
   }
 }

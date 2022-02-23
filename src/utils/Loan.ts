@@ -97,7 +97,7 @@ export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
       loanEntity.totalSold = newTotalSold
       const totalWeightedPrice = oldWeightedPrice.plus(newWeightedPrice)
       loanEntity.averageSellPrice = totalWeightedPrice.div(newTotalSold)
-      const newPnL = amountSold.div(loanEntity.averageSellPrice.div(differenceFromBuyPrice))
+      const newPnL = differenceFromBuyPrice.gt(BigDecimal.zero()) ? amountSold.div(loanEntity.averageSellPrice.div(differenceFromBuyPrice)) : BigDecimal.zero()
       eventPnL = newPnL
       loanEntity.realizedPnL = loanEntity.realizedPnL.plus(newPnL).truncate(18)
       loanEntity.realizedPnLPercent = loanEntity.realizedPnL.times(decimal.fromNumber(100)).div(loanEntity.maximumPositionSize).truncate(8)

@@ -31,12 +31,12 @@ import {
 } from '../generated/schema'
 import { ConversionEventForSwap, createAndReturnSwap } from './utils/Swap'
 import { createAndReturnToken } from './utils/Token'
-
 import { loadTransaction } from './utils/Transaction'
 import { BigInt, dataSource } from '@graphprotocol/graph-ts'
 import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnPoolToken } from './utils/PoolToken'
 import { createAndReturnUser } from './utils/User'
+import { decimal } from '@protofire/subgraph-toolkit'
 
 export function handlePriceDataUpdate(event: PriceDataUpdateEvent): void {
   let entity = new PriceDataUpdate(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
@@ -276,8 +276,8 @@ export function handleConversionV1(event: ConversionEventV1): void {
     transactionHash: event.transaction.hash,
     fromToken: event.params._fromToken,
     toToken: event.params._toToken,
-    fromAmount: event.params._amount,
-    toAmount: event.params._return,
+    fromAmount: decimal.fromBigInt(event.params._amount, 18),
+    toAmount: decimal.fromBigInt(event.params._return, 18),
     timestamp: event.block.timestamp,
     user: event.transaction.from,
     trader: event.params._trader,
@@ -305,8 +305,8 @@ export function handleConversionV2(event: ConversionEventV2): void {
     transactionHash: event.transaction.hash,
     fromToken: event.params._fromToken,
     toToken: event.params._toToken,
-    fromAmount: event.params._amount,
-    toAmount: event.params._return,
+    fromAmount: decimal.fromBigInt(event.params._amount, 18),
+    toAmount: decimal.fromBigInt(event.params._return, 18),
     timestamp: event.block.timestamp,
     user: event.transaction.from,
     trader: event.params._trader,
@@ -333,8 +333,8 @@ export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void
     transactionHash: event.transaction.hash,
     fromToken: event.params._fromToken,
     toToken: event.params._toToken,
-    fromAmount: event.params._amount,
-    toAmount: event.params._return,
+    fromAmount: decimal.fromBigInt(event.params._amount, 18),
+    toAmount: decimal.fromBigInt(event.params._return, 18),
     timestamp: event.block.timestamp,
     user: event.transaction.from,
     trader: event.params._trader,

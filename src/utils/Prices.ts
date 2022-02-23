@@ -10,7 +10,7 @@ import { createAndReturnProtocolStats } from './ProtocolStats'
 import { USDTAddress, WRBTCAddress } from '../contracts/contracts'
 import { handleCandlesticks, ICandleSticks } from './Candlesticks'
 
-export function updateLastPriceUsdAll(newBtcPrice: BigDecimal, timestamp: BigInt, usdVolume: BigDecimal): void {
+export function updateLastPriceUsdAll(newBtcPrice: BigDecimal, timestamp: BigInt): void {
   let protocolStats = createAndReturnProtocolStats()
   for (var i = 0; i < protocolStats.tokens.length; i++) {
     const token = protocolStats.tokens[i]
@@ -20,7 +20,7 @@ export function updateLastPriceUsdAll(newBtcPrice: BigDecimal, timestamp: BigInt
       if (tokenEntity.id.toLowerCase() == USDTAddress.toLowerCase()) {
         tokenEntity.lastPriceUsd = BigDecimal.fromString('1').truncate(2)
         tokenEntity.save()
-      } else {
+      } else if (tokenEntity.id.toLowerCase() != WRBTCAddress.toLowerCase()) {
         const oldUsdPrice = tokenEntity.lastPriceUsd
         tokenEntity.lastPriceUsd = tokenEntity.lastPriceBtc.times(newBtcPrice).truncate(2)
         const newUsdPrice = tokenEntity.lastPriceUsd
