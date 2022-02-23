@@ -11,7 +11,7 @@ import { USDTAddress, WRBTCAddress } from '../contracts/contracts'
 import { handleCandlesticks, ICandleSticks } from './Candlesticks'
 import { decimal } from '@protofire/subgraph-toolkit'
 
-export function updateLastPriceUsdAll(newBtcPrice: BigDecimal, timestamp: BigInt, usdVolume: BigDecimal): void {
+export function updateLastPriceUsdAll(newBtcPrice: BigDecimal, timestamp: BigInt): void {
   let protocolStats = createAndReturnProtocolStats()
   for (var i = 0; i < protocolStats.tokens.length; i++) {
     const token = protocolStats.tokens[i]
@@ -19,9 +19,9 @@ export function updateLastPriceUsdAll(newBtcPrice: BigDecimal, timestamp: BigInt
     let tokenEntity = Token.load(token)
     if (tokenEntity !== null) {
       if (tokenEntity.id.toLowerCase() == USDTAddress.toLowerCase()) {
-        tokenEntity.lastPriceUsd = BigDecimal.fromString('1').truncate(2)
+        tokenEntity.lastPriceUsd = BigDecimal.fromString('1')
         tokenEntity.save()
-      } else {
+      } else if (tokenEntity.id.toLowerCase() != WRBTCAddress.toLowerCase()) {
         const oldUsdPrice = tokenEntity.lastPriceUsd
         tokenEntity.lastPriceUsd = tokenEntity.lastPriceBtc.times(newBtcPrice).truncate(2)
         const newUsdPrice = tokenEntity.lastPriceUsd
@@ -29,13 +29,13 @@ export function updateLastPriceUsdAll(newBtcPrice: BigDecimal, timestamp: BigInt
 
         const tradingPair = token + '_' + USDTAddress.toLowerCase()
 
-        handleCandlesticks({
-          blockTimestamp: timestamp,
-          newPrice: newUsdPrice,
-          oldPrice: oldUsdPrice,
-          tradingPair: tradingPair,
-          volume: BigDecimal.zero(),
-        })
+        // handleCandlesticks({
+        //   blockTimestamp: timestamp,
+        //   newPrice: newUsdPrice,
+        //   oldPrice: oldUsdPrice,
+        //   tradingPair: tradingPair,
+        //   volume: BigDecimal.zero(),
+        // })
       }
     }
   }

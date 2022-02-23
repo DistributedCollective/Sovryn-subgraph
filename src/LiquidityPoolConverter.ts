@@ -31,9 +31,8 @@ import {
 } from '../generated/schema'
 import { ConversionEventForSwap, createAndReturnSwap } from './utils/Swap'
 import { createAndReturnToken } from './utils/Token'
-
 import { loadTransaction } from './utils/Transaction'
-import { BigInt, dataSource } from '@graphprotocol/graph-ts'
+import { BigInt, BigDecimal, dataSource } from '@graphprotocol/graph-ts'
 import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnPoolToken } from './utils/PoolToken'
 import { createAndReturnUser } from './utils/User'
@@ -275,13 +274,13 @@ export function handleConversionV1(event: ConversionEventV1): void {
     transactionHash: event.transaction.hash,
     fromToken: event.params._fromToken,
     toToken: event.params._toToken,
-    fromAmount: event.params._amount,
-    toAmount: event.params._return,
+    fromAmount: decimal.fromBigInt(event.params._amount, 18),
+    toAmount: decimal.fromBigInt(event.params._return, 18),
     timestamp: event.block.timestamp,
     user: event.transaction.from,
     trader: event.params._trader,
-    lpFee: event.params._conversionFee,
-    protocolFee: BigInt.zero(),
+    lpFee: BigDecimal.zero(),
+    protocolFee: BigDecimal.zero(),
   }
   createAndReturnSwap(parsedEvent)
 }
@@ -306,13 +305,13 @@ export function handleConversionV2(event: ConversionEventV2): void {
     transactionHash: event.transaction.hash,
     fromToken: event.params._fromToken,
     toToken: event.params._toToken,
-    fromAmount: event.params._amount,
-    toAmount: event.params._return,
+    fromAmount: decimal.fromBigInt(event.params._amount, 18),
+    toAmount: decimal.fromBigInt(event.params._return, 18),
     timestamp: event.block.timestamp,
     user: event.transaction.from,
     trader: event.params._trader,
-    lpFee: event.params._conversionFee,
-    protocolFee: BigInt.zero(),
+    lpFee: decimal.fromBigInt(event.params._conversionFee, 18),
+    protocolFee: BigDecimal.zero(),
   }
   createAndReturnSwap(parsedEvent)
 }
@@ -336,13 +335,13 @@ export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void
     transactionHash: event.transaction.hash,
     fromToken: event.params._fromToken,
     toToken: event.params._toToken,
-    fromAmount: event.params._amount,
-    toAmount: event.params._return,
+    fromAmount: decimal.fromBigInt(event.params._amount, 18),
+    toAmount: decimal.fromBigInt(event.params._return, 18),
     timestamp: event.block.timestamp,
     user: event.transaction.from,
     trader: event.params._trader,
-    lpFee: event.params._conversionFee,
-    protocolFee: event.params._protocolFee,
+    lpFee: decimal.fromBigInt(event.params._conversionFee, 18),
+    protocolFee: decimal.fromBigInt(event.params._protocolFee, 18),
   }
   createAndReturnSwap(parsedEvent)
 }
