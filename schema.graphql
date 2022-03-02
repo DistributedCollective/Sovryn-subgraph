@@ -159,9 +159,9 @@ type UserLendingHistory @entity {
 
 type Token @entity {
   id: ID! @unique
-  name: String
-  symbol: String
-  decimals: Int
+  name: String!
+  symbol: String!
+  decimals: Int!
   version: Int
   liquidityPools: [LiquidityPoolToken!] @derivedFrom(field: "token")
   smartTokens: [TokenSmartToken!] @derivedFrom(field: "token")
