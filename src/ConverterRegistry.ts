@@ -70,7 +70,14 @@ export function handleConvertibleTokenAdded(event: ConvertibleTokenAddedEvent): 
   token.save()
 }
 
-export function handleConvertibleTokenRemoved(event: ConvertibleTokenRemovedEvent): void {}
+export function handleConvertibleTokenRemoved(event: ConvertibleTokenRemovedEvent): void {
+  const smartTokenAddress = event.params._smartToken
+  const smartTokenContract = SmartTokenContract.bind(smartTokenAddress)
+  const converterAddress = smartTokenContract.owner()
+  const token = createAndReturnToken(event.params._convertibleToken, converterAddress, smartTokenAddress)
+  token.currentConverterRegistry = null
+  token.save()
+
 
 export function handleSmartTokenAdded(event: SmartTokenAddedEvent): void {
   let smartTokenAddress = event.params._smartToken
