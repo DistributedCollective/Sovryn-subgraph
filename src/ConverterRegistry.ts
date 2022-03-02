@@ -1,4 +1,5 @@
 import { BigInt } from '@graphprotocol/graph-ts'
+import { decimal } from '@protofire/subgraph-toolkit'
 
 import {
   ConverterAnchorAdded as ConverterAnchorAddedEvent,
@@ -18,6 +19,7 @@ import { loadTransaction } from './utils/Transaction'
 import { createAndReturnToken } from './utils/Token'
 import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnLiquidityPool } from './utils/LiquidityPool'
+import { USDTAddress, WRBTCAddress } from './contracts/contracts'
 
 export function handleConverterAnchorAdded(event: ConverterAnchorAddedEvent): void {}
 
@@ -66,6 +68,12 @@ export function handleConvertibleTokenAdded(event: ConvertibleTokenAddedEvent): 
   const smartTokenContract = SmartTokenContract.bind(smartTokenAddress)
   const converterAddress = smartTokenContract.owner()
   const token = createAndReturnToken(event.params._convertibleToken, converterAddress, smartTokenAddress)
+  if (token.id.toLowerCase() == WRBTCAddress.toLowerCase()) {
+    token.lastPriceBtc = decimal.ONE
+  }
+  if (token.id.toLowerCase() == USDTAddress.toLowerCase()) {
+    token.lastPriceUsd = decimal.ONE
+  }
   token.currentConverterRegistry = event.address.toHex()
   token.save()
 }

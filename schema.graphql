@@ -368,10 +368,14 @@ type Conversion @entity {
 
 type TokenRateUpdate @entity {
   id: ID!
-  _token1: Bytes! # address
-  _token2: Bytes! # address
+  _token1: Token # address
+  _token1Address: Bytes! # address
+  _token2: Token # address
+  _token2Address: Bytes! # address
   _rateN: BigInt! # uint256
   _rateD: BigInt! # uint256
+  rate: BigDecimal! # uint256
+  reverseRate: BigDecimal! # uint256
   timestamp: BigInt!
   emittedBy: Bytes! #address
   transaction: Transaction!

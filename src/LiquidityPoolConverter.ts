@@ -1,4 +1,4 @@
-import { BigInt, dataSource } from '@graphprotocol/graph-ts'
+import { BigDecimal, BigInt, dataSource, log } from '@graphprotocol/graph-ts'
 import {
   PriceDataUpdate as PriceDataUpdateEvent,
   LiquidityAdded as LiquidityAddedEvent,
@@ -38,6 +38,8 @@ import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnPoolToken } from './utils/PoolToken'
 import { createAndReturnUser } from './utils/User'
 import { createAndReturnLiquidityPool } from './utils/LiquidityPool'
+import { updateLastTradedPriceBTC, updateLastPriceUsdAll, updateTokensVolume } from './utils/Prices'
+import { USDTAddress } from './contracts/contracts'
 
 export function handlePriceDataUpdate(event: PriceDataUpdateEvent): void {
   let entity = new PriceDataUpdate(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
@@ -198,7 +200,9 @@ export function handleConversionV1(event: ConversionEventV1): void {
     user: event.transaction.from,
     trader: event.params._trader,
   }
-  createAndReturnSwap(parsedEvent)
+  const swap = createAndReturnSwap(parsedEvent)
+
+  updateTokensVolume(swap)
 }
 
 export function handleConversionV2(event: ConversionEventV2): void {
@@ -227,7 +231,9 @@ export function handleConversionV2(event: ConversionEventV2): void {
     user: event.transaction.from,
     trader: event.params._trader,
   }
-  createAndReturnSwap(parsedEvent)
+  const swap = createAndReturnSwap(parsedEvent)
+
+  updateTokensVolume(swap)
 }
 
 export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void {
@@ -255,20 +261,57 @@ export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void
     user: event.transaction.from,
     trader: event.params._trader,
   }
-  createAndReturnSwap(parsedEvent)
+  const swap = createAndReturnSwap(parsedEvent)
+
+  updateTokensVolume(swap)
 }
 
 export function handleTokenRateUpdate(event: TokenRateUpdateEvent): void {
   let entity = new TokenRateUpdate(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity._token1 = event.params._token1
-  entity._token2 = event.params._token2
+  entity._token1 = event.params._token1.toHex()
+  entity._token1Address = event.params._token1
+  entity._token2 = event.params._token2.toHex()
+  entity._token2Address = event.params._token2
   entity._rateN = event.params._rateN
   entity._rateD = event.params._rateD
   let transaction = loadTransaction(event)
   entity.transaction = transaction.id
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
+
+  // TODO: this code block is for debug purposes only, can be removed once dev is finished
+  const token2Entity = Token.load(event.params._token2.toHex())
+  const token1Entity = Token.load(event.params._token1.toHex())
+
+  let rate = BigDecimal.zero()
+  let reverseRate = BigDecimal.zero()
+  if (event.params._rateN.gt(BigInt.zero())) {
+    rate = event.params._rateN.toBigDecimal().div(event.params._rateD.toBigDecimal())
+    reverseRate = event.params._rateD.toBigDecimal().div(event.params._rateN.toBigDecimal())
+  }
+
+  // log.debug('handleTokenRateUpdate1 - rate: {}', [rate.toString()])
+  entity.rate = rate
+  entity.reverseRate = reverseRate
   entity.save()
+
+  if (token1Entity !== null && token2Entity !== null) {
+    log.debug('handleTokenRateUpdate1 - token1 {}, token1Rate {}, token2 {}, token2Rate {}', [
+      token1Entity.symbol,
+      rate.toString(),
+      token2Entity.symbol,
+      reverseRate.toString(),
+    ])
+    // TODO: code block above is for debug purposes only, can be removed once dev is finished
+
+    updateLastTradedPriceBTC(event)
+    if (
+      event.params._token1.toHex().toLowerCase() == USDTAddress.toLowerCase() ||
+      event.params._token2.toHex().toLowerCase() == USDTAddress.toLowerCase()
+    ) {
+      updateLastPriceUsdAll(event)
+    }
+  }
 }
 
 export function handleConversionFeeUpdate(event: ConversionFeeUpdateEvent): void {
