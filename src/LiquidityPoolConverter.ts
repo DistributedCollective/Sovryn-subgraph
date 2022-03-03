@@ -29,16 +29,15 @@ import {
   WithdrawFees,
   LiquidityPool,
 } from '../generated/schema'
-import { ConversionEventForSwap, createAndReturnSwap } from './utils/Swap'
+import { ConversionEventForSwap, createAndReturnSwap, updatePricingAndCandlesticks } from './utils/Swap'
 import { createAndReturnToken } from './utils/Token'
 import { loadTransaction } from './utils/Transaction'
 import { BigInt, BigDecimal, dataSource } from '@graphprotocol/graph-ts'
 import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnPoolToken } from './utils/PoolToken'
 import { createAndReturnUser } from './utils/User'
-import { createAndReturnProtocolStats } from './utils/ProtocolStats'
-import { convertToUsd, getTokenPriceConversions } from './utils/Prices'
 import { integer, decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
+import { liquidityPoolV1ChangeBlock } from './contracts/contracts'
 
 export function handlePriceDataUpdate(event: PriceDataUpdateEvent): void {
   let entity = new PriceDataUpdate(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
@@ -93,7 +92,7 @@ function updateUserLiquidityHistory(
   amountAdded: BigInt,
   amountRemoved: BigInt
 ): void {
-  /** TODO: This would be more efficient with anoter if/else statement for type, but less readable? */
+  /** This would be more efficient with anoter if/else statement for type, but less readable? */
   if (liquidityPool.token0 == token) {
     userLiquidityHistory.totalAsset0LiquidityAdded = userLiquidityHistory.totalAsset0LiquidityAdded.plus(amountAdded)
     userLiquidityHistory.totalAsset0LiquidityRemoved = userLiquidityHistory.totalAsset0LiquidityRemoved.plus(amountRemoved)
@@ -113,7 +112,6 @@ export function handleLiquidityAdded(event: LiquidityAddedEvent): void {
       userLiquidityHistory = new UserLiquidityHistory(event.transaction.from.toHexString() + event.address.toHexString())
       userLiquidityHistory.user = event.transaction.from.toHexString()
       userLiquidityHistory.liquidityPool = event.address.toHexString()
-      /** TODO: Correct this logic */
       userLiquidityHistory.totalAsset0LiquidityAdded = BigInt.zero()
       userLiquidityHistory.totalAsset0LiquidityRemoved = BigInt.zero()
       userLiquidityHistory.totalAsset1LiquidityAdded = BigInt.zero()
@@ -192,8 +190,7 @@ export function handleActivation(event: ActivationEvent): void {
     liquidityPool.smartToken = smartToken.smartToken.id
 
     if (event.params._type == 1) {
-      /** TODO: Don't hard-code this block number */
-      if (event.block.number < BigInt.fromString('2393856')) {
+      if (event.block.number < BigInt.fromI64(liquidityPoolV1ChangeBlock)) {
         const contract = LiquidityPoolV1Contract.bind(event.address)
         let reserveTokenCountResult = contract.try_reserveTokenCount()
         if (!reserveTokenCountResult.reverted) {
@@ -283,6 +280,7 @@ export function handleConversionV1(event: ConversionEventV1): void {
     protocolFee: BigDecimal.zero(),
   }
   createAndReturnSwap(parsedEvent)
+  updatePricingAndCandlesticks(parsedEvent)
 }
 
 export function handleConversionV2(event: ConversionEventV2): void {
@@ -314,6 +312,7 @@ export function handleConversionV2(event: ConversionEventV2): void {
     protocolFee: BigDecimal.zero(),
   }
   createAndReturnSwap(parsedEvent)
+  updatePricingAndCandlesticks(parsedEvent)
 }
 
 export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void {
@@ -344,6 +343,7 @@ export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void
     protocolFee: decimal.fromBigInt(event.params._protocolFee, 18),
   }
   createAndReturnSwap(parsedEvent)
+  updatePricingAndCandlesticks(parsedEvent)
 }
 
 export function handleTokenRateUpdate(event: TokenRateUpdateEvent): void {

@@ -3,7 +3,7 @@ import { Burn, FlashBorrow, Mint, UserLendingHistory, LendingHistoryItem } from 
 import { loadTransaction } from './utils/Transaction'
 import { createAndReturnUser } from './utils/User'
 import { Address, BigInt, dataSource } from '@graphprotocol/graph-ts'
-import { createAndReturnProtocolStats } from './utils/ProtocolStats'
+import { createAndReturnProtocolStats, createAndReturnUserTotals } from './utils/ProtocolStats'
 import { convertToUsd } from './utils/Prices'
 
 export function handleBurn(event: BurnEvent): void {
@@ -44,9 +44,12 @@ export function handleBurn(event: BurnEvent): void {
   lendingHistoryItem.save()
 
   let protocolStatsEntity = createAndReturnProtocolStats()
+  let userTotalsEntity = createAndReturnUserTotals(event.params.burner)
   let usdVolume = convertToUsd(Address.fromString(underlyingAsset), event.params.assetAmount)
   protocolStatsEntity.totalUnlendVolumeUsd = protocolStatsEntity.totalUnlendVolumeUsd.plus(usdVolume)
+  userTotalsEntity.totalUnlendVolumeUsd = userTotalsEntity.totalUnlendVolumeUsd.plus(usdVolume)
   protocolStatsEntity.save()
+  userTotalsEntity.save()
 }
 
 export function handleFlashBorrow(event: FlashBorrowEvent): void {
@@ -110,7 +113,10 @@ export function handleMint(event: MintEvent): void {
   lendingHistoryItem.save()
 
   let protocolStatsEntity = createAndReturnProtocolStats()
+  let userTotalsEntity = createAndReturnUserTotals(event.params.minter)
   let usdVolume = convertToUsd(Address.fromString(underlyingAsset), event.params.assetAmount)
   protocolStatsEntity.totalLendVolumeUsd = protocolStatsEntity.totalLendVolumeUsd.plus(usdVolume)
+  userTotalsEntity.totalLendVolumeUsd = userTotalsEntity.totalLendVolumeUsd.plus(usdVolume)
   protocolStatsEntity.save()
+  userTotalsEntity.save()
 }

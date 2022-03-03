@@ -1,11 +1,14 @@
-import { Address, BigDecimal, log } from '@graphprotocol/graph-ts'
-import { Token, LiquidityPoolToken, TokenSmartToken } from '../../generated/schema'
+import { Address, bigDecimal, BigDecimal, log } from '@graphprotocol/graph-ts'
+import { Token, LiquidityPoolToken, TokenSmartToken, ProtocolStats } from '../../generated/schema'
 import { ERC20 as ERC20TokenContract } from '../../generated/templates/ERC20/ERC20'
 import { createAndReturnProtocolStats } from './ProtocolStats'
+import { decimal } from '@protofire/subgraph-toolkit'
+import { stablecoins } from '../contracts/contracts'
 
 export function createAndReturnToken(tokenAddress: Address, converterAddress: Address, smartTokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHex())
   let isNewToken = false
+  let protocolStats: ProtocolStats
   if (token === null) {
     isNewToken = true
     token = new Token(tokenAddress.toHex())
@@ -14,6 +17,13 @@ export function createAndReturnToken(tokenAddress: Address, converterAddress: Ad
     token.btcVolume = BigDecimal.zero()
     token.usdVolume = BigDecimal.zero()
     token.tokenVolume = BigDecimal.zero()
+
+    protocolStats = createAndReturnProtocolStats()
+    if (stablecoins.includes(tokenAddress.toHexString().toLowerCase())) {
+      protocolStats.usdStablecoin = tokenAddress.toHexString().toLowerCase()
+      token.lastPriceUsd = decimal.ONE
+    }
+    protocolStats.tokens = protocolStats.tokens.concat([tokenAddress.toHexString()])
 
     log.debug('Token created: {}', [smartTokenAddress.toHex()])
     const tokenContract = ERC20TokenContract.bind(tokenAddress)
@@ -48,13 +58,8 @@ export function createAndReturnToken(tokenAddress: Address, converterAddress: Ad
   tokenSmartToken.smartToken = smartTokenAddress.toHex()
   tokenSmartToken.save()
   token.save()
-
-  if (isNewToken == true) {
-    log.debug('TOKEN IS NEW, ADDING TO PROTOCOL STATS', [])
-    let protocolStats = createAndReturnProtocolStats()
-    protocolStats.tokens = protocolStats.tokens.concat([tokenAddress.toHexString()])
+  if (protocolStats != null) {
     protocolStats.save()
   }
-
   return token
 }

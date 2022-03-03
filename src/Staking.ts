@@ -15,8 +15,9 @@ import { createAndReturnUser, createAndReturnUserStakeHistory } from './utils/Us
 import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
 import { Address, BigInt } from '@graphprotocol/graph-ts'
 import { genesisVestingStartBlock, genesisVestingEndBlock } from './blockNumbers/blockNumbers'
-import { createAndReturnProtocolStats } from './utils/ProtocolStats'
+import { createAndReturnProtocolStats, createAndReturnUserTotals } from './utils/ProtocolStats'
 import { convertToUsd } from './utils/Prices'
+import { adminContracts } from './contracts/contracts'
 
 export function handleDelegateChanged(event: DelegateChangedEvent): void {
   let user = User.load(event.params.delegator.toHexString())
@@ -153,12 +154,6 @@ function handleStakingOrTokensWithdrawn(transaction: Transaction, staker: Addres
     protocolStatsEntity.totalVoluntarilyStakedSov = protocolStatsEntity.totalVoluntarilyStakedSov.minus(amount)
     protocolStatsEntity.save()
   } else if (vesting != null) {
-    /** TODO: Don't hard code the addresses. They are GovernorAlpha, GovernorOwner and Multisig */
-    const adminContracts = [
-      '0x924f5ad34698Fd20c90Fe5D5A8A0abd3b42dc711'.toLowerCase(),
-      '0x05f4f068DF59a5aA7911f57cE4f41ebFBcB8E247'.toLowerCase(),
-      '0x51C754330c6cD04B810014E769Dab0343E31409E'.toLowerCase(),
-    ]
     if (adminContracts.includes(receiver.toHexString().toLowerCase()) && vesting.type == 'Team') {
       /** This happens when a team member with vesting contract leaves the project and their remaining balance is returned to the protocol */
       stakeHistoryItem.action = 'Revoked'

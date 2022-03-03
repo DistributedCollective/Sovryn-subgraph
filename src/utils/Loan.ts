@@ -51,9 +51,6 @@ export function createAndReturnLoan(startParams: LoanStartState): Loan {
     loanEntity.realizedPnL = BigDecimal.zero()
     loanEntity.realizedPnLPercent = BigDecimal.zero()
     loanEntity.save()
-    /**
-     * TODO: Add Max Position Size for calculating PnL percentage
-     */
   }
   return loanEntity
 }

@@ -11,6 +11,8 @@ type ProtocolStats @entity {
   An array of all tokens in the protocol
   """ 
   tokens: [Token!]!
+  usdStablecoin: Token!
+  btcUsdPrice: BigDecimal!
   """
   Total number of users of the protocol. This number is incremented each time a user is created
   """
@@ -43,13 +45,12 @@ type ProtocolStats @entity {
   This is SOV staked by vesting contracts. It in incremented when the contracts stake the tokens, and decremented when users claim their unlocked tokens
   """
   totalStakedByVestingSov: BigInt!
+  totalTransactedVolumeUsd: BigInt! # TODO: Implement
 }
 
-# TODO: Implement this totals entity for Users and move the protocol stats entity to one of these
 type UserTotals @entity {
-  id: ID! # User address or 0 for protocol stats
-  protocolStats: ProtocolStats
-  user: User
+  id: ID!
+  user: User!
   totalMarginTradeVolumeUsd: BigDecimal!
   totalCloseWithSwapVolumeUsd: BigDecimal!
   totalDepositCollateralVolumeUsd: BigDecimal!
@@ -64,8 +65,7 @@ type UserTotals @entity {
   totalUnlendVolumeUsd: BigDecimal!
   totalBorrowVolumeUsd: BigDecimal!
   totalCloseWithDepositVolumeUsd: BigDecimal!
-  totalVoluntarilyStakedSov: BigInt!
-  totalStakedByVestingSov: BigInt!
+  totalTransactedVolumeUsd: BigInt! # TODO: Implement
 }
 
 type SmartToken @entity {
@@ -143,7 +143,7 @@ type Transaction @entity {
   gasPrice: BigInt!
   # tx index
   index: BigInt!
-  from: Bytes!
+  from: Bytes! # TODO: Change to User entity
   to: Bytes
   value: BigInt!
   gasLimit: BigInt!
@@ -203,6 +203,7 @@ type User @entity {
   """
   vestingContracts: [VestingContract!] @derivedFrom(field:"user")
   votes: [VoteCast!] @derivedFrom(field: "voter")
+  userTotals: UserTotals @derivedFrom(field: "user")
 }
 
 type UserLendingHistory @entity {
@@ -267,7 +268,7 @@ type Swap @entity {
   fromAmount: BigDecimal!
   toAmount: BigDecimal!
   rate: BigDecimal!
-  user: User!
+  user: User
   isMarginTrade: Boolean!
   isBorrow: Boolean!
   timestamp: BigInt!
