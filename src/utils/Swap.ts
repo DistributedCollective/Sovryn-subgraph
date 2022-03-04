@@ -40,7 +40,6 @@ export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
     swapEntity.rate = event.fromAmount.div(event.toAmount).truncate(8)
     if (userEntity != null) {
       swapEntity.user = userEntity.id
-      userEntity.numSwaps += 1
       userEntity.save()
     }
     swapEntity.isMarginTrade = false

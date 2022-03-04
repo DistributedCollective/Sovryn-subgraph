@@ -23,7 +23,7 @@ export function handleDelegateChanged(event: DelegateChangedEvent): void {
   let user = User.load(event.params.delegator.toHexString())
   if (event.params.fromDelegate.toHexString() != ZERO_ADDRESS && user != null) {
     let transaction = loadTransaction(event)
-    let stakeHistoryItem = new StakeHistoryItem(event.transaction.hash.toHexString())
+    let stakeHistoryItem = new StakeHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
     stakeHistoryItem.user = event.params.delegator.toHexString()
     stakeHistoryItem.action = 'Delegate'
     stakeHistoryItem.timestamp = event.block.timestamp
@@ -48,7 +48,7 @@ export function handleDelegateStakeChanged(event: DelegateStakeChangedEvent): vo
 
 export function handleExtendedStakingDuration(event: ExtendedStakingDurationEvent): void {
   let transaction = loadTransaction(event)
-  let stakeHistoryItem = new StakeHistoryItem(event.params.staker.toHexString())
+  let stakeHistoryItem = new StakeHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   stakeHistoryItem.user = event.params.staker.toHexString()
   stakeHistoryItem.action = 'Extend Stake'
   stakeHistoryItem.timestamp = event.block.timestamp
@@ -105,7 +105,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
 
     entity.isUserStaked = true
     entity.user = event.params.staker.toHexString()
-    let stakeHistoryItem = new StakeHistoryItem(event.params.staker.toHexString())
+    let stakeHistoryItem = new StakeHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
     stakeHistoryItem.user = event.params.staker.toHexString()
     stakeHistoryItem.action = event.params.amount < event.params.totalStaked ? 'Increase Stake' : 'Stake'
     stakeHistoryItem.timestamp = event.block.timestamp
@@ -124,19 +124,31 @@ export function handleTokensUnlocked(event: TokensUnlockedEvent): void {}
 
 export function handleTokensWithdrawn(event: TokensWithdrawnEvent): void {
   let transaction = loadTransaction(event)
-  handleStakingOrTokensWithdrawn(transaction, event.params.staker, event.params.receiver, event.params.amount)
+  handleStakingOrTokensWithdrawn(
+    event.transaction.hash.toHex() + '-' + event.logIndex.toString(),
+    transaction,
+    event.params.staker,
+    event.params.receiver,
+    event.params.amount
+  )
 }
 
 /** This is a copy of handleTokensWithdrawn. The event was renamed but params remained the same. */
 export function handleStakingWithdrawn(event: StakingWithdrawnEvent): void {
   let transaction = loadTransaction(event)
-  handleStakingOrTokensWithdrawn(transaction, event.params.staker, event.params.receiver, event.params.amount)
+  handleStakingOrTokensWithdrawn(
+    event.transaction.hash.toHex() + '-' + event.logIndex.toString(),
+    transaction,
+    event.params.staker,
+    event.params.receiver,
+    event.params.amount
+  )
 }
 
-function handleStakingOrTokensWithdrawn(transaction: Transaction, staker: Address, receiver: Address, amount: BigInt): void {
-  let stakeHistoryItem = new StakeHistoryItem(transaction.id)
-  let user = User.load(staker.toHexString())
-  let vesting = VestingContract.load(staker.toHexString())
+function handleStakingOrTokensWithdrawn(id: string, transaction: Transaction, staker: Address, receiver: Address, amount: BigInt): void {
+  let stakeHistoryItem = new StakeHistoryItem(id)
+  let user = User.load(staker.toHexString().toLowerCase())
+  let vesting = VestingContract.load(staker.toHexString().toLowerCase())
   if (user !== null) {
     stakeHistoryItem.user = receiver.toHexString()
     /** In the FeeSharingProxy mapping, the handleTokensTransferred function will change this to Unstaked if a slashing event occurred */
@@ -160,7 +172,7 @@ function handleStakingOrTokensWithdrawn(transaction: Transaction, staker: Addres
       stakeHistoryItem.user = vesting.user
     } else {
       stakeHistoryItem.action = 'WithdrawVested'
-      stakeHistoryItem.user = receiver.toHexString()
+      stakeHistoryItem.user = receiver.toHexString().toLowerCase()
     }
     stakeHistoryItem.timestamp = transaction.timestamp
     stakeHistoryItem.transaction = transaction.id

@@ -190,7 +190,7 @@ export function handleActivation(event: ActivationEvent): void {
     liquidityPool.smartToken = smartToken.smartToken.id
 
     if (event.params._type == 1) {
-      if (event.block.number < BigInt.fromI64(liquidityPoolV1ChangeBlock)) {
+      if (event.block.number < BigInt.fromI32(liquidityPoolV1ChangeBlock)) {
         const contract = LiquidityPoolV1Contract.bind(event.address)
         let reserveTokenCountResult = contract.try_reserveTokenCount()
         if (!reserveTokenCountResult.reverted) {

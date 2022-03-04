@@ -163,10 +163,6 @@ type User @entity {
   """
   swaps: [Swap!] @derivedFrom(field: "user")
   """
-  Number of swaps the user has made. This can be used for pagination.
-  """
-  numSwaps: Int!
-  """
   An array of all LiquidityAdded and LiquidityRemoved events
   """
   liquidityHistory: [UserLiquidityHistory!] @derivedFrom(field: "user")

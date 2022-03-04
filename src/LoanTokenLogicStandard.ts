@@ -29,7 +29,7 @@ export function handleBurn(event: BurnEvent): void {
     userHistoryEntity.save()
   }
 
-  let lendingHistoryItem = new LendingHistoryItem(event.transaction.hash.toHexString())
+  let lendingHistoryItem = new LendingHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   lendingHistoryItem.userLendingHistory = userAddress + dataSource.address().toHexString()
   lendingHistoryItem.lender = userAddress
   lendingHistoryItem.type = 'UnLend'
@@ -98,7 +98,7 @@ export function handleMint(event: MintEvent): void {
     userHistoryEntity.save()
   }
 
-  let lendingHistoryItem = new LendingHistoryItem(event.transaction.hash.toHexString())
+  let lendingHistoryItem = new LendingHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   lendingHistoryItem.userLendingHistory = userAddress + dataSource.address().toHexString()
   lendingHistoryItem.lender = userAddress
   lendingHistoryItem.type = 'Lend'

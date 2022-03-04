@@ -242,7 +242,7 @@ export function handleEarnReward(event: EarnRewardEvent): void {
     userRewardsEarnedHistory.save()
   }
 
-  let rewardsEarnedHistoryItem = new RewardsEarnedHistoryItem(event.transaction.hash.toHexString())
+  let rewardsEarnedHistoryItem = new RewardsEarnedHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   rewardsEarnedHistoryItem.action = 'EarnReward'
   rewardsEarnedHistoryItem.user = event.params.receiver.toHexString()
   rewardsEarnedHistoryItem.amount = event.params.amount
