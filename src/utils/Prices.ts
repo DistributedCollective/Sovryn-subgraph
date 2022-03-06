@@ -6,10 +6,11 @@
 
 import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
 import { Swap, Token } from '../../generated/schema'
+import { ConversionEventForSwap } from '../utils/Swap'
 import { TokenRateUpdate as TokenRateUpdateEvent } from '../../generated/templates/LiquidityPoolV1Converter/LiquidityPoolV1Converter'
 import { createAndReturnProtocolStats } from './ProtocolStats'
 import { USDTAddress, WRBTCAddress } from '../contracts/contracts'
-// import { handleCandlesticks, ICandleSticks } from './Candlesticks'
+import { updateCandleSticksPrice } from './Candlesticks'
 import { decimal } from '@protofire/subgraph-toolkit'
 
 export function updateLastTradedPriceBTC(event: TokenRateUpdateEvent): void {
@@ -21,6 +22,7 @@ export function updateLastTradedPriceBTC(event: TokenRateUpdateEvent): void {
     token2Address.toHex(),
   ])
 
+  let oldPrice = BigDecimal.zero()
   let price = BigDecimal.zero()
   if (token1Address.toHex().toLowerCase() == WRBTCAddress.toLowerCase()) {
     const token = Token.load(token2Address.toHex())
@@ -29,10 +31,16 @@ export function updateLastTradedPriceBTC(event: TokenRateUpdateEvent): void {
         price = event.params._rateD.toBigDecimal().div(event.params._rateN.toBigDecimal())
       }
       log.debug('updateLastTradedPriceBTC1 - token {}, price {}', [token.symbol, price.toString()])
+      oldPrice = token.lastPriceBtc
       token.lastPriceBtc = price
       token.save()
+
+      const quoteToken = Token.load(token1Address.toHex())
+      if (quoteToken != null) {
+        updateCandleSticksPrice(token, quoteToken, oldPrice, price, event.block.timestamp)
+      }
     }
-  } else if (token2Address.toHex.toString() == WRBTCAddress.toLowerCase()) {
+  } else if (token2Address.toHex().toLowerCase() == WRBTCAddress.toLowerCase()) {
     if (event.params._rateD.gt(BigInt.zero())) {
       price = event.params._rateN.toBigDecimal().div(event.params._rateD.toBigDecimal())
     }
@@ -40,8 +48,14 @@ export function updateLastTradedPriceBTC(event: TokenRateUpdateEvent): void {
     const token = Token.load(token1Address.toHex())
     if (token != null) {
       log.debug('updateLastTradedPriceBTC2 - token {}, price {}', [token.symbol, price.toString()])
+      oldPrice = token.lastPriceBtc
       token.lastPriceBtc = price
       token.save()
+
+      const quoteToken = Token.load(token2Address.toHex())
+      if (quoteToken != null) {
+        updateCandleSticksPrice(token, quoteToken, oldPrice, price, event.block.timestamp)
+      }
     }
   } else {
     log.debug('updateLastTradedPriceBTC3 - token1Address {}, token2Address {}', [

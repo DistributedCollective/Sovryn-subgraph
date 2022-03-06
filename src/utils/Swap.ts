@@ -4,7 +4,6 @@ import { createAndReturnUser } from './User'
 import { USDTAddress, WRBTCAddress } from '../contracts/contracts'
 import { updateLastPriceUsdAll } from './Prices'
 import { decimal } from '@protofire/subgraph-toolkit'
-import { handleCandlesticks } from './Candlesticks'
 
 export class ConversionEventForSwap {
   transactionHash: Bytes

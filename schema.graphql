@@ -1013,11 +1013,20 @@ type TokenConverted @entity {
 
 # Candlesticks
 
-type CandleSticksFifteenMinute @entity {
+enum CandleSticksInterval {
+  MinuteInterval
+  FifteenMintuesInterval
+  HourInterval
+  FourHourInterval
+  DayInterval
+}
+
+type CandleStick @entity {
   id: ID! # fromToken + toToken + timestamp
-  tradingPair: String! # baseToken_quoteToken
+  # tradingPair: String! # baseToken_quoteToken
   baseToken: Token
   quoteToken: Token
+  interval: CandleSticksInterval
   open: BigDecimal # opening price
   high: BigDecimal! # high price
   low: BigDecimal! # low price
