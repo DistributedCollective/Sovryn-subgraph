@@ -202,7 +202,7 @@ export function handleConversionV1(event: ConversionEventV1): void {
   }
   const swap = createAndReturnSwap(parsedEvent)
 
-  updateTokensVolume(swap)
+  updateTokensVolume(parsedEvent)
 }
 
 export function handleConversionV2(event: ConversionEventV2): void {
@@ -233,7 +233,7 @@ export function handleConversionV2(event: ConversionEventV2): void {
   }
   const swap = createAndReturnSwap(parsedEvent)
 
-  updateTokensVolume(swap)
+  updateTokensVolume(parsedEvent)
 }
 
 export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void {
@@ -263,7 +263,7 @@ export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void
   }
   const swap = createAndReturnSwap(parsedEvent)
 
-  updateTokensVolume(swap)
+  updateTokensVolume(parsedEvent)
 }
 
 export function handleTokenRateUpdate(event: TokenRateUpdateEvent): void {

@@ -97,18 +97,18 @@ function calculateBtcUSdPrice(event: TokenRateUpdateEvent): BigDecimal {
   return price
 }
 
-export function updateTokensVolume(swap: Swap): void {
-  const fromToken = Token.load(swap.fromToken)
+export function updateTokensVolume(parsedEvent: ConversionEventForSwap): void {
+  const fromToken = Token.load(parsedEvent.fromToken.toHex())
 
   if (fromToken != null) {
-    updateVolume(fromToken, swap.fromAmount)
+    updateVolume(fromToken, parsedEvent.fromAmount)
     fromToken.save()
   }
 
-  const toToken = Token.load(swap.toToken)
+  const toToken = Token.load(parsedEvent.toToken.toHex())
 
   if (toToken != null) {
-    updateVolume(toToken, swap.toAmount)
+    updateVolume(toToken, parsedEvent.toAmount)
     toToken.save()
   }
 }
