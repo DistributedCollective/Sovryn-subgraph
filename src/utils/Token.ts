@@ -1,4 +1,4 @@
-import { Address, bigDecimal, BigDecimal, log } from '@graphprotocol/graph-ts'
+import { Address, bigDecimal, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
 import { Token, LiquidityPoolToken, TokenSmartToken, ProtocolStats } from '../../generated/schema'
 import { ERC20 as ERC20TokenContract } from '../../generated/templates/ERC20/ERC20'
 import { createAndReturnProtocolStats } from './ProtocolStats'
@@ -41,8 +41,11 @@ export function createAndReturnToken(tokenAddress: Address, converterAddress: Ad
     }
   }
   let liquidityPoolToken = LiquidityPoolToken.load(converterAddress.toHex() + tokenAddress.toHex())
-  if (liquidityPoolToken === null) {
+  if (liquidityPoolToken == null) {
     liquidityPoolToken = new LiquidityPoolToken(converterAddress.toHex() + tokenAddress.toHex())
+    liquidityPoolToken.totalVolume = BigInt.zero()
+    liquidityPoolToken.volumeBought = BigInt.zero()
+    liquidityPoolToken.volumeSold = BigInt.zero()
   }
 
   liquidityPoolToken.token = tokenAddress.toHex()

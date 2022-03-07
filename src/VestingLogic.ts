@@ -47,10 +47,6 @@ export function handleTokensWithdrawn(event: TokensWithdrawnEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
-
-  /** There is no amount field here, so withdrawn tokens are subtracted in TokensWithdrawn event on the Staking contract
-   * TODO: How do we handle this for FISH contracts?
-   */
 }
 
 export function handleVotesDelegated(event: VotesDelegatedEvent): void {}

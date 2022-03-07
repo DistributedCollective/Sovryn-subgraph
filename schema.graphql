@@ -302,6 +302,10 @@ type LiquidityPoolToken @entity {
   token: Token!
   liquidityPool: LiquidityPool!
   poolToken: PoolToken!
+  # balance: BigInt! # Balance is hard to implement because pools were initially funded not throught the LiquidityAdded event
+  volumeBought: BigInt!
+  volumeSold: BigInt!
+  totalVolume: BigInt!
 }
 
 type TokenPoolToken @entity {
