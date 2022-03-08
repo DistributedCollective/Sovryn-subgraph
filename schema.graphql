@@ -241,6 +241,8 @@ type Token @entity {
   # marketCap: BigInt!
   # circulatingSupply: BigInt!
   currentConverterRegistry: ConverterRegistry
+  hasBtcPool: Boolean
+  hasStablecoinPool: Boolean
 }
 
 """

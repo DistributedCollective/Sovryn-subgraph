@@ -19,7 +19,7 @@ export function updateLastPriceUsdAll(timestamp: BigInt): void {
     const token = protocolStats.tokens[i]
     if (token.toLowerCase() != WRBTCAddress.toLowerCase() && token.toLowerCase() != USDTAddress.toLowerCase()) {
       let tokenEntity = Token.load(token)
-      if (tokenEntity !== null) {
+      if (tokenEntity !== null && tokenEntity.hasBtcPool == true) {
         const oldUsdPrice = tokenEntity.lastPriceUsd
         log.debug('UPDATING LAST PRICE USD, lastPriceUsd: {}, btcToUsdPrice: {}', [tokenEntity.lastPriceUsd.toString(), btcUsdPrice.toString()])
         tokenEntity.lastPriceUsd = tokenEntity.lastPriceBtc.times(btcUsdPrice).truncate(18)
@@ -35,6 +35,8 @@ export function updateLastPriceUsdAll(timestamp: BigInt): void {
           tradingPair: tradingPair,
           volume: BigDecimal.zero(),
         })
+      } else if (tokenEntity != null && tokenEntity.hasStablecoinPool == true) {
+        /**TODO: Update btc price/candlesticks with btc/usd price */
       }
     }
   }
