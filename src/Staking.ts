@@ -93,7 +93,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     newVestingContract.createdAtTransaction = transaction.id
     newVestingContract.stakeHistory.push(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
     newVestingContract.startingBalance = event.params.amount
-    newVestingContract.currentBalance = BigInt.zero()
+    newVestingContract.currentBalance = event.params.amount
     newVestingContract.save()
   } else if (vestingContract == null) {
     /** Tokens were staked by user. If tokens were staked by Vesting Contract, this is handled in VestingRegistry or VestingLogic */
@@ -189,15 +189,17 @@ function handleStakingOrTokensWithdrawn(id: string, transaction: Transaction, st
       /** This happens when a team member with vesting contract leaves the project and their remaining balance is returned to the protocol */
       stakeHistoryItem.action = 'Revoked'
       stakeHistoryItem.user = vesting.user
+      stakeHistoryItem.amount = amount
     } else {
       stakeHistoryItem.action = 'WithdrawVested'
+      stakeHistoryItem.amount = amount
       stakeHistoryItem.user = receiver.toHexString().toLowerCase()
     }
     stakeHistoryItem.timestamp = transaction.timestamp
     stakeHistoryItem.transaction = transaction.id
     stakeHistoryItem.save()
 
-    vesting.currentBalance.minus(amount)
+    vesting.currentBalance = vesting.currentBalance.minus(amount)
     vesting.save()
 
     let protocolStatsEntity = createAndReturnProtocolStats()

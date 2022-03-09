@@ -270,6 +270,7 @@ type Swap @entity {
   isMarginTrade: Boolean!
   isBorrow: Boolean!
   timestamp: BigInt!
+  transaction: Transaction!
 }
 
 type LiquidityPool @entity {

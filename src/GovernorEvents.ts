@@ -65,6 +65,7 @@ export function handleProposalQueued(event: ProposalQueuedEvent): void {
 
 export function handleVoteCast(event: VoteCastEvent): void {
   let entity = new VoteCast(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
+
   entity.voter = event.params.voter.toHexString()
   entity.proposalId = event.params.proposalId
   entity.support = event.params.support
