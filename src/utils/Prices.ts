@@ -19,7 +19,7 @@ export function updateLastPriceUsdAll(timestamp: BigInt): void {
     const token = protocolStats.tokens[i]
     if (token.toLowerCase() != WRBTCAddress.toLowerCase() && token.toLowerCase() != USDTAddress.toLowerCase()) {
       let tokenEntity = Token.load(token)
-      if (tokenEntity !== null && tokenEntity.hasBtcPool == true) {
+      if (tokenEntity !== null) {
         const oldUsdPrice = tokenEntity.lastPriceUsd
         log.debug('UPDATING LAST PRICE USD, lastPriceUsd: {}, btcToUsdPrice: {}', [tokenEntity.lastPriceUsd.toString(), btcUsdPrice.toString()])
         tokenEntity.lastPriceUsd = tokenEntity.lastPriceBtc.times(btcUsdPrice).truncate(18)

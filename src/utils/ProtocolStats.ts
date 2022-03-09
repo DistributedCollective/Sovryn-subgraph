@@ -1,6 +1,7 @@
 import { BigDecimal, BigInt, Address } from '@graphprotocol/graph-ts'
 import { ProtocolStats, UserTotals } from '../../generated/schema'
 import { USDTAddress } from '../contracts/contracts'
+import { stablecoins } from '../contracts/contracts'
 
 export function createAndReturnProtocolStats(): ProtocolStats {
   let protocolStatsEntity = ProtocolStats.load('0')
@@ -24,7 +25,7 @@ export function createAndReturnProtocolStats(): ProtocolStats {
     protocolStatsEntity.totalVoluntarilyStakedSov = BigInt.zero()
     protocolStatsEntity.totalStakedByVestingSov = BigInt.zero()
     protocolStatsEntity.btcUsdPrice = BigDecimal.zero()
-    protocolStatsEntity.usdStablecoin = '0xcb46c0ddc60d18efeb0e586c17af6ea36452dae0'
+    protocolStatsEntity.usdStablecoin = '0xe700691da7b9851f2f35f8b8182c69c53ccad9db'
     protocolStatsEntity.tokens = []
     protocolStatsEntity.save()
   }

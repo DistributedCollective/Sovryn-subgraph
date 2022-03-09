@@ -54,6 +54,22 @@ const governorContractsTestnet = {
     ]
 }
 
+const governorContractsMainnet = {
+    originalName: "GovernorAlphaEvents",
+    changeBlocks: [
+        {
+            name: "GovernorAlphaEvents3100270",
+            address: "0x6496DF39D000478a7A7352C01E0E713835051CcD",
+            startBlock: 3100270
+        },
+        {
+            name: "GovernorAlphaEvents3100277",
+            address: "0xfF25f66b7D7F385503D70574AE0170b6B1622dAd",
+            startBlock: 3100277
+        }
+    ]
+}
+
 const wrapperProxyContractsMainnet = {
     originalName: "rbtcWrapperProxyTokenConverted",
     changeBlocks: [
@@ -73,6 +89,7 @@ const wrapperProxyContractsMainnet = {
 module.exports = {
     newDataSources: process.env.NETWORK === 'mainnet' ? [
         wrapperProxyContractsMainnet,
+        governorContractsMainnet
     ] : [
         wrapperProxyContractsTestnet,
         feeSharingProxyContractsTestnet,

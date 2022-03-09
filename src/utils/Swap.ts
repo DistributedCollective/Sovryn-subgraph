@@ -1,7 +1,7 @@
 import { Address, Bytes, BigInt, BigDecimal } from '@graphprotocol/graph-ts'
 import { Swap, Token, User } from '../../generated/schema'
 import { createAndReturnUser } from './User'
-import { USDTAddress, WRBTCAddress } from '../contracts/contracts'
+import { WRBTCAddress } from '../contracts/contracts'
 import { updateLastPriceUsdAll } from './Prices'
 import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
 import { handleCandlesticks } from './Candlesticks'
@@ -57,59 +57,6 @@ export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
   return swapEntity
 }
 
-function handleNonBtcPair(event: ConversionEventForSwap, usdStablecoin: string): void {
-  let fromToken = Token.load(event.fromToken.toHexString())
-  let toToken = Token.load(event.toToken.toHexString())
-
-  let fromTokenUsdPrice: BigDecimal
-  let toTokenUsdPrice: BigDecimal
-  let fromTokenBtcPrice: BigDecimal
-  let toTokenBtcPrice: BigDecimal
-
-  let amountUsd: BigDecimal
-  let amountBtc: BigDecimal
-
-  if (fromToken != null && toToken != null) {
-    fromToken.tokenVolume = fromToken.tokenVolume.plus(event.fromAmount)
-    toToken.tokenVolume = toToken.tokenVolume.plus(event.toAmount)
-    /** If one of the tokens is usd */
-    if (event.fromToken.toHexString().toLowerCase() == usdStablecoin) {
-      fromTokenUsdPrice = decimal.ONE
-      amountUsd = event.fromAmount
-
-      fromTokenBtcPrice = fromToken.lastPriceBtc
-      amountBtc = event.fromAmount.times(fromToken.lastPriceBtc)
-
-      toTokenUsdPrice = event.toAmount.div(event.fromAmount).truncate(18)
-      toTokenBtcPrice = toTokenUsdPrice.times(fromToken.lastPriceBtc)
-
-      fromToken.usdVolume = fromToken.usdVolume.plus(amountUsd)
-      toToken.usdVolume = toToken.usdVolume.plus(amountUsd)
-      fromToken.btcVolume = fromToken.btcVolume.plus(amountBtc)
-      toToken.btcVolume = toToken.btcVolume.plus(amountBtc)
-
-      /** fromToken is stablecoin, so for the btc candlesticks, update only volume */
-      handleCandlesticks({
-        tradingPair: fromToken.id.toLowerCase() + '_' + WRBTCAddress.toLowerCase(),
-        blockTimestamp: event.timestamp,
-        oldPrice: fromToken.lastPriceBtc,
-        newPrice: fromToken.lastPriceBtc,
-        volume: amountBtc,
-      })
-
-      /** For toToken, update USD candlesticks completely, and btc candlesticks with volume only */
-      handleCandlesticks({
-        tradingPair: toToken.id.toLowerCase() + '_' + USDTAddress.toLowerCase(),
-        blockTimestamp: event.timestamp,
-        oldPrice: toToken.lastPriceUsd,
-        newPrice: event.toAmount.div(event.fromAmount).truncate(18),
-        volume: amountUsd,
-      })
-    } else if (event.toToken.toHexString().toLowerCase() == usdStablecoin) {
-    }
-  }
-}
-
 export function updatePricingAndCandlesticks(event: ConversionEventForSwap): void {
   /** This threshold is set so that the last traded price is not skewed by rounding errors */
   const threshold = decimal.fromNumber(0.00000001)
@@ -136,8 +83,7 @@ export function updatePricingAndCandlesticks(event: ConversionEventForSwap): voi
       tokenAmount = event.fromAmount
       btcAmount = event.toAmount
     } else {
-      handleNonBtcPair(event, USDTAddress)
-      return
+      /** TODO: Handle case where neither token is rBTC for when AMM pools with non-rBTC tokens are introduced */
     }
 
     /** IF SWAP IS BTC/USDT: Update lastPriceUsd on BTC */
@@ -152,7 +98,6 @@ export function updatePricingAndCandlesticks(event: ConversionEventForSwap): voi
     }
 
     if (token != null) {
-      token.hasBtcPool = true
       const oldPriceBtc = token.lastPriceBtc
       const newPriceBtc = btcAmount.div(tokenAmount).truncate(18)
       const btcVolume = btcAmount.truncate(18)
@@ -180,14 +125,12 @@ export function updatePricingAndCandlesticks(event: ConversionEventForSwap): voi
         volume: btcVolume,
       })
 
-      let ammVolumeUsd = BigDecimal.zero()
       let lpFeeUsd = newPriceUsd.times(event.lpFee).truncate(18)
       let stakerFeeUsd = newPriceUsd.times(event.protocolFee)
 
       if (token.id.toLowerCase() != USDTAddress.toLowerCase()) {
         token.usdVolume = token.usdVolume.plus(usdVolume).truncate(18)
         BTCToken.usdVolume = BTCToken.usdVolume.plus(usdVolume).truncate(18)
-        ammVolumeUsd = newPriceUsd.times(event.toAmount).truncate(18)
 
         /** Update USD Candlesticks for token */
         handleCandlesticks({
@@ -201,10 +144,9 @@ export function updatePricingAndCandlesticks(event: ConversionEventForSwap): voi
         token.lastPriceUsd = decimal.ONE
         token.usdVolume = token.usdVolume.plus(tokenAmount).truncate(18)
         BTCToken.usdVolume = BTCToken.usdVolume.plus(tokenAmount).truncate(18)
-        ammVolumeUsd = tokenAmount
       }
 
-      protocolStatsEntity.totalAmmVolumeUsd = protocolStatsEntity.totalAmmVolumeUsd.plus(ammVolumeUsd)
+      protocolStatsEntity.totalAmmVolumeUsd = protocolStatsEntity.totalAmmVolumeUsd.plus(usdVolume)
       protocolStatsEntity.totalAmmLpFeesUsd = protocolStatsEntity.totalAmmLpFeesUsd.plus(lpFeeUsd)
       protocolStatsEntity.totalAmmStakerFeesUsd = protocolStatsEntity.totalAmmStakerFeesUsd.plus(stakerFeeUsd)
       protocolStatsEntity.save()

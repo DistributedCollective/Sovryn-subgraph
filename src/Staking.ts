@@ -88,6 +88,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     let user = createAndReturnUser(event.transaction.from)
     newVestingContract.user = user.id
     newVestingContract.type = 'Genesis'
+    newVestingContract.createdAtTimestamp = event.block.timestamp
     newVestingContract.emittedBy = event.address
     newVestingContract.createdAtTransaction = transaction.id
     newVestingContract.stakeHistory.push(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
@@ -116,6 +117,13 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
 
     let protocolStatsEntity = createAndReturnProtocolStats()
     protocolStatsEntity.totalVoluntarilyStakedSov = protocolStatsEntity.totalVoluntarilyStakedSov.plus(event.params.amount)
+    protocolStatsEntity.save()
+  } else {
+    vestingContract.currentBalance = vestingContract.currentBalance.plus(event.params.amount)
+    vestingContract.save()
+
+    let protocolStatsEntity = createAndReturnProtocolStats()
+    protocolStatsEntity.totalStakedByVestingSov = protocolStatsEntity.totalStakedByVestingSov.plus(event.params.amount)
     protocolStatsEntity.save()
   }
 }

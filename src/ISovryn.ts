@@ -113,6 +113,7 @@ export function handleCloseWithDeposit(event: CloseWithDepositEvent): void {
     isOpen: event.params.currentMargin.gt(BigInt.zero()) ? true : false,
     rate: decimal.ONE.div(decimal.fromBigInt(event.params.collateralToLoanRate, 18)),
     type: 'Sell',
+    timestamp: event.block.timestamp,
   }
   updateLoanReturnPnL(changeParams)
 
@@ -153,6 +154,7 @@ export function handleCloseWithSwap(event: CloseWithSwapEvent): void {
     isOpen: event.params.currentLeverage.gt(BigInt.zero()) ? true : false,
     rate: decimal.fromBigInt(event.params.exitPrice, 18),
     type: 'Sell',
+    timestamp: event.block.timestamp,
   }
   updateLoanReturnPnL(changeParams)
 
@@ -183,6 +185,7 @@ export function handleDepositCollateral(event: DepositCollateralEvent): void {
     isOpen: true,
     rate: decimal.fromBigInt(event.params.rate, 18),
     type: null,
+    timestamp: event.block.timestamp,
   }
   updateLoanReturnPnL(changeParams)
 
@@ -206,6 +209,7 @@ export function handleDepositCollateralLegacy(event: DepositCollateralLegacyEven
     isOpen: true,
     rate: decimal.ONE, //This is a placeholder, this value is not used for DepositCollateral events
     type: null,
+    timestamp: event.block.timestamp,
   }
   updateLoanReturnPnL(changeParams)
 
@@ -285,6 +289,7 @@ export function handleLiquidate(event: LiquidateEvent): void {
     isOpen: event.params.currentMargin.gt(BigInt.zero()) ? true : false,
     rate: decimal.ONE.div(decimal.fromBigInt(event.params.collateralToLoanRate, 18)),
     type: 'Sell',
+    timestamp: event.block.timestamp,
   }
   updateLoanReturnPnL(changeParams)
 

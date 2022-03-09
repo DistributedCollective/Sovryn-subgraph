@@ -400,7 +400,7 @@ function updatePoolVolumeAndBalance(fromToken: Address, toToken: Address, fromAm
 
   let toTokenEntity = LiquidityPoolToken.load(liquidityPool.toHexString() + toToken.toHexString())
   if (toTokenEntity != null) {
-    toTokenEntity.volumeBought = toTokenEntity.volumeSold.plus(toAmount)
+    toTokenEntity.volumeBought = toTokenEntity.volumeBought.plus(toAmount)
     toTokenEntity.totalVolume = toTokenEntity.totalVolume.plus(toAmount)
     toTokenEntity.save()
   }
