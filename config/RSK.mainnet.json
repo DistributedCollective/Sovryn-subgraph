@@ -2,7 +2,7 @@
     "network": "mainnet",
     "node": {
         "network": "mainnet",
-        "address": "https://mainnet.sovryn.app/rpc",
+        "address": "https//graph-mainnet.sovryn.app/",
         "log_level": "debug"
     },
     "SOV": {
@@ -39,22 +39,22 @@
     "VestingRegistry1": {
         "network": "mainnet",
         "address": "0x80B036ae59B3e38B573837c01BB1DB95515b7E6B",
-        "startBlock": 1218836
+        "startBlock": 3100287
     },
     "VestingRegistry2": {
         "network": "mainnet",
         "address": "0x0a9bDbf5e104a30fb4c99f6812FB85B60Fd8D372",
-        "startBlock": 1218836
+        "startBlock": 3159211
     },
     "VestingRegistry3": {
         "network": "mainnet",
         "address": "0x14F3FE332e21Ef3f5d244C45C8D5fbFcEF2FB5c9",
-        "startBlock": 1218836
+        "startBlock": 3306661
     },
     "Staking": {
         "network": "mainnet",
         "address": "0x5684a06CaB22Db16d901fEe2A5C081b4C91eA40e",
-        "startBlock": 1218836
+        "startBlock": 3100263
     },
     "FeeSharingProxy_start": {
         "network": "mainnet",
