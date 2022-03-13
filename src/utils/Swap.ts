@@ -4,7 +4,7 @@ import { createAndReturnUser } from './User'
 import { WRBTCAddress } from '../contracts/contracts'
 import { updateLastPriceUsdAll } from './Prices'
 import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
-import { handleCandlesticks } from './Candlesticks'
+// import { handleCandlesticks } from './Candlesticks'
 import { createAndReturnProtocolStats, createAndReturnUserTotals } from './ProtocolStats'
 import { getTokenPriceConversions } from './Prices'
 
@@ -93,29 +93,29 @@ export function updatePricing(event: ConversionEventForSwap): void {
       btcUsdPrice = tokenAmount.div(btcAmount)
       protocolStatsEntity.btcUsdPrice = btcUsdPrice
       protocolStatsEntity.save()
-      BTCToken.lastPriceUsd = btcUsdPrice.truncate(18)
+      BTCToken.lastPriceUsd = btcUsdPrice.truncate(DEFAULT_DECIMALS)
       BTCToken.lastPriceBtc = decimal.ONE
       updateLastPriceUsdAll(event.timestamp)
     }
 
     if (token != null) {
       const oldPriceBtc = token.lastPriceBtc
-      const newPriceBtc = btcAmount.div(tokenAmount).truncate(18)
-      // const btcVolume = btcAmount.truncate(18)
-      const newPriceUsd = newPriceBtc.times(btcUsdPrice).truncate(18) // THIS WAS THE BUG
+      const newPriceBtc = btcAmount.div(tokenAmount).truncate(DEFAULT_DECIMALS)
+      // const btcVolume = btcAmount.truncate(DEFAULT_DECIMALS)
+      const newPriceUsd = newPriceBtc.times(btcUsdPrice).truncate(DEFAULT_DECIMALS) // THIS WAS THE BUG
 
-      const oldPriceUsd = token.lastPriceUsd.truncate(18)
+      const oldPriceUsd = token.lastPriceUsd.truncate(DEFAULT_DECIMALS)
       if (token.lastPriceUsd.gt(BigDecimal.zero())) {
         token.lastPriceUsd = newPriceUsd
       }
-      // const usdVolume = btcAmount.times(btcUsdPrice).truncate(18)
+      // const usdVolume = btcAmount.times(btcUsdPrice).truncate(DEFAULT_DECIMALS)
 
       token.lastPriceBtc = newPriceBtc
-      // token.btcVolume = token.btcVolume.plus(btcVolume).truncate(18)
-      // token.tokenVolume = token.tokenVolume.plus(tokenAmount).truncate(18)
+      // token.btcVolume = token.btcVolume.plus(btcVolume).truncate(DEFAULT_DECIMALS)
+      // token.tokenVolume = token.tokenVolume.plus(tokenAmount).truncate(DEFAULT_DECIMALS)
 
-      // BTCToken.btcVolume = BTCToken.btcVolume.plus(btcVolume).truncate(18)
-      // BTCToken.tokenVolume = BTCToken.btcVolume.plus(btcVolume).truncate(18)
+      // BTCToken.btcVolume = BTCToken.btcVolume.plus(btcVolume).truncate(DEFAULT_DECIMALS)
+      // BTCToken.tokenVolume = BTCToken.btcVolume.plus(btcVolume).truncate(DEFAULT_DECIMALS)
 
       /** Update BTC Candlesticks for token */
       // handleCandlesticks({
@@ -126,12 +126,12 @@ export function updatePricing(event: ConversionEventForSwap): void {
       //   volume: btcVolume,
       // })
 
-      let lpFeeUsd = newPriceUsd.times(event.lpFee).truncate(18)
+      let lpFeeUsd = newPriceUsd.times(event.lpFee).truncate(DEFAULT_DECIMALS)
       let stakerFeeUsd = newPriceUsd.times(event.protocolFee)
 
       if (token.id.toLowerCase() != USDTAddress.toLowerCase()) {
-        // token.usdVolume = token.usdVolume.plus(usdVolume).truncate(18)
-        // BTCToken.usdVolume = BTCToken.usdVolume.plus(usdVolume).truncate(18)
+        // token.usdVolume = token.usdVolume.plus(usdVolume).truncate(DEFAULT_DECIMALS)
+        // BTCToken.usdVolume = BTCToken.usdVolume.plus(usdVolume).truncate(DEFAULT_DECIMALS)
         /** Update USD Candlesticks for token */
         // handleCandlesticks({
         //   tradingPair: token.id.toLowerCase() + '_' + USDTAddress.toLowerCase(),
@@ -142,8 +142,8 @@ export function updatePricing(event: ConversionEventForSwap): void {
         // })
       } else {
         token.lastPriceUsd = decimal.ONE
-        // token.usdVolume = token.usdVolume.plus(tokenAmount).truncate(18)
-        // BTCToken.usdVolume = BTCToken.usdVolume.plus(tokenAmount).truncate(18)
+        // token.usdVolume = token.usdVolume.plus(tokenAmount).truncate(DEFAULT_DECIMALS)
+        // BTCToken.usdVolume = BTCToken.usdVolume.plus(tokenAmount).truncate(DEFAULT_DECIMALS)
       }
 
       // protocolStatsEntity.totalAmmVolumeUsd = protocolStatsEntity.totalAmmVolumeUsd.plus(usdVolume)
