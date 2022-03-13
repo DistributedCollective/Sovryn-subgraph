@@ -58,7 +58,7 @@ export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
   return swapEntity
 }
 
-export function updatePricingAndCandlesticks(event: ConversionEventForSwap): void {
+export function updatePricing(event: ConversionEventForSwap): void {
   /** This threshold is set so that the last traded price is not skewed by rounding errors */
   const threshold = decimal.fromNumber(0.00000001)
   if (event.fromAmount < threshold || event.toAmount < threshold) {
@@ -101,53 +101,52 @@ export function updatePricingAndCandlesticks(event: ConversionEventForSwap): voi
     if (token != null) {
       const oldPriceBtc = token.lastPriceBtc
       const newPriceBtc = btcAmount.div(tokenAmount).truncate(18)
-      const btcVolume = btcAmount.truncate(18)
+      // const btcVolume = btcAmount.truncate(18)
       const newPriceUsd = newPriceBtc.times(btcUsdPrice).truncate(18) // THIS WAS THE BUG
 
       const oldPriceUsd = token.lastPriceUsd.truncate(18)
       if (token.lastPriceUsd.gt(BigDecimal.zero())) {
         token.lastPriceUsd = newPriceUsd
       }
-      const usdVolume = btcAmount.times(btcUsdPrice).truncate(18)
+      // const usdVolume = btcAmount.times(btcUsdPrice).truncate(18)
 
       token.lastPriceBtc = newPriceBtc
-      token.btcVolume = token.btcVolume.plus(btcVolume).truncate(18)
-      token.tokenVolume = token.tokenVolume.plus(tokenAmount).truncate(18)
+      // token.btcVolume = token.btcVolume.plus(btcVolume).truncate(18)
+      // token.tokenVolume = token.tokenVolume.plus(tokenAmount).truncate(18)
 
-      BTCToken.btcVolume = BTCToken.btcVolume.plus(btcVolume).truncate(18)
-      BTCToken.tokenVolume = BTCToken.btcVolume.plus(btcVolume).truncate(18)
+      // BTCToken.btcVolume = BTCToken.btcVolume.plus(btcVolume).truncate(18)
+      // BTCToken.tokenVolume = BTCToken.btcVolume.plus(btcVolume).truncate(18)
 
       /** Update BTC Candlesticks for token */
-      handleCandlesticks({
-        tradingPair: token.id.toLowerCase() + '_' + WRBTCAddress.toLowerCase(),
-        blockTimestamp: event.timestamp,
-        oldPrice: oldPriceBtc,
-        newPrice: newPriceBtc,
-        volume: btcVolume,
-      })
+      // handleCandlesticks({
+      //   tradingPair: token.id.toLowerCase() + '_' + WRBTCAddress.toLowerCase(),
+      //   blockTimestamp: event.timestamp,
+      //   oldPrice: oldPriceBtc,
+      //   newPrice: newPriceBtc,
+      //   volume: btcVolume,
+      // })
 
       let lpFeeUsd = newPriceUsd.times(event.lpFee).truncate(18)
       let stakerFeeUsd = newPriceUsd.times(event.protocolFee)
 
       if (token.id.toLowerCase() != USDTAddress.toLowerCase()) {
-        token.usdVolume = token.usdVolume.plus(usdVolume).truncate(18)
-        BTCToken.usdVolume = BTCToken.usdVolume.plus(usdVolume).truncate(18)
-
+        // token.usdVolume = token.usdVolume.plus(usdVolume).truncate(18)
+        // BTCToken.usdVolume = BTCToken.usdVolume.plus(usdVolume).truncate(18)
         /** Update USD Candlesticks for token */
-        handleCandlesticks({
-          tradingPair: token.id.toLowerCase() + '_' + USDTAddress.toLowerCase(),
-          blockTimestamp: event.timestamp,
-          oldPrice: oldPriceUsd,
-          newPrice: newPriceUsd,
-          volume: usdVolume,
-        })
+        // handleCandlesticks({
+        //   tradingPair: token.id.toLowerCase() + '_' + USDTAddress.toLowerCase(),
+        //   blockTimestamp: event.timestamp,
+        //   oldPrice: oldPriceUsd,
+        //   newPrice: newPriceUsd,
+        //   volume: usdVolume,
+        // })
       } else {
         token.lastPriceUsd = decimal.ONE
-        token.usdVolume = token.usdVolume.plus(tokenAmount).truncate(18)
-        BTCToken.usdVolume = BTCToken.usdVolume.plus(tokenAmount).truncate(18)
+        // token.usdVolume = token.usdVolume.plus(tokenAmount).truncate(18)
+        // BTCToken.usdVolume = BTCToken.usdVolume.plus(tokenAmount).truncate(18)
       }
 
-      protocolStatsEntity.totalAmmVolumeUsd = protocolStatsEntity.totalAmmVolumeUsd.plus(usdVolume)
+      // protocolStatsEntity.totalAmmVolumeUsd = protocolStatsEntity.totalAmmVolumeUsd.plus(usdVolume)
       protocolStatsEntity.totalAmmLpFeesUsd = protocolStatsEntity.totalAmmLpFeesUsd.plus(lpFeeUsd)
       protocolStatsEntity.totalAmmStakerFeesUsd = protocolStatsEntity.totalAmmStakerFeesUsd.plus(stakerFeeUsd)
       protocolStatsEntity.save()
@@ -157,7 +156,7 @@ export function updatePricingAndCandlesticks(event: ConversionEventForSwap): voi
 
       if (event.user.toHexString() == event.trader.toHexString()) {
         let userTotalsEntity = createAndReturnUserTotals(event.user)
-        userTotalsEntity.totalAmmVolumeUsd = userTotalsEntity.totalAmmVolumeUsd.plus(usdVolume)
+        // userTotalsEntity.totalAmmVolumeUsd = userTotalsEntity.totalAmmVolumeUsd.plus(usdVolume)
         userTotalsEntity.totalAmmStakerFeesUsd = userTotalsEntity.totalAmmStakerFeesUsd.plus(stakerFeeUsd)
         userTotalsEntity.totalAmmLpFeesUsd = userTotalsEntity.totalAmmLpFeesUsd.plus(lpFeeUsd)
         userTotalsEntity.save()

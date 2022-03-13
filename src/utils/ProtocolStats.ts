@@ -36,6 +36,7 @@ export function createAndReturnUserTotals(user: Address): UserTotals {
   let userTotals = UserTotals.load(user.toHexString())
   if (userTotals == null) {
     userTotals = new UserTotals(user.toHexString())
+    userTotals.user = user.toHexString()
     userTotals.totalMarginTradeVolumeUsd = BigDecimal.zero()
     userTotals.totalCloseWithSwapVolumeUsd = BigDecimal.zero()
     userTotals.totalDepositCollateralVolumeUsd = BigDecimal.zero()

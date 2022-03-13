@@ -8,6 +8,8 @@ import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
 import { Token } from '../../generated/schema'
 import { createAndReturnProtocolStats } from './ProtocolStats'
 import { WRBTCAddress } from '../contracts/contracts'
+import { ConversionEventForSwap } from './Swap'
+import { createAndReturnUserTotals } from './ProtocolStats'
 import { handleCandlesticks, ICandleSticks } from './Candlesticks'
 import { decimal } from '@protofire/subgraph-toolkit'
 
