@@ -28,17 +28,16 @@ import {
   ConversionFeeUpdate,
   WithdrawFees,
   LiquidityPool,
-  LiquidityPoolToken,
 } from '../generated/schema'
 import { ConversionEventForSwap, createAndReturnSwap, updatePricing } from './utils/Swap'
 import { createAndReturnToken } from './utils/Token'
 import { loadTransaction } from './utils/Transaction'
-import { BigInt, BigDecimal, dataSource, Address, log } from '@graphprotocol/graph-ts'
+import { BigInt, BigDecimal, dataSource, log } from '@graphprotocol/graph-ts'
 import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnPoolToken } from './utils/PoolToken'
 import { createAndReturnUser } from './utils/User'
 import { updateVolumes } from './utils/Volumes'
-import { integer, decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
+import { decimal } from '@protofire/subgraph-toolkit'
 import { liquidityPoolV1ChangeBlock } from './contracts/contracts'
 
 export function handlePriceDataUpdate(event: PriceDataUpdateEvent): void {
@@ -281,11 +280,10 @@ export function handleConversionV1(event: ConversionEventV1): void {
     lpFee: BigDecimal.zero(),
     protocolFee: BigDecimal.zero(),
   }
-  updatePoolVolumeAndBalance(event.params._fromToken, event.params._toToken, event.params._amount, event.params._return, dataSource.address())
-  const swap = createAndReturnSwap(parsedEvent)
-  updatePricing(parsedEvent)
 
-  updateVolumes(parsedEvent)
+  createAndReturnSwap(parsedEvent)
+  updatePricing(parsedEvent)
+  updateVolumes(parsedEvent, dataSource.address())
 }
 
 export function handleConversionV2(event: ConversionEventV2): void {
@@ -316,11 +314,10 @@ export function handleConversionV2(event: ConversionEventV2): void {
     lpFee: decimal.fromBigInt(event.params._conversionFee, 18),
     protocolFee: BigDecimal.zero(),
   }
-  updatePoolVolumeAndBalance(event.params._fromToken, event.params._toToken, event.params._amount, event.params._return, dataSource.address())
-  const swap = createAndReturnSwap(parsedEvent)
-  updatePricing(parsedEvent)
 
-  updateVolumes(parsedEvent)
+  createAndReturnSwap(parsedEvent)
+  updatePricing(parsedEvent)
+  updateVolumes(parsedEvent, dataSource.address())
 }
 
 export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void {
@@ -350,11 +347,10 @@ export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void
     lpFee: decimal.fromBigInt(event.params._conversionFee, 18),
     protocolFee: decimal.fromBigInt(event.params._protocolFee, 18),
   }
-  updatePoolVolumeAndBalance(event.params._fromToken, event.params._toToken, event.params._amount, event.params._return, dataSource.address())
-  const swap = createAndReturnSwap(parsedEvent)
-  updatePricing(parsedEvent)
 
-  updateVolumes(parsedEvent)
+  createAndReturnSwap(parsedEvent)
+  updatePricing(parsedEvent)
+  updateVolumes(parsedEvent, dataSource.address())
 }
 
 export function handleTokenRateUpdate(event: TokenRateUpdateEvent): void {
@@ -396,19 +392,3 @@ export function handleWithdrawFees(event: WithdrawFeesEvent): void {
 }
 
 export function handleOwnerUpdate(event: OwnerUpdateEvent): void {}
-
-function updatePoolVolumeAndBalance(fromToken: Address, toToken: Address, fromAmount: BigInt, toAmount: BigInt, liquidityPool: Address): void {
-  let fromTokenEntity = LiquidityPoolToken.load(liquidityPool.toHexString() + fromToken.toHexString())
-  if (fromTokenEntity != null) {
-    fromTokenEntity.volumeSold = fromTokenEntity.volumeSold.plus(fromAmount)
-    fromTokenEntity.totalVolume = fromTokenEntity.totalVolume.plus(fromAmount)
-    fromTokenEntity.save()
-  }
-
-  let toTokenEntity = LiquidityPoolToken.load(liquidityPool.toHexString() + toToken.toHexString())
-  if (toTokenEntity != null) {
-    toTokenEntity.volumeBought = toTokenEntity.volumeBought.plus(toAmount)
-    toTokenEntity.totalVolume = toTokenEntity.totalVolume.plus(toAmount)
-    toTokenEntity.save()
-  }
-}

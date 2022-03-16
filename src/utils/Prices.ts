@@ -8,7 +8,6 @@ import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
 import { Token } from '../../generated/schema'
 import { createAndReturnProtocolStats } from './ProtocolStats'
 import { WRBTCAddress } from '../contracts/contracts'
-import { handleCandlesticks, ICandleSticks } from './Candlesticks'
 import { decimal } from '@protofire/subgraph-toolkit'
 
 export function updateLastPriceUsdAll(timestamp: BigInt): void {
@@ -20,21 +19,9 @@ export function updateLastPriceUsdAll(timestamp: BigInt): void {
     if (token.toLowerCase() != WRBTCAddress.toLowerCase() && token.toLowerCase() != USDTAddress.toLowerCase()) {
       let tokenEntity = Token.load(token)
       if (tokenEntity !== null) {
-        const oldUsdPrice = tokenEntity.lastPriceUsd
         log.debug('UPDATING LAST PRICE USD, lastPriceUsd: {}, btcToUsdPrice: {}', [tokenEntity.lastPriceUsd.toString(), btcUsdPrice.toString()])
         tokenEntity.lastPriceUsd = tokenEntity.lastPriceBtc.times(btcUsdPrice).truncate(18)
-        const newUsdPrice = tokenEntity.lastPriceUsd
         tokenEntity.save()
-
-        const tradingPair = token + '_' + USDTAddress.toLowerCase()
-
-        handleCandlesticks({
-          blockTimestamp: timestamp,
-          newPrice: newUsdPrice,
-          oldPrice: oldUsdPrice,
-          tradingPair: tradingPair,
-          volume: BigDecimal.zero(),
-        })
       } else if (tokenEntity != null && tokenEntity.hasStablecoinPool == true) {
         /**TODO: Update btc price/candlesticks with btc/usd price */
       }
