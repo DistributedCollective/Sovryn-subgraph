@@ -435,7 +435,7 @@ type PriceDataUpdate @entity {
 }
 
 type UserLiquidityHistory @entity {
-  id: ID! # user + '-' + liquidity pool TODO: Change from liquidityPool to poolToken
+  id: ID! # user + '-' + smartToken
   user: User!
   liquidityPool: LiquidityPool!
   totalAsset0LiquidityAdded: BigInt!

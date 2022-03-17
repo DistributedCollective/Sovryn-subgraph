@@ -10,9 +10,4 @@ export function handleTransfer(event: Transfer): void {}
 
 export function handleApproval(event: Approval): void {}
 
-export function handleOwnerUpdate(event: OwnerUpdate): void {
-  // TODO: Handle when a smart token is transferred to a new liquidity pool
-  /**
-   *
-   */
-}
+export function handleOwnerUpdate(event: OwnerUpdate): void {}
