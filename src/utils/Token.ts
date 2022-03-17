@@ -1,9 +1,10 @@
 import { Address, bigDecimal, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
-import { Token, LiquidityPoolToken, TokenSmartToken, ProtocolStats } from '../../generated/schema'
+import { Token, LiquidityPoolToken, TokenSmartToken, ProtocolStats, PoolToken } from '../../generated/schema'
 import { ERC20 as ERC20TokenContract } from '../../generated/templates/ERC20/ERC20'
 import { createAndReturnProtocolStats } from './ProtocolStats'
 import { decimal } from '@protofire/subgraph-toolkit'
 import { stablecoins } from '../contracts/contracts'
+import { createAndReturnPoolToken } from './PoolToken'
 
 export function createAndReturnToken(tokenAddress: Address, converterAddress: Address, smartTokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHex())
@@ -46,6 +47,12 @@ export function createAndReturnToken(tokenAddress: Address, converterAddress: Ad
     liquidityPoolToken.totalVolume = BigInt.zero()
     liquidityPoolToken.volumeBought = BigInt.zero()
     liquidityPoolToken.volumeSold = BigInt.zero()
+    /** Try to load PoolToken first */
+    let poolTokenEntity = PoolToken.load(smartTokenAddress.toHexString())
+    if (poolTokenEntity == null) {
+      createAndReturnPoolToken(smartTokenAddress, converterAddress, tokenAddress)
+    }
+    liquidityPoolToken.poolToken = smartTokenAddress.toHex()
   }
 
   liquidityPoolToken.token = tokenAddress.toHex()
@@ -55,11 +62,10 @@ export function createAndReturnToken(tokenAddress: Address, converterAddress: Ad
   let tokenSmartToken = TokenSmartToken.load(tokenAddress.toHex() + smartTokenAddress.toHex())
   if (tokenSmartToken === null) {
     tokenSmartToken = new TokenSmartToken(tokenAddress.toHex() + smartTokenAddress.toHex())
+    tokenSmartToken.token = tokenAddress.toHex()
+    tokenSmartToken.smartToken = smartTokenAddress.toHex()
+    tokenSmartToken.save()
   }
-
-  tokenSmartToken.token = tokenAddress.toHex()
-  tokenSmartToken.smartToken = smartTokenAddress.toHex()
-  tokenSmartToken.save()
   token.save()
   if (protocolStats != null) {
     protocolStats.save()

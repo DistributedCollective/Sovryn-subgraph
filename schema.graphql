@@ -301,7 +301,7 @@ type LiquidityPool @entity {
 }
 
 type LiquidityPoolToken @entity {
-  id: ID! # ID is token address + liquidityPool address
+  id: ID! # ID liquidityPool address + tokenAddress
   token: Token!
   liquidityPool: LiquidityPool!
   poolToken: PoolToken!
@@ -435,7 +435,7 @@ type PriceDataUpdate @entity {
 }
 
 type UserLiquidityHistory @entity {
-  id: ID! # user + liquidity pool
+  id: ID! # user + '-' + liquidity pool TODO: Change from liquidityPool to poolToken
   user: User!
   liquidityPool: LiquidityPool!
   totalAsset0LiquidityAdded: BigInt!
@@ -1020,27 +1020,6 @@ type RewardsEarnedHistoryItem @entity {
   user: UserRewardsEarnedHistory!
   token: Token
   amount: BigInt!
-  timestamp: BigInt!
-  transaction: Transaction!
-}
-
-# Matches liquidSovHistory sql
-type LiquidSovHistory @entity {
-  id: ID! #transaction hash
-  action: String!
-  user: User!
-  sovAmount: BigInt!
-  timestamp: BigInt!
-  transaction: Transaction!
-}
-
-# Matches rewardHistorySql_new
-type RewardHistory @entity {
-  id: ID!
-  action: String!
-  user: User!
-  amount: BigInt!
-  poolToken: PoolToken
   timestamp: BigInt!
   transaction: Transaction!
 }
