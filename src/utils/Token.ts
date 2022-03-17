@@ -44,15 +44,15 @@ export function createAndReturnToken(tokenAddress: Address, converterAddress: Ad
   let liquidityPoolToken = LiquidityPoolToken.load(converterAddress.toHex() + tokenAddress.toHex())
   if (liquidityPoolToken == null) {
     liquidityPoolToken = new LiquidityPoolToken(converterAddress.toHex() + tokenAddress.toHex())
-    liquidityPoolToken.totalVolume = BigInt.zero()
-    liquidityPoolToken.volumeBought = BigInt.zero()
-    liquidityPoolToken.volumeSold = BigInt.zero()
     /** Try to load PoolToken first */
     let poolTokenEntity = PoolToken.load(smartTokenAddress.toHexString())
     if (poolTokenEntity == null) {
       createAndReturnPoolToken(smartTokenAddress, converterAddress, tokenAddress)
     }
     liquidityPoolToken.poolToken = smartTokenAddress.toHex()
+    liquidityPoolToken.totalVolume = BigDecimal.zero()
+    liquidityPoolToken.volumeBought = BigDecimal.zero()
+    liquidityPoolToken.volumeSold = BigDecimal.zero()
   }
 
   liquidityPoolToken.token = tokenAddress.toHex()
