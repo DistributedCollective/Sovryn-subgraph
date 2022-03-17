@@ -2,7 +2,7 @@
     "network": "mainnet",
     "node": {
         "network": "mainnet",
-        "address": "https://rsk-graph1.sovryn.app/rpc",
+        "address": "https://graph-mainnet.sovryn.app/",
         "log_level": "debug"
     },
     "SOV": {
