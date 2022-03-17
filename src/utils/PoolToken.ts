@@ -45,6 +45,9 @@ export function createAndReturnPoolToken(poolTokenAddress: Address, liquidityPoo
   return { poolToken, isNew }
 }
 
+/** IMPORTANT: This function is only for use when needing to use a pool token id in a composite ID.
+ * The empty string returned if a pool token does not exist is not a very nice implementation, this should probably be improved
+ * */
 export function getPoolTokenFromToken(token: Address, liquidityPool: Address): string {
   let tokenPoolTokenEntity = LiquidityPoolToken.load(liquidityPool.toHexString() + token.toHexString())
   if (tokenPoolTokenEntity != null) {
