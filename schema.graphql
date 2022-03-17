@@ -233,7 +233,15 @@ type Token @entity {
   liquidityPools: [LiquidityPoolToken!] @derivedFrom(field: "token")
   smartTokens: [TokenSmartToken!] @derivedFrom(field: "token")
   # tokenSwapTotals: [TokenSwapTotals!]
+  """
+  previous BTC price used for candleSticks
+  """
+  prevPriceBtc: BigDecimal!
   lastPriceBtc: BigDecimal!
+  """
+  previous BTC price used for candleSticks
+  """
+  prevPriceUsd: BigDecimal!
   lastPriceUsd: BigDecimal!
   btcVolume: BigDecimal!
   usdVolume: BigDecimal!
@@ -1132,14 +1140,25 @@ type TokenConverted @entity {
 
 # Candlesticks
 
-type CandleSticksFifteenMinute @entity {
+enum CandleSticksInterval {
+  MinuteInterval
+  FifteenMintuesInterval
+  HourInterval
+  FourHourInterval
+  DayInterval
+}
+
+type CandleStick @entity {
   id: ID! # fromToken + toToken + timestamp
-  tradingPair: String! # baseToken_quoteToken
+  # tradingPair: String! # baseToken_quoteToken
+  baseToken: Token
+  quoteToken: Token
+  interval: CandleSticksInterval
   open: BigDecimal # opening price
   high: BigDecimal! # high price
   low: BigDecimal! # low price
   close: BigDecimal! # close price
-  txCount: BigInt! # number of transactions during period
+  # txCount: BigInt! # number of transactions during period
   totalVolume: BigDecimal! # total volume in quote currency
   periodStartUnix: Int! # unix timestamp for start of candle
 }
