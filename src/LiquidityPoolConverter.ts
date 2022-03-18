@@ -117,7 +117,7 @@ export function handleLiquidityAdded(event: LiquidityAddedEvent): void {
     if (userLiquidityHistory == null) {
       userLiquidityHistory = new UserLiquidityHistory(userLiquidityHistoryId)
       userLiquidityHistory.user = event.transaction.from.toHexString()
-      userLiquidityHistory.liquidityPool = event.address.toHexString()
+      userLiquidityHistory.poolToken = liquidityPoolToken.poolToken
       userLiquidityHistory.totalAsset0LiquidityAdded = BigInt.zero()
       userLiquidityHistory.totalAsset0LiquidityRemoved = BigInt.zero()
       userLiquidityHistory.totalAsset1LiquidityAdded = BigInt.zero()
