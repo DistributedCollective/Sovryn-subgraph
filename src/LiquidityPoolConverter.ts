@@ -34,7 +34,7 @@ import {
 import { ConversionEventForSwap, createAndReturnSwap, updatePricing } from './utils/Swap'
 import { createAndReturnToken } from './utils/Token'
 import { loadTransaction } from './utils/Transaction'
-import { BigInt, BigDecimal, dataSource, log } from '@graphprotocol/graph-ts'
+import { BigInt, BigDecimal, dataSource, log, store } from '@graphprotocol/graph-ts'
 import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnPoolToken } from './utils/PoolToken'
 import { createAndReturnUser } from './utils/User'
@@ -180,6 +180,7 @@ export function handleLiquidityRemoved(event: LiquidityRemovedEvent): void {
   })
 }
 
+/** This event is triggered when a pool is activated or deactivated */
 export function handleActivation(event: ActivationEvent): void {
   let entity = new Activation(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   entity._type = event.params._type
@@ -200,11 +201,23 @@ export function handleActivation(event: ActivationEvent): void {
       let smartToken = createAndReturnSmartToken(event.params._anchor)
       liquidityPool.smartToken = smartToken.smartToken.id
     } else {
+      /** This either means the liquidity pool is not yet activated, or that the liquidity pool as been deactivated */
       liquidityPool.smartToken = null
       liquidityPool.currentConverterRegistry = null
+      /** If deactivated, remove the LiquidityPoolToken entity for this old converter from the store */
+      const token0Address = liquidityPool.token0
+      const token1Address = liquidityPool.token1
+      if (token0Address !== null) {
+        store.remove('LiquidityPoolToken', dataSource.address().toHex() + token0Address)
+      }
+
+      if (token1Address !== null) {
+        store.remove('LiquidityPoolToken', dataSource.address().toHex() + token1Address)
+      }
     }
 
     if (event.params._type == 1) {
+      /** The liquidityPoolV1ChangeBlock is where the abi changes to include the protocolFee */
       if (event.block.number < BigInt.fromI32(liquidityPoolV1ChangeBlock)) {
         const contract = LiquidityPoolV1Contract.bind(event.address)
         let reserveTokenCountResult = contract.try_reserveTokenCount()
