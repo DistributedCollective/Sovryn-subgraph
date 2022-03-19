@@ -2,7 +2,7 @@
     "network": "mainnet",
     "node": {
         "network": "mainnet",
-        "address": "https://graph-mainnet.sovryn.app/",
+        "address": "https://rsk-graph1.sovryn.app/rpc",
         "log_level": "debug"
     },
     "SOV": {
@@ -33,7 +33,7 @@
     },
     "blockNumbers": {
         "liquidityPoolV1Converter": {
-            "V2": 3941609
+            "V2": 3921380
         },
         "genesisVestingBlocks": {
             "start": 3114728,
