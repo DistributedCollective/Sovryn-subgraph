@@ -1,4 +1,4 @@
-import { Address } from '@graphprotocol/graph-ts'
+import { Address, log } from '@graphprotocol/graph-ts'
 import { LiquidityPoolToken, PoolToken, TokenPoolToken } from '../../generated/schema'
 import { ERC20 } from '../../generated/templates/ERC20/ERC20'
 
@@ -53,6 +53,7 @@ export function getPoolTokenFromToken(token: Address, liquidityPool: Address): s
   if (tokenPoolTokenEntity != null) {
     return tokenPoolTokenEntity.poolToken
   } else {
+    log.debug('src/utils/PoolToken.ts ~ PoolToken.ts ~ 56 ~  : {}', [token.toHexString(), liquidityPool.toHexString()])
     return ''
   }
 }

@@ -253,7 +253,7 @@ type PoolToken @entity {
   name: String
   symbol: String
   decimals: Int
-  converters: LiquidityPoolToken! @derivedFrom(field: "poolToken") #TODO: Does this need a many-to-many relationship?
+  converters: [LiquidityPoolToken!] @derivedFrom(field: "poolToken") #TODO: Does this need a many-to-many relationship?
   underlyingAssets: [TokenPoolToken!] @derivedFrom(field: "poolToken")
 }
 

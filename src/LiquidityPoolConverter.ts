@@ -204,16 +204,6 @@ export function handleActivation(event: ActivationEvent): void {
       /** This either means the liquidity pool is not yet activated, or that the liquidity pool has been deactivated */
       liquidityPool.smartToken = null
       liquidityPool.currentConverterRegistry = null
-      /** If deactivated, remove the LiquidityPoolToken entity for this old converter from the store */
-      const token0Address = liquidityPool.token0
-      const token1Address = liquidityPool.token1
-      if (token0Address !== null) {
-        store.remove('LiquidityPoolToken', dataSource.address().toHex() + token0Address)
-      }
-
-      if (token1Address !== null) {
-        store.remove('LiquidityPoolToken', dataSource.address().toHex() + token1Address)
-      }
     }
 
     if (event.params._type == 1) {
