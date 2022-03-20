@@ -1157,7 +1157,7 @@ type CandleStick @entity {
   high: BigDecimal! # high price
   low: BigDecimal! # low price
   close: BigDecimal! # close price
-  # txCount: BigInt! # number of transactions during period
+  txCount: Int! # number of transactions during period
   totalVolume: BigDecimal! # total volume in quote currency
   periodStartUnix: Int! # unix timestamp for start of candle
 }

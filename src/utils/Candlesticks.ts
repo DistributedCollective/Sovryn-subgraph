@@ -45,12 +45,12 @@ export function updateCandleSticks(event: ConversionEventForSwap): void {
   log.debug('src/utils/Candlesticks.ts ~ Candlesticks.ts ~ 45 ~ : USDTAddress {}', [USDTAddress])
 
   if (event.fromToken.toHex().toLowerCase() == WRBTCAddress.toLowerCase()) {
-    log.debug('src/utils/Candlesticks.ts ~ Candlesticks.ts ~ 1 ~  event.fromToken: {}', [event.fromToken.toHex()])
+    log.debug('src/utils/Candlesticks.ts ~ Candlesticks.ts ~ 1 ~  event.fromToken: {} event.toToken', [event.fromToken.toHex(), event.toToken.toHex()])
     baseToken = Token.load(event.toToken.toHex()) as Token
     quoteToken = Token.load(event.fromToken.toHex()) as Token
     volume = event.toAmount
   } else if (event.toToken.toHex().toLowerCase() == WRBTCAddress.toLowerCase()) {
-    log.debug('src/utils/Candlesticks.ts ~ Candlesticks.ts ~ 2 ~  event.fromToken: {}', [event.fromToken.toHex()])
+    log.debug('src/utils/Candlesticks.ts ~ Candlesticks.ts ~ 2 ~  event.fromToken: {} event.toToken', [event.fromToken.toHex(), event.toToken.toHex()])
     baseToken = Token.load(event.fromToken.toHex()) as Token
     quoteToken = Token.load(event.toToken.toHex()) as Token
     volume = event.fromAmount
@@ -62,32 +62,36 @@ export function updateCandleSticks(event: ConversionEventForSwap): void {
   oldPrice = baseToken.prevPriceBtc
   newPrice = baseToken.lastPriceBtc
 
-  updateAllIntervals(baseToken, quoteToken, oldPrice, newPrice, volume, blockTimestamp)
+  updateAllIntervals(baseToken, quoteToken, oldPrice, newPrice, volume, 1, blockTimestamp)
 
   const usdToken = Token.load(USDTAddress)
   if (usdToken != null) {
     const oldPriceUsd = baseToken.prevPriceUsd
     const newPriceUsd = baseToken.lastPriceUsd
-    updateAllIntervals(baseToken, usdToken, oldPriceUsd, newPriceUsd, volume, blockTimestamp)
+    updateAllIntervals(baseToken, usdToken, oldPriceUsd, newPriceUsd, volume, 1, blockTimestamp)
   }
 
   if (event.fromToken.toHex().toLowerCase() == USDTAddress.toLowerCase() || event.toToken.toHex().toLowerCase() == USDTAddress.toLowerCase()) {
     const tokens = protocolStats.tokens
     for (let index = 0; index < tokens.length; index++) {
       const tokenAddress = tokens[index]
-      if (tokenAddress.toLowerCase() != USDTAddress.toLowerCase()) {
+      if (tokenAddress.toLowerCase() != USDTAddress.toLowerCase() || tokenAddress.toLowerCase() != WRBTCAddress.toLowerCase()) {
         log.debug('src/utils/Candlesticks.ts ~ Candlesticks.ts ~ 90 ~ tokenAddress: {}', [tokenAddress.toString()])
         baseToken = Token.load(tokenAddress) as Token
         quoteToken = Token.load(USDTAddress) as Token
-        if (event.fromToken.toHex().toLowerCase() == USDTAddress.toLowerCase()) {
-          volume = event.toAmount
-        } else {
-          volume = event.fromAmount
-        }
+        volume = BigDecimal.zero()
+        // let txCount = 0
+        // if (event.fromToken.toHex().toLowerCase() == WRBTCAddress.toLowerCase()) {
+        //   volume = event.fromAmount
+        //   txCount = 1
+        // } else if (event.toToken.toHex().toLowerCase() == WRBTCAddress.toLowerCase()) {
+        //   volume = event.toAmount
+        //   txCount = 1
+        // }
 
         oldPrice = baseToken.prevPriceUsd
         newPrice = baseToken.lastPriceUsd
-        updateAllIntervals(baseToken, quoteToken, oldPrice, newPrice, volume, blockTimestamp)
+        updateAllIntervals(baseToken, quoteToken, oldPrice, newPrice, volume, 0, blockTimestamp)
       }
     }
   } else {
@@ -95,14 +99,32 @@ export function updateCandleSticks(event: ConversionEventForSwap): void {
   }
 }
 
-function updateAllIntervals(baseToken: Token, quoteToken: Token, oldPrice: BigDecimal, newPrice: BigDecimal, volume: BigDecimal, blockTimestamp: BigInt): void {
+function updateAllIntervals(
+  baseToken: Token,
+  quoteToken: Token,
+  oldPrice: BigDecimal,
+  newPrice: BigDecimal,
+  volume: BigDecimal,
+  txCount: i32,
+  blockTimestamp: BigInt
+): void {
   if (baseToken !== null && quoteToken !== null) {
     if (oldPrice.gt(BigDecimal.zero()) && newPrice.gt(BigDecimal.zero())) {
-      updateCandlestick(baseToken, quoteToken, oldPrice, newPrice, volume, blockTimestamp, Interval.MinuteInterval, IntervalStr.MinuteInterval)
-      updateCandlestick(baseToken, quoteToken, oldPrice, newPrice, volume, blockTimestamp, Interval.FifteenMintuesInterval, IntervalStr.FifteenMintuesInterval)
-      updateCandlestick(baseToken, quoteToken, oldPrice, newPrice, volume, blockTimestamp, Interval.HourInterval, IntervalStr.HourInterval)
-      updateCandlestick(baseToken, quoteToken, oldPrice, newPrice, volume, blockTimestamp, Interval.FourHourInterval, IntervalStr.FourHourInterval)
-      updateCandlestick(baseToken, quoteToken, oldPrice, newPrice, volume, blockTimestamp, Interval.DayInterval, IntervalStr.DayInterval)
+      updateCandlestick(baseToken, quoteToken, oldPrice, newPrice, volume, txCount, blockTimestamp, Interval.MinuteInterval, IntervalStr.MinuteInterval)
+      updateCandlestick(
+        baseToken,
+        quoteToken,
+        oldPrice,
+        newPrice,
+        volume,
+        txCount,
+        blockTimestamp,
+        Interval.FifteenMintuesInterval,
+        IntervalStr.FifteenMintuesInterval
+      )
+      updateCandlestick(baseToken, quoteToken, oldPrice, newPrice, volume, txCount, blockTimestamp, Interval.HourInterval, IntervalStr.HourInterval)
+      updateCandlestick(baseToken, quoteToken, oldPrice, newPrice, volume, txCount, blockTimestamp, Interval.FourHourInterval, IntervalStr.FourHourInterval)
+      updateCandlestick(baseToken, quoteToken, oldPrice, newPrice, volume, txCount, blockTimestamp, Interval.DayInterval, IntervalStr.DayInterval)
     }
   } else {
     log.warning('Candlesticks one or both tokens returned null on load - baseToken: {}, quoteToken {}', [baseToken.id, quoteToken.id])
@@ -115,6 +137,7 @@ function updateCandlestick(
   oldPrice: BigDecimal,
   newPrice: BigDecimal,
   volume: BigDecimal,
+  txCount: i32,
   blockTimestamp: BigInt,
   interval: Interval,
   intervalStr: string
@@ -131,7 +154,7 @@ function updateCandlestick(
     candleStick.open = oldPrice == BigDecimal.zero() ? newPrice : oldPrice
     candleStick.low = oldPrice == BigDecimal.zero() ? newPrice : oldPrice
     candleStick.high = oldPrice == BigDecimal.zero() ? newPrice : oldPrice
-    // candleStick.txCount = BigInt.zero()
+    candleStick.txCount = 0
     candleStick.totalVolume = BigDecimal.zero()
     candleStick.baseToken = baseToken.id
     candleStick.quoteToken = quoteToken.id
@@ -148,7 +171,7 @@ function updateCandlestick(
   candleStick.totalVolume = candleStick.totalVolume.plus(volume)
 
   candleStick.close = newPrice
-  // candleStick.txCount = candleStick.txCount.plus(BigInt.fromI32(1))
+  candleStick.txCount = candleStick.txCount + txCount
   candleStick.save()
 }
 class ICandleStick {
