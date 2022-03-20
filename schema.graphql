@@ -1149,8 +1149,7 @@ enum CandleSticksInterval {
 }
 
 type CandleStick @entity {
-  id: ID! # fromToken + toToken + timestamp
-  # tradingPair: String! # baseToken_quoteToken
+  id: ID! # fromToken + toToken + timestamp + interval
   baseToken: Token
   quoteToken: Token
   interval: CandleSticksInterval

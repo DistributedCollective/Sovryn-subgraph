@@ -114,7 +114,7 @@ function updateCandlestick(
 ): void {
   let candleStickTimestamp = blockTimestamp.toI32() - (blockTimestamp.toI32() % interval)
   log.debug('src/utils/Candlesticks.ts ~ Candlesticks.ts ~ 80 ~  candleStickTimestamp: {}', [candleStickTimestamp.toString()])
-  const candlestickId = getCandleStickId(baseToken, quoteToken, candleStickTimestamp)
+  const candlestickId = getCandleStickId(baseToken, quoteToken, candleStickTimestamp, interval)
   const candleStickObj = getCandleStick(candlestickId, intervalStr)
 
   const isNew = candleStickObj.isNew
@@ -164,8 +164,8 @@ function getCandleStick(candlestickId: string, interval: string): ICandleStick {
   }
 }
 
-function getCandleStickId(baseToken: Token, quoteToken: Token, candleStickTimestamp: number): string {
+function getCandleStickId(baseToken: Token, quoteToken: Token, candleStickTimestamp: number, interval: Interval): string {
   const tradingPairId = baseToken.id.toLowerCase() + '_' + quoteToken.id.toLowerCase()
-  const candleStickId = tradingPairId + '-' + candleStickTimestamp.toString()
+  const candleStickId = tradingPairId + '-' + candleStickTimestamp.toString() + '-' + interval.toString()
   return candleStickId
 }
