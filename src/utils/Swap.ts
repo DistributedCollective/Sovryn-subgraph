@@ -91,8 +91,11 @@ export function updatePricing(event: ConversionEventForSwap): void {
       btcUsdPrice = tokenAmount.div(btcAmount)
       protocolStatsEntity.btcUsdPrice = btcUsdPrice
       protocolStatsEntity.save()
+      BTCToken.prevPriceUsd = BTCToken.lastPriceUsd
       BTCToken.lastPriceUsd = btcUsdPrice
+      BTCToken.prevPriceBtc = decimal.ONE
       BTCToken.lastPriceBtc = decimal.ONE
+
       updateLastPriceUsdAll(event.timestamp)
     }
 
@@ -104,6 +107,7 @@ export function updatePricing(event: ConversionEventForSwap): void {
         token.lastPriceUsd = newPriceUsd
       }
 
+      token.prevPriceBtc = token.lastPriceBtc
       token.lastPriceBtc = newPriceBtc
       let lpFeeUsd = newPriceUsd.times(event.lpFee)
       let stakerFeeUsd = newPriceUsd.times(event.protocolFee)

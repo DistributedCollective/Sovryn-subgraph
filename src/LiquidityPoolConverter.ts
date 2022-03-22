@@ -41,6 +41,7 @@ import { createAndReturnUser } from './utils/User'
 import { updateVolumes } from './utils/Volumes'
 import { decimal } from '@protofire/subgraph-toolkit'
 import { liquidityPoolV1ChangeBlock } from './contracts/contracts'
+import { updateCandleSticks } from './utils/Candlesticks'
 
 export function handlePriceDataUpdate(event: PriceDataUpdateEvent): void {
   let entity = new PriceDataUpdate(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
@@ -301,6 +302,7 @@ export function handleConversionV1(event: ConversionEventV1): void {
   createAndReturnSwap(parsedEvent)
   updatePricing(parsedEvent)
   updateVolumes(parsedEvent, dataSource.address())
+  updateCandleSticks(parsedEvent)
 }
 
 export function handleConversionV2(event: ConversionEventV2): void {
@@ -335,6 +337,7 @@ export function handleConversionV2(event: ConversionEventV2): void {
   createAndReturnSwap(parsedEvent)
   updatePricing(parsedEvent)
   updateVolumes(parsedEvent, dataSource.address())
+  updateCandleSticks(parsedEvent)
 }
 
 export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void {
@@ -368,6 +371,7 @@ export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void
   createAndReturnSwap(parsedEvent)
   updatePricing(parsedEvent)
   updateVolumes(parsedEvent, dataSource.address())
+  updateCandleSticks(parsedEvent)
 }
 
 export function handleTokenRateUpdate(event: TokenRateUpdateEvent): void {

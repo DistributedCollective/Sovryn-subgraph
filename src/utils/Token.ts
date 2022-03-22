@@ -13,7 +13,9 @@ export function createAndReturnToken(tokenAddress: Address, converterAddress: Ad
   if (token === null) {
     isNewToken = true
     token = new Token(tokenAddress.toHex())
+    token.prevPriceUsd = BigDecimal.zero()
     token.lastPriceUsd = BigDecimal.zero()
+    token.prevPriceBtc = BigDecimal.zero()
     token.lastPriceBtc = BigDecimal.zero()
     token.btcVolume = BigDecimal.zero()
     token.usdVolume = BigDecimal.zero()

@@ -20,6 +20,7 @@ export function updateLastPriceUsdAll(timestamp: BigInt): void {
       let tokenEntity = Token.load(token)
       if (tokenEntity !== null) {
         log.debug('UPDATING LAST PRICE USD, lastPriceUsd: {}, btcToUsdPrice: {}', [tokenEntity.lastPriceUsd.toString(), btcUsdPrice.toString()])
+        tokenEntity.prevPriceUsd = tokenEntity.lastPriceUsd
         tokenEntity.lastPriceUsd = tokenEntity.lastPriceBtc.times(btcUsdPrice).truncate(18)
         tokenEntity.save()
       } else if (tokenEntity != null && tokenEntity.hasStablecoinPool == true) {
