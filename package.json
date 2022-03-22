@@ -31,6 +31,7 @@
     "@protofire/subgraph-toolkit": "^0.1.2",
     "commander": "^8.3.0",
     "dotenv": "^16.0.0",
+    "js-yaml": "^4.1.0",
     "mustache": "^4.2.0",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1"
