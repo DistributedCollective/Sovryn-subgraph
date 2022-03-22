@@ -253,7 +253,7 @@ type PoolToken @entity {
   name: String
   symbol: String
   decimals: Int
-  converters: LiquidityPoolToken! @derivedFrom(field: "poolToken") #TODO: Does this need a many-to-many relationship?
+  converters: [LiquidityPoolToken!] @derivedFrom(field: "poolToken") #TODO: Does this need a many-to-many relationship?
   underlyingAssets: [TokenPoolToken!] @derivedFrom(field: "poolToken")
 }
 
@@ -301,7 +301,7 @@ type LiquidityPool @entity {
 }
 
 type LiquidityPoolToken @entity {
-  id: ID! # ID is token address + liquidityPool address
+  id: ID! # ID liquidityPool address + tokenAddress
   token: Token!
   liquidityPool: LiquidityPool!
   poolToken: PoolToken!
@@ -434,9 +434,9 @@ type PriceDataUpdate @entity {
 }
 
 type UserLiquidityHistory @entity {
-  id: ID! # user + liquidity pool
+  id: ID! # user + '-' + smartToken
   user: User!
-  liquidityPool: LiquidityPool!
+  poolToken: PoolToken!
   totalAsset0LiquidityAdded: BigInt!
   totalAsset0LiquidityRemoved: BigInt!
   totalAsset1LiquidityAdded: BigInt!
@@ -1019,27 +1019,6 @@ type RewardsEarnedHistoryItem @entity {
   user: UserRewardsEarnedHistory!
   token: Token
   amount: BigInt!
-  timestamp: BigInt!
-  transaction: Transaction!
-}
-
-# Matches liquidSovHistory sql
-type LiquidSovHistory @entity {
-  id: ID! #transaction hash
-  action: String!
-  user: User!
-  sovAmount: BigInt!
-  timestamp: BigInt!
-  transaction: Transaction!
-}
-
-# Matches rewardHistorySql_new
-type RewardHistory @entity {
-  id: ID!
-  action: String!
-  user: User!
-  amount: BigInt!
-  poolToken: PoolToken
   timestamp: BigInt!
   transaction: Transaction!
 }

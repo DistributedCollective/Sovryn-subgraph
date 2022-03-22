@@ -28,11 +28,13 @@ import {
   ConversionFeeUpdate,
   WithdrawFees,
   LiquidityPool,
+  LiquidityPoolToken,
+  SmartToken,
 } from '../generated/schema'
 import { ConversionEventForSwap, createAndReturnSwap, updatePricing } from './utils/Swap'
 import { createAndReturnToken } from './utils/Token'
 import { loadTransaction } from './utils/Transaction'
-import { BigInt, BigDecimal, dataSource, log } from '@graphprotocol/graph-ts'
+import { BigInt, BigDecimal, dataSource, log, store } from '@graphprotocol/graph-ts'
 import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnPoolToken } from './utils/PoolToken'
 import { createAndReturnUser } from './utils/User'
@@ -93,7 +95,7 @@ function updateUserLiquidityHistory(
   amountAdded: BigInt,
   amountRemoved: BigInt
 ): void {
-  /** This would be more efficient with anoter if/else statement for type, but less readable? */
+  /** This would be more efficient with another if/else statement for type, but less readable? */
   if (liquidityPool.token0 == token) {
     userLiquidityHistory.totalAsset0LiquidityAdded = userLiquidityHistory.totalAsset0LiquidityAdded.plus(amountAdded)
     userLiquidityHistory.totalAsset0LiquidityRemoved = userLiquidityHistory.totalAsset0LiquidityRemoved.plus(amountRemoved)
@@ -107,12 +109,15 @@ function updateUserLiquidityHistory(
 export function handleLiquidityAdded(event: LiquidityAddedEvent): void {
   createAndReturnUser(event.transaction.from)
   let liquidityPool = LiquidityPool.load(event.address.toHexString())
-  if (liquidityPool != null) {
-    let userLiquidityHistory = UserLiquidityHistory.load(event.transaction.from.toHexString() + event.address.toHexString())
+  let liquidityPoolToken = LiquidityPoolToken.load(event.address.toHexString() + event.params._reserveToken.toHexString())
+  let userLiquidityHistoryId = ''
+  if (liquidityPool != null && liquidityPoolToken != null) {
+    userLiquidityHistoryId = event.transaction.from.toHexString() + liquidityPoolToken.poolToken
+    let userLiquidityHistory = UserLiquidityHistory.load(userLiquidityHistoryId)
     if (userLiquidityHistory == null) {
-      userLiquidityHistory = new UserLiquidityHistory(event.transaction.from.toHexString() + event.address.toHexString())
+      userLiquidityHistory = new UserLiquidityHistory(userLiquidityHistoryId)
       userLiquidityHistory.user = event.transaction.from.toHexString()
-      userLiquidityHistory.liquidityPool = event.address.toHexString()
+      userLiquidityHistory.poolToken = liquidityPoolToken.poolToken
       userLiquidityHistory.totalAsset0LiquidityAdded = BigInt.zero()
       userLiquidityHistory.totalAsset0LiquidityRemoved = BigInt.zero()
       userLiquidityHistory.totalAsset1LiquidityAdded = BigInt.zero()
@@ -128,7 +133,7 @@ export function handleLiquidityAdded(event: LiquidityAddedEvent): void {
   createLiquidityHistoryItem({
     id: event.transaction.hash.toHex() + '-' + event.logIndex.toString(),
     user: event.transaction.from.toHexString(),
-    userLiquidityHistory: event.transaction.from.toHexString() + event.address.toHexString(),
+    userLiquidityHistory: userLiquidityHistoryId,
     type: 'Added',
     provider: event.params._provider.toHexString(),
     reserveToken: event.params._reserveToken.toHexString(),
@@ -145,8 +150,11 @@ export function handleLiquidityAdded(event: LiquidityAddedEvent): void {
 export function handleLiquidityRemoved(event: LiquidityRemovedEvent): void {
   createAndReturnUser(event.transaction.from)
   let liquidityPool = LiquidityPool.load(event.address.toHexString())
-  if (liquidityPool != null) {
-    let userLiquidityHistory = UserLiquidityHistory.load(event.transaction.from.toHexString() + event.address.toHexString())
+  let liquidityPoolToken = LiquidityPoolToken.load(event.address.toHexString() + event.params._reserveToken.toHexString())
+  let userLiquidityHistoryId = ''
+  if (liquidityPool != null && liquidityPoolToken != null) {
+    userLiquidityHistoryId = event.transaction.from.toHexString() + liquidityPoolToken.poolToken
+    let userLiquidityHistory = UserLiquidityHistory.load(userLiquidityHistoryId)
     if (userLiquidityHistory != null) {
       if (userLiquidityHistory != null) {
         updateUserLiquidityHistory(liquidityPool, userLiquidityHistory, event.params._reserveToken.toHexString(), BigInt.zero(), event.params._amount)
@@ -158,7 +166,7 @@ export function handleLiquidityRemoved(event: LiquidityRemovedEvent): void {
   createLiquidityHistoryItem({
     id: event.transaction.hash.toHex() + '-' + event.logIndex.toString(),
     user: event.transaction.from.toHexString(),
-    userLiquidityHistory: event.transaction.from.toHexString() + event.address.toHexString(),
+    userLiquidityHistory: userLiquidityHistoryId,
     type: 'Removed',
     provider: event.params._provider.toHexString(),
     reserveToken: event.params._reserveToken.toHexString(),
@@ -172,6 +180,7 @@ export function handleLiquidityRemoved(event: LiquidityRemovedEvent): void {
   })
 }
 
+/** This event is triggered when a pool is activated or deactivated */
 export function handleActivation(event: ActivationEvent): void {
   let entity = new Activation(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   entity._type = event.params._type
@@ -187,10 +196,18 @@ export function handleActivation(event: ActivationEvent): void {
 
   if (liquidityPool != null) {
     liquidityPool.activated = event.params._activated
-    let smartToken = createAndReturnSmartToken(event.params._anchor)
-    liquidityPool.smartToken = smartToken.smartToken.id
+
+    if (event.params._activated == true) {
+      let smartToken = createAndReturnSmartToken(event.params._anchor)
+      liquidityPool.smartToken = smartToken.smartToken.id
+    } else {
+      /** This either means the liquidity pool is not yet activated, or that the liquidity pool has been deactivated */
+      liquidityPool.smartToken = null
+      liquidityPool.currentConverterRegistry = null
+    }
 
     if (event.params._type == 1) {
+      /** The liquidityPoolV1ChangeBlock is where the abi changes to include the protocolFee */
       if (event.block.number < BigInt.fromI32(liquidityPoolV1ChangeBlock)) {
         const contract = LiquidityPoolV1Contract.bind(event.address)
         let reserveTokenCountResult = contract.try_reserveTokenCount()

@@ -132,11 +132,6 @@ export function handleTokensUnlocked(event: TokensUnlockedEvent): void {}
 
 export function handleTokensWithdrawn(event: TokensWithdrawnEvent): void {
   let transaction = loadTransaction(event)
-  /** TODO: Don't hardcode this */
-  if (dataSource.address().toHexString() == '0xc1fc98FEFA2130fC1CE352ec85f7aa61021eFE97') {
-    handleWithdrawnFish(event.params.staker.toHexString(), event.params.amount)
-    return
-  }
   handleStakingOrTokensWithdrawn(
     event.transaction.hash.toHex() + '-' + event.logIndex.toString(),
     transaction,
@@ -148,13 +143,7 @@ export function handleTokensWithdrawn(event: TokensWithdrawnEvent): void {
 
 /** This is a copy of handleTokensWithdrawn. The event was renamed but params remained the same. */
 export function handleStakingWithdrawn(event: StakingWithdrawnEvent): void {
-  let context = dataSource.context()
   let transaction = loadTransaction(event)
-  let name = context.getString('name')
-  if (name == 'StakingFish') {
-    handleWithdrawnFish(event.params.staker.toHexString(), event.params.amount)
-    return
-  }
   handleStakingOrTokensWithdrawn(
     event.transaction.hash.toHex() + '-' + event.logIndex.toString(),
     transaction,
@@ -217,12 +206,4 @@ export function handleVestingTokensWithdrawn(event: VestingTokensWithdrawnEvent)
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
-}
-
-function handleWithdrawnFish(vestingAddress: string, amount: BigInt): void {
-  let vestingEntity = VestingContract.load(vestingAddress)
-  if (vestingEntity != null) {
-    vestingEntity.currentBalance = vestingEntity.currentBalance.minus(amount)
-    vestingEntity.save()
-  }
 }
