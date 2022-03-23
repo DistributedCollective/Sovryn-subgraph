@@ -917,8 +917,18 @@ type VestingContract @entity {
   type: String! # Team, Non-team, Rewards, Fish
   emittedBy: Bytes!
   createdAtTransaction: Transaction!
-  stakeHistory: [TokensStaked!]!
-  # sovTransferred: [SOVTransferred!] @derivedFrom(field: "receiver")
+  stakeHistory: [VestingTokensStaked!] @derivedFrom(field: "staker")
+}
+
+type VestingTokensStaked @entity {
+  id: ID!
+  staker: VestingContract!
+  amount: BigInt! # uint256
+  lockedUntil: BigInt! # uint256
+  totalStaked: BigInt! # uint256
+  timestamp: BigInt!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
 }
 
 type SOVTransferred @entity {

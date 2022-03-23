@@ -9,7 +9,16 @@ import {
   StakingWithdrawn as StakingWithdrawnEvent,
   VestingTokensWithdrawn as VestingTokensWithdrawnEvent,
 } from '../generated/Staking/Staking'
-import { DelegateStakeChanged, StakeHistoryItem, TokensStaked, VestingContract, VestingTokensWithdrawn, User, Transaction } from '../generated/schema'
+import {
+  DelegateStakeChanged,
+  StakeHistoryItem,
+  TokensStaked,
+  VestingContract,
+  VestingTokensWithdrawn,
+  User,
+  Transaction,
+  VestingTokensStaked,
+} from '../generated/schema'
 import { loadTransaction } from './utils/Transaction'
 import { createAndReturnUser, createAndReturnUserStakeHistory } from './utils/User'
 import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
@@ -69,7 +78,6 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
   entity.transaction = transaction.id
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
-  entity.save()
 
   let vestingContract = VestingContract.load(event.params.staker.toHexString())
   entity.isUserStaked == false
@@ -91,10 +99,11 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     newVestingContract.createdAtTimestamp = event.block.timestamp
     newVestingContract.emittedBy = event.address
     newVestingContract.createdAtTransaction = transaction.id
-    newVestingContract.stakeHistory.push(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
     newVestingContract.startingBalance = event.params.amount
     newVestingContract.currentBalance = event.params.amount
     newVestingContract.save()
+
+    createVestingTokensStaked(event)
   } else if (vestingContract == null) {
     /** Tokens were staked by user. If tokens were staked by Vesting Contract, this is handled in VestingRegistry or VestingLogic */
     createAndReturnUser(event.params.staker)
@@ -125,7 +134,23 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     let protocolStatsEntity = createAndReturnProtocolStats()
     protocolStatsEntity.totalStakedByVestingSov = protocolStatsEntity.totalStakedByVestingSov.plus(event.params.amount)
     protocolStatsEntity.save()
+
+    createVestingTokensStaked(event)
   }
+
+  entity.save()
+}
+
+function createVestingTokensStaked(event: TokensStakedEvent): void {
+  let vestingTokensStakedEntity = new VestingTokensStaked(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
+  vestingTokensStakedEntity.staker = event.params.staker.toHexString()
+  vestingTokensStakedEntity.amount = event.params.amount
+  vestingTokensStakedEntity.lockedUntil = event.params.lockedUntil
+  vestingTokensStakedEntity.totalStaked = event.params.totalStaked
+  vestingTokensStakedEntity.timestamp = event.block.timestamp
+  vestingTokensStakedEntity.emittedBy = event.address
+  vestingTokensStakedEntity.transaction = event.transaction.hash.toHex()
+  vestingTokensStakedEntity.save()
 }
 
 export function handleTokensUnlocked(event: TokensUnlockedEvent): void {}
