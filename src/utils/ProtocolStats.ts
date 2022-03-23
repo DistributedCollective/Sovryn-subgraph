@@ -25,6 +25,7 @@ export function createAndReturnProtocolStats(): ProtocolStats {
     protocolStatsEntity.totalVoluntarilyStakedSov = BigInt.zero()
     protocolStatsEntity.totalStakedByVestingSov = BigInt.zero()
     protocolStatsEntity.btcUsdPrice = BigDecimal.zero()
+    // TODO: this is hardcoded mainnet value, should be dynamic for testnet/mainnet somehow
     protocolStatsEntity.usdStablecoin = '0xe700691da7b9851f2f35f8b8182c69c53ccad9db'
     protocolStatsEntity.tokens = []
     protocolStatsEntity.save()
