@@ -30,7 +30,7 @@ import {
   SetLoanPool,
   SetWrbtcToken,
   Trade,
-  LoanToken,
+  LendingPool,
   Swap,
   UserRewardsEarnedHistory,
   RewardsEarnedHistoryItem,
@@ -398,9 +398,12 @@ export function handleSetLoanPool(event: SetLoanPoolEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
 
-  let loanTokenEntity = new LoanToken(event.params.loanPool.toHexString())
-  loanTokenEntity.underlyingAsset = event.params.underlying.toHexString()
-  loanTokenEntity.save()
+  let lendingPoolEntity = new LendingPool(event.params.loanPool.toHexString())
+  lendingPoolEntity.underlyingAsset = event.params.underlying.toHexString()
+  lendingPoolEntity.poolTokenBalance = BigInt.zero()
+  lendingPoolEntity.assetBalance = BigInt.zero()
+  lendingPoolEntity.totalAssetLent = BigInt.zero()
+  lendingPoolEntity.save()
 
   entity.save()
 }

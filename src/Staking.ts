@@ -166,7 +166,7 @@ function handleStakingOrTokensWithdrawn(id: string, transaction: Transaction, st
     stakeHistoryItem.save()
 
     let userStakeHistory = createAndReturnUserStakeHistory(receiver)
-    userStakeHistory.totalWithdrawn = userStakeHistory.totalWithdrawn.minus(amount)
+    userStakeHistory.totalWithdrawn = userStakeHistory.totalWithdrawn.plus(amount)
     userStakeHistory.totalRemaining = userStakeHistory.totalRemaining.minus(amount)
     userStakeHistory.save()
 
