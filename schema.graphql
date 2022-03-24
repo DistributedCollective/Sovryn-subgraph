@@ -48,7 +48,7 @@ type ProtocolStats @entity {
   totalTransactedVolumeUsd: BigInt! # TODO: Implement
 }
 
-type UserTotals @entity {
+type UserTotal @entity {
   id: ID!
   user: User!
   totalMarginTradeVolumeUsd: BigDecimal!
@@ -65,7 +65,7 @@ type UserTotals @entity {
   totalUnlendVolumeUsd: BigDecimal!
   totalBorrowVolumeUsd: BigDecimal!
   totalCloseWithDepositVolumeUsd: BigDecimal!
-  totalTransactedVolumeUsd: BigInt! # TODO: Implement
+  # totalTransactedVolumeUsd: BigInt! # TODO: Implement
 }
 
 type SmartToken @entity {
@@ -199,7 +199,7 @@ type User @entity {
   """
   vestingContracts: [VestingContract!] @derivedFrom(field: "user")
   votes: [VoteCast!] @derivedFrom(field: "voter")
-  userTotals: UserTotals @derivedFrom(field: "user")
+  userTotals: UserTotal @derivedFrom(field: "user")
 }
 
 type UserLendingHistory @entity {
@@ -917,11 +917,18 @@ type VestingContract @entity {
   type: String! # Team, Non-team, Rewards, Fish
   emittedBy: Bytes!
   createdAtTransaction: Transaction!
-  stakeHistory: [VestingTokensStaked!] @derivedFrom(field: "staker")
+  stakeHistory: [VestingHistoryItem!] @derivedFrom(field: "staker")
 }
 
-type VestingTokensStaked @entity {
+enum VestingHistoryItemAction {
+  TokensStaked,
+  TeamTokensRevoked,
+  TokensWithdrawn
+}
+
+type VestingHistoryItem @entity {
   id: ID!
+  action: VestingHistoryItemAction!
   staker: VestingContract!
   amount: BigInt! # uint256
   lockedUntil: BigInt! # uint256

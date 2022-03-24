@@ -74,7 +74,7 @@ export function handleUserFeeWithdrawn(event: UserFeeWithdrawnEvent): void {
 
   let stakeHistoryItem = new StakeHistoryItem(event.params.sender.toHexString())
   stakeHistoryItem.user = event.params.sender.toHexString()
-  stakeHistoryItem.action = 'Fee Withdrawn'
+  stakeHistoryItem.action = 'FeeWithdrawn'
   stakeHistoryItem.timestamp = event.block.timestamp
   stakeHistoryItem.amount = event.params.amount
   stakeHistoryItem.transaction = event.transaction.hash.toHexString()

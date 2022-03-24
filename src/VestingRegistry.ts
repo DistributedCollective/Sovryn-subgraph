@@ -49,7 +49,6 @@ vestingContractTypes.set(vestingRegistry3.toLowerCase(), 'Rewards')
 vestingContractTypes.set(vestingRegistryFish.toLowerCase(), 'Fish')
 
 export function handleTeamVestingCreated(event: TeamVestingCreatedEvent): void {
-  log.debug('VESTING CREATED', [event.params.vesting.toHexString()])
   let entity = new VestingContract(event.params.vesting.toHexString())
   let user = createAndReturnUser(event.params.tokenOwner)
   entity.user = user.id
@@ -61,8 +60,7 @@ export function handleTeamVestingCreated(event: TeamVestingCreatedEvent): void {
   entity.createdAtTransaction = transaction.id
   entity.createdAtTimestamp = transaction.timestamp
   entity.emittedBy = event.address
-  entity.type = vestingContractTypes.get(event.address.toHexString().toLowerCase()) == 'Fish' ? 'Fish Team' : 'Team'
-  entity.stakeHistory = []
+  entity.type = vestingContractTypes.get(event.address.toHexString().toLowerCase()) == 'Fish' ? 'FishTeam' : 'Team'
   entity.save()
 }
 
@@ -82,6 +80,5 @@ export function handleVestingCreated(event: VestingCreatedEvent): void {
   entity.createdAtTimestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.type = vestingContractTypes.get(event.address.toHexString().toLowerCase())
-  entity.stakeHistory = []
   entity.save()
 }
