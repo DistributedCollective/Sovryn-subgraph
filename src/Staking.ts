@@ -9,11 +9,11 @@ import {
   StakingWithdrawn as StakingWithdrawnEvent,
   VestingTokensWithdrawn as VestingTokensWithdrawnEvent,
 } from '../generated/Staking/Staking'
-import { StakeHistoryItem, TokensStaked, VestingContract, User, Transaction, VestingHistoryItem } from '../generated/schema'
+import { StakeHistoryItem, TokensStaked, VestingContract, User, Transaction, VestingHistoryItem, FeeSharingTokensTransferred } from '../generated/schema'
 import { loadTransaction } from './utils/Transaction'
 import { createAndReturnUser, createAndReturnUserStakeHistory } from './utils/User'
 import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
-import { Address, BigInt, dataSource } from '@graphprotocol/graph-ts'
+import { Address, BigInt } from '@graphprotocol/graph-ts'
 import { genesisVestingStartBlock, genesisVestingEndBlock } from './blockNumbers/blockNumbers'
 import { createAndReturnProtocolStats } from './utils/ProtocolStats'
 import { adminContracts, stakingFish } from './contracts/contracts'
@@ -156,9 +156,10 @@ function handleStakingOrTokensWithdrawn(id: string, transaction: Transaction, st
   let vesting = VestingContract.load(staker.toHexString().toLowerCase())
   if (user !== null) {
     let stakeHistoryItem = new StakeHistoryItem(id)
+    /** Check if there was a fee sharing event in this transaction. If there was, this was early unstaking */
+    let feeSharingTokensTransferredEvent = FeeSharingTokensTransferred.load(transaction.id)
     stakeHistoryItem.user = receiver.toHexString()
-    /** In the FeeSharingProxy mapping, the handleTokensTransferred function will change this to Unstaked if a slashing event occurred */
-    stakeHistoryItem.action = 'WithdrawStaked'
+    stakeHistoryItem.action = feeSharingTokensTransferredEvent == null ? 'WithdrawStaked' : 'Unstake'
     stakeHistoryItem.amount = amount
     stakeHistoryItem.timestamp = transaction.timestamp
     stakeHistoryItem.transaction = transaction.id
@@ -167,6 +168,9 @@ function handleStakingOrTokensWithdrawn(id: string, transaction: Transaction, st
     let userStakeHistory = createAndReturnUserStakeHistory(receiver)
     userStakeHistory.totalWithdrawn = userStakeHistory.totalWithdrawn.plus(amount)
     userStakeHistory.totalRemaining = userStakeHistory.totalRemaining.minus(amount)
+    if (feeSharingTokensTransferredEvent != null) {
+      userStakeHistory.totalRemaining = userStakeHistory.totalRemaining.minus(feeSharingTokensTransferredEvent.amount)
+    }
     userStakeHistory.save()
 
     let protocolStatsEntity = createAndReturnProtocolStats()

@@ -1027,3 +1027,13 @@ type VoteCast @entity {
   emittedBy: Bytes! #address
   transaction: Transaction!
 }
+
+# This event is emitted when tokens are transferred to the Protocol contract as fees
+# It is needed because this is a flag for if staked tokens were unstaked early
+
+type FeeSharingTokensTransferred @entity {
+  id: ID! # ID is tx hash - it can't be tx hash + log index because we need to load on tx hash
+  sender: Bytes!
+  token: Bytes!
+  amount: BigInt!
+}

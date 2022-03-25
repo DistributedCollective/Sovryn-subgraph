@@ -8,7 +8,7 @@ import {
   UserFeeWithdrawn as UserFeeWithdrawnEvent,
   WhitelistedConverter as WhitelistedConverterEvent,
 } from '../generated/FeeSharingProxy/FeeSharingProxy'
-import { StakeHistoryItem } from '../generated/schema'
+import { StakeHistoryItem, FeeSharingTokensTransferred } from '../generated/schema'
 
 import { loadTransaction } from './utils/Transaction'
 
@@ -23,12 +23,14 @@ export function handleOwnershipTransferred(event: OwnershipTransferredEvent): vo
 export function handleTokensTransferred(event: TokensTransferredEvent): void {
   /** If this event occurs in the same transaction as a StakingWithdrawn or TokensWithdrawn event on the staking contract, it means the user unstaked their SOV early
    * This event is emitted when the "slashing" penalty for early unstaking occurs
+   * This event is emitted BEFORE TokensWithdrawn
    */
-  let stakeHistoryEntity = StakeHistoryItem.load(event.transaction.hash.toHexString())
-  if (stakeHistoryEntity != null) {
-    stakeHistoryEntity.action = 'Unstake'
-    stakeHistoryEntity.save()
-  }
+
+  let tokensTransferredEntity = new FeeSharingTokensTransferred(event.transaction.hash.toHexString())
+  tokensTransferredEntity.sender = event.params.sender
+  tokensTransferredEntity.token = event.params.token
+  tokensTransferredEntity.amount = event.params.amount
+  tokensTransferredEntity.save()
 }
 
 export function handleUnwhitelistedConverter(event: UnwhitelistedConverterEvent): void {}
