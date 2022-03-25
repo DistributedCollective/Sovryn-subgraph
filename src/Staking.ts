@@ -178,6 +178,7 @@ function handleStakingOrTokensWithdrawn(id: string, transaction: Transaction, st
     stakeHistoryItem.user = receiver.toHexString()
     /** In the FeeSharingProxy mapping, the handleTokensTransferred function will change this to Unstaked if a slashing event occurred */
     stakeHistoryItem.action = 'WithdrawStaked'
+    stakeHistoryItem.amount = amount
     stakeHistoryItem.timestamp = transaction.timestamp
     stakeHistoryItem.transaction = transaction.id
     stakeHistoryItem.save()

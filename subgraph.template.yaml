@@ -526,13 +526,12 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - Deposited
+        - UserRewardEarnedHistory
+        - RewardsEarnedHistoryItem
       abis:
         - name: LockedSov
           file: ./abis/LockedSov.json
       eventHandlers:
-        - event: Deposited(indexed address,indexed address,uint256,uint256)
-          handler: handleDeposited
         - event: TokenStaked(indexed address,indexed address,uint256)
           handler: handleTokenStaked
       file: ./src/LockedSov.ts

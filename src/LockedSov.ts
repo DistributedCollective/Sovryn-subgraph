@@ -1,8 +1,6 @@
 import { BigInt } from '@graphprotocol/graph-ts'
-import { Deposited as DepositedEvent, TokenStaked as TokenStakedEvent } from '../generated/LockedSov/LockedSov'
-import { Deposited, UserRewardsEarnedHistory, RewardsEarnedHistoryItem } from '../generated/schema'
-
-import { loadTransaction } from './utils/Transaction'
+import { TokenStaked as TokenStakedEvent } from '../generated/LockedSov/LockedSov'
+import { UserRewardsEarnedHistory, RewardsEarnedHistoryItem } from '../generated/schema'
 import { createAndReturnUser } from './utils/User'
 
 export function handleTokenStaked(event: TokenStakedEvent): void {
