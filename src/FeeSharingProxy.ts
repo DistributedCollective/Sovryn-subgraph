@@ -21,6 +21,9 @@ export function handleFeeWithdrawn(event: FeeWithdrawnEvent): void {}
 export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {}
 
 export function handleTokensTransferred(event: TokensTransferredEvent): void {
+  /** If this event occurs in the same transaction as a StakingWithdrawn or TokensWithdrawn event on the staking contract, it means the user unstaked their SOV early
+   * This event is emitted when the "slashing" penalty for early unstaking occurs
+   */
   let stakeHistoryEntity = StakeHistoryItem.load(event.transaction.hash.toHexString())
   if (stakeHistoryEntity != null) {
     stakeHistoryEntity.action = 'Unstake'
