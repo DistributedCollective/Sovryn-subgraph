@@ -1121,6 +1121,22 @@ type UserFeeWithdrawn @entity {
   transaction: Transaction!
 }
 
+<<<<<<< HEAD
+=======
+# Locked SOV
+
+type Deposited @entity {
+  id: ID!
+  _initiator: Bytes! # address
+  _userAddress: Bytes! # address
+  _sovAmount: BigInt! # uint256
+  _basisPoint: BigInt! # uint256
+  timestamp: BigInt!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
+>>>>>>> 5f0655002b5d33c9c1f5ca8dfefc6a11332602d2
 # Mining Proxy
 
 type RewardClaimed @entity {

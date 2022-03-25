@@ -43,12 +43,15 @@ export function handleBurn(event: BurnEvent): void {
   lendingHistoryItem.loanTokenAmount = entity.tokenAmount
   lendingHistoryItem.save()
 
+<<<<<<< HEAD
   let lendingPoolEntity = LendingPool.load(event.address.toHexString())
   if (lendingPoolEntity != null) {
     lendingPoolEntity.poolTokenBalance = lendingPoolEntity.poolTokenBalance.minus(event.params.tokenAmount)
     lendingPoolEntity.assetBalance = lendingPoolEntity.assetBalance.minus(event.params.assetAmount)
   }
 
+=======
+>>>>>>> 5f0655002b5d33c9c1f5ca8dfefc6a11332602d2
   let protocolStatsEntity = createAndReturnProtocolStats()
   let userTotalsEntity = createAndReturnUserTotals(event.params.burner)
   let usdVolume = convertToUsd(Address.fromString(underlyingAsset), event.params.assetAmount)
@@ -117,6 +120,7 @@ export function handleMint(event: MintEvent): void {
   lendingHistoryItem.loanTokenAmount = entity.tokenAmount
   lendingHistoryItem.save()
 
+<<<<<<< HEAD
   let lendingPoolEntity = LendingPool.load(event.address.toHexString())
   if (lendingPoolEntity != null) {
     lendingPoolEntity.poolTokenBalance = lendingPoolEntity.poolTokenBalance.plus(event.params.tokenAmount)
@@ -124,6 +128,8 @@ export function handleMint(event: MintEvent): void {
     lendingPoolEntity.totalAssetLent = lendingPoolEntity.totalAssetLent.plus(event.params.assetAmount)
   }
 
+=======
+>>>>>>> 5f0655002b5d33c9c1f5ca8dfefc6a11332602d2
   let protocolStatsEntity = createAndReturnProtocolStats()
   let userTotalsEntity = createAndReturnUserTotals(event.params.minter)
   let usdVolume = convertToUsd(Address.fromString(underlyingAsset), event.params.assetAmount)

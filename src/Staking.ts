@@ -22,7 +22,7 @@ import {
 import { loadTransaction } from './utils/Transaction'
 import { createAndReturnUser, createAndReturnUserStakeHistory } from './utils/User'
 import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
-import { Address, BigInt } from '@graphprotocol/graph-ts'
+import { Address, BigInt, dataSource } from '@graphprotocol/graph-ts'
 import { genesisVestingStartBlock, genesisVestingEndBlock } from './blockNumbers/blockNumbers'
 import { createAndReturnProtocolStats } from './utils/ProtocolStats'
 import { adminContracts, stakingFish } from './contracts/contracts'
