@@ -745,30 +745,6 @@ templates:
           handler: handleOwnerUpdate
       file: ./src/SmartToken.ts
 
-  # ERC20
-  - kind: ethereum/contract
-    name: ERC20
-    network: {{network}}
-    source:
-      abi: ERC20
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Approval
-        - Transfer
-      abis:
-        - name: ERC20
-          file: ./abis/ERC20.json
-      eventHandlers:
-        
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      file: ./src/ERC20.ts
-  
   # LoanTokenLogicStandard
   - kind: ethereum/contract
     name: LoanTokenLogicStandard

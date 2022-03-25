@@ -9,7 +9,7 @@ import {
   VestingCreated as VestingCreatedEvent,
   TokensStaked as TokensStakedEvent,
 } from '../generated/VestingRegistry1/VestingRegistry'
-import { SOVTransferred, VestingContract } from '../generated/schema'
+import { VestingContract } from '../generated/schema'
 import { BigInt } from '@graphprotocol/graph-ts'
 import { loadTransaction } from './utils/Transaction'
 import { vestingRegistry1, vestingRegistry2, vestingRegistry3, vestingRegistryFish } from './contracts/contracts'
@@ -31,16 +31,7 @@ export function handleCSOVTokensExchanged(event: CSOVTokensExchangedEvent): void
 
 export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {}
 
-export function handleSOVTransferred(event: SOVTransferredEvent): void {
-  let entity = new SOVTransferred(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.receiver = event.params.receiver.toHexString()
-  entity.amount = event.params.amount
-  let transaction = loadTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-}
+export function handleSOVTransferred(event: SOVTransferredEvent): void {}
 
 const vestingContractTypes = new Map<string, string>()
 vestingContractTypes.set(vestingRegistry1.toLowerCase(), 'Origins')

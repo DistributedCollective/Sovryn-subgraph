@@ -18,19 +18,7 @@ import {
   Conversion as ConversionEventV1WithProtocol,
   LiquidityPoolV1ConverterProtocolFee as LiquidityPoolV1ConverterProtocolFeeContract,
 } from '../generated/templates/LiquidityPoolV1ConverterProtocolFee/LiquidityPoolV1ConverterProtocolFee'
-import {
-  PriceDataUpdate,
-  UserLiquidityHistory,
-  LiquidityHistoryItem,
-  Activation,
-  Conversion,
-  TokenRateUpdate,
-  ConversionFeeUpdate,
-  WithdrawFees,
-  LiquidityPool,
-  LiquidityPoolToken,
-  SmartToken,
-} from '../generated/schema'
+import { UserLiquidityHistory, LiquidityHistoryItem, Conversion, LiquidityPool, LiquidityPoolToken, SmartToken } from '../generated/schema'
 import { ConversionEventForSwap, createAndReturnSwap, updatePricing } from './utils/Swap'
 import { createAndReturnToken } from './utils/Token'
 import { loadTransaction } from './utils/Transaction'
@@ -43,18 +31,7 @@ import { decimal } from '@protofire/subgraph-toolkit'
 import { liquidityPoolV1ChangeBlock } from './contracts/contracts'
 import { updateCandleSticks } from './utils/Candlesticks'
 
-export function handlePriceDataUpdate(event: PriceDataUpdateEvent): void {
-  let entity = new PriceDataUpdate(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity._connectorToken = event.params._connectorToken
-  entity._tokenSupply = event.params._tokenSupply
-  entity._connectorBalance = event.params._connectorBalance
-  entity._connectorWeight = event.params._connectorWeight
-  let transaction = loadTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-}
+export function handlePriceDataUpdate(event: PriceDataUpdateEvent): void {}
 
 class LiquidityHistoryItemParams {
   id: string
@@ -183,16 +160,7 @@ export function handleLiquidityRemoved(event: LiquidityRemovedEvent): void {
 
 /** This event is triggered when a pool is activated or deactivated */
 export function handleActivation(event: ActivationEvent): void {
-  let entity = new Activation(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity._type = event.params._type
-  entity._anchor = event.params._anchor
-  entity._activated = event.params._activated
-  let transaction = loadTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-
+  loadTransaction(event)
   let liquidityPool = LiquidityPool.load(dataSource.address().toHex())
 
   if (liquidityPool != null) {
@@ -374,42 +342,10 @@ export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void
   updateCandleSticks(parsedEvent)
 }
 
-export function handleTokenRateUpdate(event: TokenRateUpdateEvent): void {
-  let entity = new TokenRateUpdate(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity._token1 = event.params._token1
-  entity._token2 = event.params._token2
-  entity._rateN = event.params._rateN
-  entity._rateD = event.params._rateD
-  let transaction = loadTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-}
+export function handleTokenRateUpdate(event: TokenRateUpdateEvent): void {}
 
-export function handleConversionFeeUpdate(event: ConversionFeeUpdateEvent): void {
-  let entity = new ConversionFeeUpdate(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity._prevFee = event.params._prevFee
-  entity._newFee = event.params._newFee
-  let transaction = loadTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-}
+export function handleConversionFeeUpdate(event: ConversionFeeUpdateEvent): void {}
 
-export function handleWithdrawFees(event: WithdrawFeesEvent): void {
-  let entity = new WithdrawFees(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.sender = event.params.sender
-  entity.receiver = event.params.receiver
-  entity.token = event.params.token
-  entity.protocolFeeAmount = event.params.protocolFeeAmount
-  entity.wRBTCConverted = event.params.wRBTCConverted
-  let transaction = loadTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-}
+export function handleWithdrawFees(event: WithdrawFeesEvent): void {}
 
 export function handleOwnerUpdate(event: OwnerUpdateEvent): void {}

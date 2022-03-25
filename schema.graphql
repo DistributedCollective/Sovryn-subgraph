@@ -14,28 +14,65 @@ type ProtocolStats @entity {
   usdStablecoin: Token!
   btcUsdPrice: BigDecimal!
   """
-  Total number of users of the protocol. This number is incremented each time a user is created
+  Total number of users of the protocol. This number is incremented each time a user initiates a transaction with the Protocol.
+  Currently this is incremented by specific user actions, but could be incremented on a per Transaction basis.
   """
   totalUsers: BigInt!
   """
-  Total of positionSize property in Trade event (in usd)
+  Total of positionSize property in Trade event (in usd). This includes user collateral and borrowed amount
   """
   totalMarginTradeVolumeUsd: BigDecimal!
+  """
+  Total position volume closed for Margin Trades (in usd)
+  """
   totalCloseWithSwapVolumeUsd: BigDecimal!
+  """
+  Total additional collateral deposited for Margin Trades and Borrows (in usd)
+  """
   totalDepositCollateralVolumeUsd: BigDecimal!
+  """
+  Total Margin Trade and Borrow position size that has been liquidated (in usd)
+  """
   totalLiquidateVolumeUsd: BigDecimal!
+  """
+  Total volume that has passed through every AMM pool of the Sovryn protocol (in usd)
+  """
   totalAmmVolumeUsd: BigDecimal!
+  """
+  Total volume of fees earned by liquidity providers to AMM pools (in usd)
+  """
   totalAmmLpFeesUsd: BigDecimal!
+  """
+  Total volume of fees earned by SOV stakers from AMM conversion events (in usd). These fees began after the fee-sharing SIP was executed.
+  """
   totalAmmStakerFeesUsd: BigDecimal!
+  """
+  Total fees from Margin Trading earned by SOV stakers (in usd)
+  """
   totalTradingFeesUsd: BigDecimal!
+  """
+  Total fees from Lending and Unlending earned by SOV stakers (in usd)
+  """
   totalLendingFeesUsd: BigDecimal!
+  """
+  Total fees from Borrowing earned by SOV stakers (in usd)
+  """
   totalBorrowingFeesUsd: BigDecimal!
+  """
+  Total volume supplied to Lending Pools over all time (in usd)
+  """
   totalLendVolumeUsd: BigDecimal!
+  """
+  Total volume withdrawn from Lending Pool over all time (in usd)
+  """
   totalUnlendVolumeUsd: BigDecimal!
   """
   Total of collateral property in Trade event (in usd). This may be changed to borrowed amount volume, but collateral keeps it consistent with margin trading
   """
   totalBorrowVolumeUsd: BigDecimal!
+  """
+  Total volume of Borrows closed (in usd)
+  """
   totalCloseWithDepositVolumeUsd: BigDecimal!
   """
   This is SOV staked by users (not vesting contracts). It is incremented when users stake tokens, and decremented when users withdraw tokens from the staking contract
@@ -45,9 +82,15 @@ type ProtocolStats @entity {
   This is SOV staked by vesting contracts. It in incremented when the contracts stake the tokens, and decremented when users claim their unlocked tokens
   """
   totalStakedByVestingSov: BigInt!
+  """
+  NOT YET IMPLEMENTED: This will be a total of volumes of all transaction types (AMM Swaps, Margin Trades, CloseWithSwap etc etc)
+  """
   totalTransactedVolumeUsd: BigInt! # TODO: Implement
 }
 
+"""
+This is the total volumes of different actions for one user. See ProtocolStats entity for full descriptions.
+"""
 type UserTotal @entity {
   id: ID!
   user: User!
@@ -68,6 +111,10 @@ type UserTotal @entity {
   # totalTransactedVolumeUsd: BigInt! # TODO: Implement
 }
 
+"""
+The smart token represents a single reserve asset on a single pool. 
+For V1 pools, there is 1 smart token representing both reserve assets. For V2 pools, there are 2 smart tokens, one for each reserve asset.
+"""
 type SmartToken @entity {
   """
   ID is smart token address
@@ -82,6 +129,9 @@ type SmartToken @entity {
   """
   smartTokenType: String # Relay, Liquid, BNT?, Others?
   transfersEnabled: Boolean
+  """
+  The AMM pool this smart token "belongs" to
+  """
   liquidityPool: LiquidityPool! @derivedFrom(field: "smartToken")
   """
   connectorTokens are the entity that holds the many-to-many relationship between the underlying token asset and the smart token
@@ -109,11 +159,17 @@ type TokenSmartToken @entity {
   smartToken: SmartToken!
 }
 
+"""
+The ConverterRegistry registers each new AMM pool added to the Sovryn Protocol
+"""
 type ConverterRegistry @entity {
   """
   ID is the address of the converter registry contract
   """
   id: ID!
+  """
+  All the converters (AMM pools) associated with this registry
+  """
   converters: [LiquidityPool!] @derivedFrom(field: "currentConverterRegistry")
   smartTokens: [SmartToken!] @derivedFrom(field: "currentConverterRegistry")
   connectorTokens: [Token!] @derivedFrom(field: "currentConverterRegistry")
@@ -136,13 +192,18 @@ type Transaction @entity {
   """
   id: ID!
   blockNumber: BigInt!
-  # timestamp txn was confirmed
+  """
+  The timestamp the transaction was confirmed
+  """
   timestamp: BigInt!
-  # gas used during txn execution
-  # gasUsed: BigInt!
   gasPrice: BigInt!
-  # tx index
+  """
+  The index of this transaction within the block
+  """
   index: BigInt!
+  """
+  The account that initiated this transaction. This must be an Account and not a Contract.
+  """
   from: Bytes! # TODO: Change to User entity
   to: Bytes
   value: BigInt!
@@ -183,31 +244,53 @@ type User @entity {
   """
   loans: [Loan!] @derivedFrom(field: "user")
   """
-  An array of all Mint and Burn events
+  The lending history of a User, separated into lending pools. Explore the UserLendingHistory entity for more granular events.
   """
   lendingHistory: [UserLendingHistory!] @derivedFrom(field: "user")
-  dividendsCollected: [DividendsCollected!] @derivedFrom(field: "receiver")
   """
-  An array of Stake, Unstake, Extend Stake and Withdraw Stake actions
+  The SOV Staking history of a user. This includes withdrawing vested tokens. Explore the UserStakeHistory entity for more granular events.
   """
   stakeHistory: [UserStakeHistory!] @derivedFrom(field: "user")
+  """
+  The Rewards history of one user. This includes actions like EarnReward, RewardSovDeposited, and RewardSovStaked.
+  Explore the UserRewardsEarnedHistory entity for more granular events
+  """
   rewardsEarnedHistory: [UserRewardsEarnedHistory!] @derivedFrom(field: "user")
-  # feesEarnedHistory: [UserFeesEarnedHistory!] @derivedFrom(field: "user")
-  # vestedTokensWithdrawn: [TokensWithdrawn!] @derivedFrom(field: "receiver")
   """
-  Vesting contracts owned by this user
+  Vesting contracts owned by User, labelled by type
   """
-  vestingContracts: [VestingContract!] @derivedFrom(field: "user")
+  vestingContracts: [VestingContract!] @derivedFrom(field:"user")
+  """
+  Voting history of User
+  """
   votes: [VoteCast!] @derivedFrom(field: "voter")
+  """
+  See UserTotals entity for full documentation
+  """
   userTotals: UserTotal @derivedFrom(field: "user")
 }
 
+"""
+This entity contains the lending and unlending history of one User
+"""
 type UserLendingHistory @entity {
-  id: ID! # user address + lending pool
+  """
+  ID is userAddress + lendingPoolAddress (lendingPool in this case is the lending pool token)
+  """
+  id: ID!
   user: User!
   lendingPool: LendingPool!
+  """
+  Granular Lend/UnLend events. Derived from Mint/Burn events on the contracts
+  """
   lendingHistory: [LendingHistoryItem!] @derivedFrom(field: "userLendingHistory")
+  """
+  Total volume this User has lent to this pool over all time (in the underlying asset currency, ie rBTC for the rBTC lending pool)
+  """
   totalLendVolume: BigInt!
+  """
+  Total volume this User has withdrawn from this pool over all time
+  """
   totalUnlendVolume: BigInt!
 }
 
@@ -221,21 +304,36 @@ type LendingHistoryItem @entity {
   lender: User!
   type: LendingHistoryType!
   lendingPool: LendingPool!
-  asset: Token # this is nullable because context is not working properly currently
-  amount: BigInt!
+  """
+  The underlying asset for this pool (eg USDT for the iUSDT pool)
+  """
+  asset: Token 
+  amount: BigInt! #TODO: Change to BigDecimal
   loanTokenAmount: BigInt!
   transaction: Transaction!
   emittedBy: String!
   userLendingHistory: UserLendingHistory!
 }
 
+"""
+This entity represents an ERC20 token traded on the Sovryn Protocol
+"""
 type Token @entity {
-  id: ID! @unique
+  """
+  The ID is the contract address of the token on RSK
+  """
+  id: ID!
   name: String
   symbol: String
   decimals: Int
   version: Int
+  """
+  The addresses of the LiquidityPools where this token is a reserve asset
+  """
   liquidityPools: [LiquidityPoolToken!] @derivedFrom(field: "token")
+  """
+  The smart tokens that have this token as an underlying asset
+  """
   smartTokens: [TokenSmartToken!] @derivedFrom(field: "token")
   # tokenSwapTotals: [TokenSwapTotals!]
   """
@@ -248,13 +346,28 @@ type Token @entity {
   """
   prevPriceUsd: BigDecimal!
   lastPriceUsd: BigDecimal!
+  """
+  The total volume of this token that has been traded through the protocol quoted in BTC
+  """
   btcVolume: BigDecimal!
+  """
+  The total volume of this token that has been traded through the protocol quoted in USD
+  """
   usdVolume: BigDecimal!
+  """
+  The total volume of this token that has been traded through the protocol
+  """
   tokenVolume: BigDecimal!
   # marketCap: BigInt!
   # circulatingSupply: BigInt!
   currentConverterRegistry: ConverterRegistry
+  """
+  Does this token have an AMM pool with rBTC as the other reserve asset?
+  """
   hasBtcPool: Boolean
+  """
+  Does this token have an AMM pool with the protocol stablecoin as the other reserve asset?
+  """
   hasStablecoinPool: Boolean
 }
 
@@ -262,7 +375,7 @@ type Token @entity {
 For the V1 pools, the pool token and smart token are the same. However, for V2 pools, there is one pool token per asset and only one smart token for the pool.
 """
 type PoolToken @entity {
-  id: ID! #address
+  id: ID!
   name: String
   symbol: String
   decimals: Int
@@ -270,15 +383,34 @@ type PoolToken @entity {
   underlyingAssets: [TokenPoolToken!] @derivedFrom(field: "poolToken")
 }
 
+"""
+The Swap entity is an aggregated entity of the individual Conversion events in a transaction.
+For example, if a User swaps XUSD to SOV, there will be 2 Conversion events through 2 AMMs (XUSD-BTC and BTC-SOV) in one transaction. These two Conversions are aggregated here.
+"""
 type Swap @entity {
-  id: ID! # transaction hash of the swap
+  """
+  Transaction hash of this swap
+  """
+  id: ID!
+  """
+  The AMM Conversion events involved in this swap
+  """
   conversions: [Conversion!] @derivedFrom(field: "swapTransaction")
+  """
+  The number of AMM Conversions involved in this swap (this is primarily for debugging purposes)
+  """
   numConversions: Int!
   fromToken: Token!
   toToken: Token!
   fromAmount: BigDecimal!
   toAmount: BigDecimal!
+  """
+  Rate is calculated as toAmount / fromAmount
+  """
   rate: BigDecimal!
+  """
+  If this swap was initiated by a contract (for example as part of a Margin Trade), User will be null
+  """
   user: User
   isMarginTrade: Boolean!
   isBorrow: Boolean!
@@ -286,11 +418,23 @@ type Swap @entity {
   transaction: Transaction!
 }
 
+"""
+AMM Pool (sometimes referred to as a Converter)
+"""
 type LiquidityPool @entity {
+  """
+  ID is the contract address of the Converter
+  """
   id: ID!
+  """
+  Sovryn uses Bancor V1 and Bancor V2 pools
+  """
   type: Int
   version: Int
   smartToken: SmartToken
+  """
+  The reserve assets of this AMM Pool. The are stored here like this so that they can be accessed inside mappings when the LiquidityPool is loaded.
+  """
   token0: Token
   token1: Token
   connectorTokens: [LiquidityPoolToken!]! @derivedFrom(field: "liquidityPool")
@@ -298,6 +442,9 @@ type LiquidityPool @entity {
   owner: String
   conversionFee: BigInt
   weight: BigInt
+  """
+  Activated with be true when this pool is activated, and will change to false is the pool is deactivated
+  """
   activated: Boolean
   # hasRBTCReserve: Boolean!
   maxConversionFee: BigInt
@@ -313,19 +460,35 @@ type LiquidityPool @entity {
   # OTHER FIELDS TO ADD HERE
 }
 
+"""
+This entity stores the relationship between liquidity pools and underlying tokens
+It also currently stores the total volumes bought and so
+"""
 type LiquidityPoolToken @entity {
-  id: ID! # ID liquidityPool address + tokenAddress
+  """
+  ID is liquidityPool address + tokenAddress
+  """
+  id: ID!
   token: Token!
   liquidityPool: LiquidityPool!
+  """
+  The pool token that represents this token-liquidityPool relationship
+  """
   poolToken: PoolToken!
-  # balance: BigInt! # Balance is hard to implement because pools were initially funded not throught the LiquidityAdded event
+  # balance: BigInt! # Balance is hard to implement because pools were initially funded not through the LiquidityAdded event
   volumeBought: BigDecimal!
   volumeSold: BigDecimal!
   totalVolume: BigDecimal!
 }
 
+"""
+The entity stores the many-to-many relationship between underlying tokens and pool tokens
+"""
 type TokenPoolToken @entity {
-  id: ID! # ID is token address + poolToken address
+  """
+  ID is token address + poolToken address
+  """
+  id: ID! 
   token: Token!
   poolToken: PoolToken!
   liquidityPool: LiquidityPool!
@@ -337,10 +500,16 @@ enum LoanType {
   Borrow
 }
 
+"""
+A Loan can be initialized by either a Margin Trade event or a Borrow event
+"""
 type Loan @entity {
   id: ID! # ID is LoanId
   loanToken: Token!
   collateralToken: Token!
+  """
+  LoanType is either Trade (for Margin Trades) or Borrow (for Borrows)
+  """
   type: LoanType!
   startTimestamp: BigInt!
   endTimestamp: BigInt
@@ -355,12 +524,21 @@ type Loan @entity {
   Total of collateral (user collateral in a Borrow, and user collateral + borrowed amount in a Trade) in collateral tokens
   """
   positionSize: BigDecimal!
+  """
+  Initial size of the position
+  """
   startPositionSize: BigDecimal!
+  """
+  The maximum this position size was - mainly for debugging purposes
+  """
   maximumPositionSize: BigDecimal!
   """
   The start rate of the loan in loan tokens (eg if it is a long USD/BTC margin trade, this is the BTC price in USD)
   """
   startRate: BigDecimal!
+  """
+  If a Liquidate, CloseWithSwap or CloseWithDeposit event occurs with 0 margin or 0 leverage, this property changes to false
+  """
   isOpen: Boolean!
   user: User
   trade: [Trade!] @derivedFrom(field: "loanId")
@@ -374,17 +552,23 @@ type Loan @entity {
   averageBuyPrice: BigDecimal!
   averageSellPrice: BigDecimal!
   """
-  The realised PnL is quoted in the collateral currency
+  The realized PnL is quoted in the collateral currency
   """
   realizedPnL: BigDecimal!
   realizedPnLPercent: BigDecimal!
 }
 
-# Lending
-
-# TODO: implement this entity
+"""
+A Lending Pool (iToken), where Users can lend assets to earn interest, and Users can borrow assets to Margin Trade or just as a regular loan.
+"""
 type LendingPool @entity {
-  id: ID! # ID is the pool token
+  """
+  ID is the contract address of the iToken
+  """
+  id: ID! 
+  """
+  The actual asset being lent and borrowed in this pool
+  """
   underlyingAsset: Token!
   poolTokenBalance: BigInt!
   assetBalance: BigInt!
@@ -405,6 +589,9 @@ type NewConverter @entity {
   transaction: Transaction!
 }
 
+"""
+Autogenerated for debugging - to be eventually deleted
+"""
 type LiquidityPoolAdded @entity {
   id: ID!
   _liquidityPool: Bytes! # address
@@ -413,6 +600,9 @@ type LiquidityPoolAdded @entity {
   transaction: Transaction!
 }
 
+"""
+Autogenerated for debugging - to be eventually deleted
+"""
 type LiquidityPoolRemoved @entity {
   id: ID!
   _liquidityPool: Bytes! # address
@@ -421,6 +611,9 @@ type LiquidityPoolRemoved @entity {
   transaction: Transaction!
 }
 
+"""
+Autogenerated for debugging - to be eventually deleted
+"""
 type SmartTokenAdded @entity {
   id: ID!
   _smartToken: Bytes! # address
@@ -429,6 +622,9 @@ type SmartTokenAdded @entity {
   transaction: Transaction!
 }
 
+"""
+Autogenerated for debugging - to be eventually deleted
+"""
 type SmartTokenRemoved @entity {
   id: ID!
   _smartToken: Bytes! # address
@@ -437,17 +633,9 @@ type SmartTokenRemoved @entity {
   transaction: Transaction!
 }
 
-type PriceDataUpdate @entity {
-  id: ID!
-  _connectorToken: Bytes! # address
-  _tokenSupply: BigInt! # uint256
-  _connectorBalance: BigInt! # uint256
-  _connectorWeight: BigInt! # uint32
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
+"""
+This entity stores one Users history of adding and removing liquidity from one AMM pool
+"""
 type UserLiquidityHistory @entity {
   id: ID! # user + '-' + smartToken
   user: User!
@@ -465,7 +653,10 @@ enum LiquidityHistoryType {
 }
 
 type LiquidityHistoryItem @entity {
-  id: ID! # transaction hash + log index
+  """
+  ID is transaction hash + log index
+  """
+  id: ID!
   user: User!
   userLiquidityHistory: UserLiquidityHistory!
   type: LiquidityHistoryType! # Added or removed
@@ -480,16 +671,9 @@ type LiquidityHistoryItem @entity {
   transaction: Transaction!
 }
 
-type Activation @entity {
-  id: ID!
-  _type: Int! # uint16
-  _anchor: Bytes! # address
-  _activated: Boolean! # bool
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
+"""
+Autogenerated for debugging - to be eventually deleted. Although this is pretty useful, maybe keep
+"""
 type Conversion @entity {
   id: ID!
   _fromToken: Token! # address
@@ -505,59 +689,9 @@ type Conversion @entity {
   swapTransaction: Swap!
 }
 
-type TokenRateUpdate @entity {
-  id: ID!
-  _token1: Bytes! # address
-  _token2: Bytes! # address
-  _rateN: BigInt! # uint256
-  _rateD: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type ConversionFeeUpdate @entity {
-  id: ID!
-  _prevFee: BigInt! # uint32
-  _newFee: BigInt! # uint32
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type WithdrawFees @entity {
-  id: ID!
-  sender: Bytes! # address
-  receiver: Bytes! # address
-  token: Bytes! # address
-  protocolFeeAmount: BigInt! # uint256
-  wRBTCConverted: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type Approval @entity {
-  id: ID!
-  owner: Bytes! # address
-  spender: Bytes! # address
-  value: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type Transfer @entity {
-  id: ID!
-  from: Bytes! # address
-  to: Bytes! # address
-  value: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-# Sovryn Protocol Events
+"""
+Granular event data for the Loan entity. Emitted when a user Borrows (takes out a loan)
+"""
 type Borrow @entity {
   id: ID!
   user: User! # address
@@ -576,6 +710,9 @@ type Borrow @entity {
   transaction: Transaction!
 }
 
+"""
+Granular event data for the Loan entity. Emitted when a user closes a loan initiated by a Borrow event
+"""
 type CloseWithDeposit @entity {
   id: ID!
   user: Bytes! # address
@@ -593,6 +730,9 @@ type CloseWithDeposit @entity {
   transaction: Transaction!
 }
 
+"""
+Granular event data for the Loan entity. Emitted when a user closes a loan initiated by a Margin Trade
+"""
 type CloseWithSwap @entity {
   id: ID!
   user: Bytes! # address
@@ -610,6 +750,9 @@ type CloseWithSwap @entity {
   transaction: Transaction!
 }
 
+"""
+Granular event data for the Loan entity. Emitted when a user closes adds collateral to a Margin Trade or Borrow
+"""
 type DepositCollateral @entity {
   id: ID!
   loanId: Loan! # bytes32
@@ -620,19 +763,9 @@ type DepositCollateral @entity {
   transaction: Transaction!
 }
 
-type EarnReward @entity {
-  id: ID!
-  receiver: User! # address
-  token: Token! # address
-  loanId: Loan! # bytes32
-  feeRebatePercent: BigInt! # uint256
-  amount: BigInt! # uint256
-  basisPoint: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
+"""
+Granular event data for the Loan entity. Emitted when a loan is fully or partially liquidated
+"""
 type Liquidate @entity {
   id: ID!
   user: User! # address
@@ -650,19 +783,9 @@ type Liquidate @entity {
   transaction: Transaction!
 }
 
-type LoanSwap @entity {
-  id: ID!
-  loanId: Loan! # bytes32
-  sourceToken: Bytes! # address
-  destToken: Bytes! # address
-  borrower: Bytes! # address
-  sourceAmount: BigInt! # uint256
-  destAmount: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
+"""
+Granular event data for the Loan entity. Emitted when a user Borrows and when a loan is rolled over
+"""
 type PayBorrowingFee @entity {
   id: ID!
   payer: Bytes! # address
@@ -674,6 +797,9 @@ type PayBorrowingFee @entity {
   transaction: Transaction!
 }
 
+"""
+Granular event data for the Loan entity. Emitted when a user Lends or Unle and when a loan is rolled over
+"""
 type PayLendingFee @entity {
   id: ID!
   payer: Bytes! # address
@@ -684,6 +810,9 @@ type PayLendingFee @entity {
   transaction: Transaction!
 }
 
+"""
+Granular event data for the Loan entity. Emitted when a user Margin Trades and when a loan is rolled over
+"""
 type PayTradingFee @entity {
   id: ID!
   payer: Bytes! # address
@@ -695,144 +824,6 @@ type PayTradingFee @entity {
   transaction: Transaction!
 }
 
-type PayTradingFeeToAffiliate @entity {
-  id: ID!
-  referrer: Bytes! # address
-  trader: Bytes! # address
-  token: Bytes! # address
-  isHeld: Boolean! # bool
-  tradingFeeTokenAmount: BigInt! # uint256
-  tokenBonusAmount: BigInt! # uint256
-  sovBonusAmount: BigInt! # uint256
-  sovBonusAmountPaid: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type PayTradingFeeToAffiliateFail @entity {
-  id: ID!
-  referrer: Bytes! # address
-  trader: Bytes! # address
-  token: Bytes! # address
-  tradingFeeTokenAmount: BigInt! # uint256
-  tokenBonusAmount: BigInt! # uint256
-  sovBonusAmount: BigInt! # uint256
-  sovBonusAmountTryingToPaid: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type ProtocolModuleContractReplaced @entity {
-  id: ID!
-  prevModuleContractAddress: Bytes! # address
-  newModuleContractAddress: Bytes! # address
-  module: Bytes! # bytes32
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type SetAffiliateFeePercent @entity {
-  id: ID!
-  sender: Bytes! # address
-  oldValue: BigInt! # uint256
-  newValue: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type SetAffiliateTradingTokenFeePercent @entity {
-  id: ID!
-  sender: Bytes! # address
-  oldValue: BigInt! # uint256
-  newValue: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type SetAffiliatesReferrer @entity {
-  id: ID!
-  user: Bytes! # address
-  referrer: Bytes! # address
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type SetAffiliatesReferrerFail @entity {
-  id: ID!
-  user: Bytes! # address
-  referrer: Bytes! # address
-  alreadySet: Boolean! # bool
-  userNotFirstTrade: Boolean! # bool
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type SetBorrowingFeePercent @entity {
-  id: ID!
-  sender: Bytes! # address
-  oldValue: BigInt! # uint256
-  newValue: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type SetFeesController @entity {
-  id: ID!
-  sender: Bytes! # address
-  oldController: Bytes! # address
-  newController: Bytes! # address
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type SetLendingFeePercent @entity {
-  id: ID!
-  sender: Bytes! # address
-  oldValue: BigInt! # uint256
-  newValue: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type SetLiquidationIncentivePercent @entity {
-  id: ID!
-  sender: Bytes! # address
-  oldValue: BigInt! # uint256
-  newValue: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type SetLoanPool @entity {
-  id: ID!
-  sender: Bytes! # address
-  loanPool: Bytes! # address
-  underlying: Bytes! # address
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type SetWrbtcToken @entity {
-  id: ID!
-  sender: Bytes! # address
-  oldWethToken: Bytes! # address
-  newWethToken: Bytes! # address
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
 
 type Trade @entity {
   id: ID!
@@ -848,67 +839,6 @@ type Trade @entity {
   entryPrice: BigInt! # uint256
   entryLeverage: BigInt! # uint256
   currentLeverage: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-# Lending Contract events
-
-type WithdrawLendingFees @entity {
-  id: ID!
-  sender: Bytes! # address
-  token: Bytes! # address
-  receiver: Bytes! # address
-  amount: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type WithdrawTradingFees @entity {
-  id: ID!
-  sender: Bytes! # address
-  token: Bytes! # address
-  receiver: Bytes! # address
-  amount: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type Burn @entity {
-  id: ID!
-  user: User! # address
-  tokenAmount: BigInt! # uint256
-  assetAmount: BigInt! # uint256
-  lendingPool: LendingPool!
-  price: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-  underlyingAsset: Token!
-}
-
-type FlashBorrow @entity {
-  id: ID!
-  user: User! # address
-  target: Bytes! # address
-  loanAmount: BigInt! # uint256
-  lendingPool: LendingPool!
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-  underlyingAsset: Token!
-}
-
-type Mint @entity {
-  id: ID!
-  user: User! # address
-  tokenAmount: BigInt! # uint256
-  assetAmount: BigInt! # uint256
-  lendingPool: LendingPool!
-  price: BigInt! # uint256
   timestamp: BigInt!
   emittedBy: Bytes! #address
   transaction: Transaction!
@@ -957,50 +887,6 @@ type VestingHistoryItem @entity {
   transaction: Transaction!
 }
 
-type SOVTransferred @entity {
-  id: ID!
-  receiver: VestingContract! # address
-  amount: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-# VestingLogic
-
-type DividendsCollected @entity {
-  id: ID!
-  caller: Bytes! # address
-  loanPoolToken: Bytes! # address
-  receiver: User! # address
-  maxCheckpoints: BigInt! # uint32
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type TokensWithdrawn_Vesting @entity {
-  id: ID!
-  caller: Bytes! # address
-  receiver: Bytes! # address
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-# Staking contract
-
-type DelegateStakeChanged @entity {
-  id: ID!
-  delegate: Bytes! # address
-  lockedUntil: BigInt! # uint256
-  previousBalance: BigInt! # uint256
-  newBalance: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
 type TokensStaked @entity {
   id: ID!
   user: User
@@ -1012,15 +898,6 @@ type TokensStaked @entity {
   emittedBy: Bytes! #address
   transaction: Transaction!
   isUserStaked: Boolean!
-}
-
-type VestingTokensWithdrawn @entity {
-  id: ID!
-  vesting: VestingContract! # address
-  receiver: Bytes! # address
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
 }
 
 # This maps to existing stakeHistory api
@@ -1077,79 +954,6 @@ type RewardsEarnedHistoryItem @entity {
   token: Token
   amount: BigInt!
   timestamp: BigInt!
-  transaction: Transaction!
-}
-
-type FeeAMMWithdrawn @entity {
-  id: ID!
-  sender: Bytes! # address
-  converter: Bytes! # address
-  amount: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type FeeWithdrawn @entity {
-  id: ID!
-  sender: Bytes! # address
-  token: Bytes! # address
-  amount: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type TokensTransferred @entity {
-  id: ID!
-  sender: Bytes! # address
-  token: Bytes! # address
-  amount: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type UserFeeWithdrawn @entity {
-  id: ID!
-  sender: Bytes! # address
-  receiver: Bytes! # address
-  token: Bytes! # address
-  amount: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-# Mining Proxy
-
-type RewardClaimed @entity {
-  id: ID!
-  user: Bytes! # address
-  poolToken: Bytes! # address
-  amount: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-# Staking Reward
-
-type RewardWithdrawn @entity {
-  id: ID!
-  receiver: Bytes! # address
-  amount: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-# TokenConverted
-
-type TokenConverted @entity {
-  id: ID!
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
   transaction: Transaction!
 }
 

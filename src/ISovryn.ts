@@ -21,14 +21,10 @@ import {
   CloseWithDeposit,
   CloseWithSwap,
   DepositCollateral,
-  EarnReward,
   Liquidate,
-  LoanSwap,
   PayBorrowingFee,
   PayLendingFee,
   PayTradingFee,
-  SetLoanPool,
-  SetWrbtcToken,
   Trade,
   LendingPool,
   Swap,
@@ -217,18 +213,7 @@ export function handleDepositCollateralLegacy(event: DepositCollateralLegacyEven
 }
 
 export function handleEarnReward(event: EarnRewardEvent): void {
-  let entity = new EarnReward(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.receiver = event.params.receiver.toHexString()
-  entity.token = event.params.token.toHexString()
-  entity.loanId = event.params.loanId.toHexString()
-  entity.feeRebatePercent = event.params.feeRebatePercent
-  entity.amount = event.params.amount
-  entity.basisPoint = event.params.basisPoint
-  let transaction = loadTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
+  loadTransaction(event)
 
   createAndReturnUser(event.params.receiver)
   let userRewardsEarnedHistory = UserRewardsEarnedHistory.load(event.params.receiver.toHexString())
@@ -302,20 +287,7 @@ export function handleLiquidate(event: LiquidateEvent): void {
   userTotalsEntity.save()
 }
 
-export function handleLoanSwap(event: LoanSwapEvent): void {
-  let entity = new LoanSwap(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.loanId = event.params.loanId.toHexString()
-  entity.sourceToken = event.params.sourceToken
-  entity.destToken = event.params.destToken
-  entity.borrower = event.params.borrower
-  entity.sourceAmount = event.params.sourceAmount
-  entity.destAmount = event.params.destAmount
-  let transaction = loadTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-}
+export function handleLoanSwap(event: LoanSwapEvent): void {}
 
 export function handlePayBorrowingFee(event: PayBorrowingFeeEvent): void {
   let entity = new PayBorrowingFee(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
@@ -388,15 +360,7 @@ export function handleSetLoanPool(event: SetLoanPoolEvent): void {
   let context = new DataSourceContext()
   context.setString('underlyingAsset', event.params.underlying.toHexString())
   LoanTokenTemplate.createWithContext(event.params.loanPool, context)
-
-  let entity = new SetLoanPool(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.sender = event.params.sender
-  entity.loanPool = event.params.loanPool
-  entity.underlying = event.params.underlying
-  let transaction = loadTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
+  loadTransaction(event)
 
   let lendingPoolEntity = new LendingPool(event.params.loanPool.toHexString())
   lendingPoolEntity.underlyingAsset = event.params.underlying.toHexString()
@@ -404,21 +368,9 @@ export function handleSetLoanPool(event: SetLoanPoolEvent): void {
   lendingPoolEntity.assetBalance = BigInt.zero()
   lendingPoolEntity.totalAssetLent = BigInt.zero()
   lendingPoolEntity.save()
-
-  entity.save()
 }
 
-export function handleSetWrbtcToken(event: SetWrbtcTokenEvent): void {
-  let entity = new SetWrbtcToken(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.sender = event.params.sender
-  entity.oldWethToken = event.params.oldWethToken
-  entity.newWethToken = event.params.newWethToken
-  let transaction = loadTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-}
+export function handleSetWrbtcToken(event: SetWrbtcTokenEvent): void {}
 
 export function handleTrade(event: TradeEvent): void {
   let entity = new Trade(event.transaction.hash.toHex() + '-' + event.logIndex.toString())

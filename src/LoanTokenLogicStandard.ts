@@ -1,5 +1,5 @@
 import { Burn as BurnEvent, FlashBorrow as FlashBorrowEvent, Mint as MintEvent } from '../generated/templates/LoanTokenLogicStandard/LoanTokenLogicStandard'
-import { Burn, FlashBorrow, Mint, UserLendingHistory, LendingHistoryItem, LendingPool } from '../generated/schema'
+import { UserLendingHistory, LendingHistoryItem, LendingPool } from '../generated/schema'
 import { loadTransaction } from './utils/Transaction'
 import { createAndReturnUser } from './utils/User'
 import { Address, BigInt, dataSource } from '@graphprotocol/graph-ts'
@@ -9,19 +9,9 @@ import { convertToUsd } from './utils/Prices'
 export function handleBurn(event: BurnEvent): void {
   let context = dataSource.context()
   let underlyingAsset = context.getString('underlyingAsset')
-  let entity = new Burn(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   createAndReturnUser(event.params.burner)
   const userAddress = event.params.burner.toHexString()
-  entity.user = userAddress
-  entity.tokenAmount = event.params.tokenAmount
-  entity.assetAmount = event.params.assetAmount
-  entity.lendingPool = event.address.toHexString()
-  entity.price = event.params.price
-  let transaction = loadTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
+  loadTransaction(event)
 
   let userHistoryEntity = UserLendingHistory.load(userAddress + dataSource.address().toHexString())
   if (userHistoryEntity != null) {
@@ -39,8 +29,8 @@ export function handleBurn(event: BurnEvent): void {
   if (underlyingAsset != null) {
     lendingHistoryItem.asset = underlyingAsset
   }
-  lendingHistoryItem.amount = entity.assetAmount
-  lendingHistoryItem.loanTokenAmount = entity.tokenAmount
+  lendingHistoryItem.amount = event.params.assetAmount
+  lendingHistoryItem.loanTokenAmount = event.params.tokenAmount
   lendingHistoryItem.save()
 
   let lendingPoolEntity = LendingPool.load(event.address.toHexString())
@@ -59,37 +49,14 @@ export function handleBurn(event: BurnEvent): void {
   userTotalsEntity.save()
 }
 
-export function handleFlashBorrow(event: FlashBorrowEvent): void {
-  // let context = dataSource.context()
-  let entity = new FlashBorrow(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  let user = createAndReturnUser(event.params.borrower)
-  entity.user = user.id
-  entity.target = event.params.target
-  entity.loanAmount = event.params.loanAmount
-  entity.lendingPool = event.address.toHexString()
-  let transaction = loadTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-}
+export function handleFlashBorrow(event: FlashBorrowEvent): void {}
 
 export function handleMint(event: MintEvent): void {
   let context = dataSource.context()
   let underlyingAsset = context.getString('underlyingAsset')
-  let entity = new Mint(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   createAndReturnUser(event.params.minter)
   const userAddress = event.params.minter.toHexString()
-  entity.user = event.params.minter.toHexString()
-  entity.tokenAmount = event.params.tokenAmount
-  entity.assetAmount = event.params.assetAmount
-  entity.lendingPool = event.address.toHexString()
-  entity.price = event.params.price
-  let transaction = loadTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
+  loadTransaction(event)
 
   let userHistoryEntity = UserLendingHistory.load(userAddress + dataSource.address().toHexString())
   if (userHistoryEntity != null) {
@@ -114,8 +81,8 @@ export function handleMint(event: MintEvent): void {
   if (underlyingAsset != null) {
     lendingHistoryItem.asset = underlyingAsset
   }
-  lendingHistoryItem.amount = entity.assetAmount
-  lendingHistoryItem.loanTokenAmount = entity.tokenAmount
+  lendingHistoryItem.amount = event.params.assetAmount
+  lendingHistoryItem.loanTokenAmount = event.params.tokenAmount
   lendingHistoryItem.save()
 
   let lendingPoolEntity = LendingPool.load(event.address.toHexString())

@@ -9,16 +9,7 @@ import {
   StakingWithdrawn as StakingWithdrawnEvent,
   VestingTokensWithdrawn as VestingTokensWithdrawnEvent,
 } from '../generated/Staking/Staking'
-import {
-  DelegateStakeChanged,
-  StakeHistoryItem,
-  TokensStaked,
-  VestingContract,
-  VestingTokensWithdrawn,
-  User,
-  Transaction,
-  VestingHistoryItem,
-} from '../generated/schema'
+import { StakeHistoryItem, TokensStaked, VestingContract, User, Transaction, VestingHistoryItem } from '../generated/schema'
 import { loadTransaction } from './utils/Transaction'
 import { createAndReturnUser, createAndReturnUserStakeHistory } from './utils/User'
 import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
@@ -41,18 +32,7 @@ export function handleDelegateChanged(event: DelegateChangedEvent): void {
   }
 }
 
-export function handleDelegateStakeChanged(event: DelegateStakeChangedEvent): void {
-  let entity = new DelegateStakeChanged(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.delegate = event.params.delegate
-  entity.lockedUntil = event.params.lockedUntil
-  entity.previousBalance = event.params.previousBalance
-  entity.newBalance = event.params.newBalance
-  let transaction = loadTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-}
+export function handleDelegateStakeChanged(event: DelegateStakeChangedEvent): void {}
 
 export function handleExtendedStakingDuration(event: ExtendedStakingDurationEvent): void {
   let transaction = loadTransaction(event)
@@ -144,6 +124,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
   entity.save()
 }
 
+/** When tokens are staked by a vesting contract, create a history item for that contract */
 function createVestingTokensStaked(event: TokensStakedEvent): void {
   let vestingTokensStakedEntity = new VestingHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   vestingTokensStakedEntity.staker = event.params.staker.toHexString()
@@ -216,13 +197,4 @@ function handleStakingOrTokensWithdrawn(id: string, transaction: Transaction, st
   }
 }
 
-export function handleVestingTokensWithdrawn(event: VestingTokensWithdrawnEvent): void {
-  let entity = new VestingTokensWithdrawn(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.vesting = event.params.vesting.toHexString()
-  entity.receiver = event.params.receiver
-  let transaction = loadTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-}
+export function handleVestingTokensWithdrawn(event: VestingTokensWithdrawnEvent): void {}
