@@ -211,10 +211,15 @@ type UserLendingHistory @entity {
   totalUnlendVolume: BigInt!
 }
 
+enum LendingHistoryType {
+  Lend
+  UnLend
+}
+
 type LendingHistoryItem @entity {
   id: ID! # tx hash
   lender: User!
-  type: String! # Lend or Unlend
+  type: LendingHistoryType!
   lendingPool: LendingPool!
   asset: Token # this is nullable because context is not working properly currently
   amount: BigInt!
@@ -454,11 +459,16 @@ type UserLiquidityHistory @entity {
   liquidityHistory: [LiquidityHistoryItem!] @derivedFrom(field: "userLiquidityHistory")
 }
 
+enum LiquidityHistoryType {
+  Added
+  Removed
+}
+
 type LiquidityHistoryItem @entity {
   id: ID! # transaction hash + log index
   user: User!
   userLiquidityHistory: UserLiquidityHistory!
-  type: String! # Added or removed
+  type: LiquidityHistoryType! # Added or removed
   provider: String! # address
   reserveToken: Token! # address
   amount: BigInt! # uint256
@@ -906,6 +916,15 @@ type Mint @entity {
 
 # Vesting Resistry
 
+enum VestingContractType {
+  Origins
+  Genesis
+  Fish
+  FishTeam
+  Team
+  Rewards
+}
+
 type VestingContract @entity {
   id: ID! # vesting contract id
   user: User!
@@ -914,7 +933,7 @@ type VestingContract @entity {
   duration: BigInt # uint256
   startingBalance: BigInt! # uint256
   currentBalance: BigInt!
-  type: String! # Team, Non-team, Rewards, Fish
+  type: VestingContractType!
   emittedBy: Bytes!
   createdAtTransaction: Transaction!
   stakeHistory: [VestingHistoryItem!] @derivedFrom(field: "staker")
@@ -1015,10 +1034,19 @@ type UserStakeHistory @entity {
   totalRemaining: BigInt!
 }
 
+enum StakeHistoryAction {
+  Stake
+  IncreaseStake
+  ExtendStake
+  Delegate
+  Unstake
+  WithdrawStaked
+}
+
 type StakeHistoryItem @entity {
   id: ID! # transaction hash
   user: UserStakeHistory!
-  action: String!
+  action: StakeHistoryAction!
   timestamp: BigInt!
   transaction: Transaction!
   amount: BigInt
@@ -1035,9 +1063,16 @@ type UserRewardsEarnedHistory @entity {
   rewardsEarnedHistory: [RewardsEarnedHistoryItem!] @derivedFrom(field: "user")
 }
 
+enum RewardsEarnedAction {
+  StakingRewardWithdrawn
+  EarnReward
+  RewardClaimed
+  RewardSovStaked
+}
+
 type RewardsEarnedHistoryItem @entity {
   id: ID! # transaction hash
-  action: String!
+  action: RewardsEarnedAction!
   user: UserRewardsEarnedHistory!
   token: Token
   amount: BigInt!
@@ -1081,19 +1116,6 @@ type UserFeeWithdrawn @entity {
   receiver: Bytes! # address
   token: Bytes! # address
   amount: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-# Locked SOV
-
-type Deposited @entity {
-  id: ID!
-  _initiator: Bytes! # address
-  _userAddress: Bytes! # address
-  _sovAmount: BigInt! # uint256
-  _basisPoint: BigInt! # uint256
   timestamp: BigInt!
   emittedBy: Bytes! #address
   transaction: Transaction!

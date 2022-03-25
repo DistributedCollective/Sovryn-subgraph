@@ -195,7 +195,7 @@ function handleStakingOrTokensWithdrawn(id: string, transaction: Transaction, st
     let vestingHistoryItem = new VestingHistoryItem(id)
     if (adminContracts.includes(receiver.toHexString().toLowerCase()) && vesting.type == 'Team') {
       /** This happens when a team member with vesting contract leaves the project and their remaining balance is returned to the protocol */
-      vestingHistoryItem.action = 'Revoked'
+      vestingHistoryItem.action = 'TeamTokensRevoked'
       vestingHistoryItem.staker = vesting.id
       vestingHistoryItem.amount = amount
     } else {
