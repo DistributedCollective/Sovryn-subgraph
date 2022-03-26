@@ -21,7 +21,8 @@
     "prepare:RSK:mainnet": "export NETWORK=mainnet && npx mustache config/RSK.mainnet.json subgraph.template.yaml > subgraph.yaml && npx mustache config/RSK.mainnet.json docker-compose.template.yml > docker-compose.yml && npx mustache config/RSK.mainnet.json src/contracts/contracts.template > src/contracts/contracts.ts && npx mustache config/RSK.mainnet.json src/blockNumbers/blockNumbers.template.ts > src/blockNumbers/blockNumbers.ts && node utils/backwardsCompatibility/scaffoldChangeBlocks.js",
     "test-start-block": "node -r esm utils/startFromLaterBlock.js",
     "build-tests": "sudo docker build -t matchstick .",
-    "run-tests": "docker run --rm matchstick"
+    "run-tests": "docker run --rm matchstick",
+    "schema": "sh ./schema.sh"
   },
   "devDependencies": {
     "@amxx/graphprotocol-utils": "^1.1.0-alpha.2",

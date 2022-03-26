@@ -1,114 +1,27 @@
-"""
-This entity will have only one instance and will be used to store protocol-wide data like list of tokens and number or users.
-The ID of this one entity is "0"
-"""
-type ProtocolStats @entity {
-  """
-  Only one entity should be created, with ID "0"
-  """
-  id: ID!
-  """
-  An array of all tokens in the protocol
-  """
-  tokens: [Token!]!
-  usdStablecoin: Token!
-  btcUsdPrice: BigDecimal!
-  """
-  Total number of users of the protocol. This number is incremented each time a user initiates a transaction with the Protocol.
-  Currently this is incremented by specific user actions, but could be incremented on a per Transaction basis.
-  """
-  totalUsers: BigInt!
-  """
-  Total of positionSize property in Trade event (in usd). This includes user collateral and borrowed amount
-  """
-  totalMarginTradeVolumeUsd: BigDecimal!
-  """
-  Total position volume closed for Margin Trades (in usd)
-  """
-  totalCloseWithSwapVolumeUsd: BigDecimal!
-  """
-  Total additional collateral deposited for Margin Trades and Borrows (in usd)
-  """
-  totalDepositCollateralVolumeUsd: BigDecimal!
-  """
-  Total Margin Trade and Borrow position size that has been liquidated (in usd)
-  """
-  totalLiquidateVolumeUsd: BigDecimal!
-  """
-  Total volume that has passed through every AMM pool of the Sovryn protocol (in usd)
-  """
-  totalAmmVolumeUsd: BigDecimal!
-  """
-  Total volume of fees earned by liquidity providers to AMM pools (in usd)
-  """
-  totalAmmLpFeesUsd: BigDecimal!
-  """
-  Total volume of fees earned by SOV stakers from AMM conversion events (in usd). These fees began after the fee-sharing SIP was executed.
-  """
-  totalAmmStakerFeesUsd: BigDecimal!
-  """
-  Total fees from Margin Trading earned by SOV stakers (in usd)
-  """
-  totalTradingFeesUsd: BigDecimal!
-  """
-  Total fees from Lending and Unlending earned by SOV stakers (in usd)
-  """
-  totalLendingFeesUsd: BigDecimal!
-  """
-  Total fees from Borrowing earned by SOV stakers (in usd)
-  """
-  totalBorrowingFeesUsd: BigDecimal!
-  """
-  Total volume supplied to Lending Pools over all time (in usd)
-  """
-  totalLendVolumeUsd: BigDecimal!
-  """
-  Total volume withdrawn from Lending Pool over all time (in usd)
-  """
-  totalUnlendVolumeUsd: BigDecimal!
-  """
-  Total of collateral property in Trade event (in usd). This may be changed to borrowed amount volume, but collateral keeps it consistent with margin trading
-  """
-  totalBorrowVolumeUsd: BigDecimal!
-  """
-  Total volume of Borrows closed (in usd)
-  """
-  totalCloseWithDepositVolumeUsd: BigDecimal!
-  """
-  This is SOV staked by users (not vesting contracts). It is incremented when users stake tokens, and decremented when users withdraw tokens from the staking contract
-  """
-  totalVoluntarilyStakedSov: BigInt!
-  """
-  This is SOV staked by vesting contracts. It in incremented when the contracts stake the tokens, and decremented when users claim their unlocked tokens
-  """
-  totalStakedByVestingSov: BigInt!
-  """
-  NOT YET IMPLEMENTED: This will be a total of volumes of all transaction types (AMM Swaps, Margin Trades, CloseWithSwap etc etc)
-  """
-  totalTransactedVolumeUsd: BigInt! # TODO: Implement
-}
+# AMM SCHEMA
 
 """
-This is the total volumes of different actions for one user. See ProtocolStats entity for full descriptions.
+The ConverterRegistry registers each new AMM pool added to the Sovryn Protocol
 """
-type UserTotal @entity {
+type ConverterRegistry @entity {
+  """
+  ID is the address of the converter registry contract
+  """
   id: ID!
-  user: User!
-  totalMarginTradeVolumeUsd: BigDecimal!
-  totalCloseWithSwapVolumeUsd: BigDecimal!
-  totalDepositCollateralVolumeUsd: BigDecimal!
-  totalLiquidateVolumeUsd: BigDecimal!
-  totalAmmVolumeUsd: BigDecimal!
-  totalAmmLpFeesUsd: BigDecimal!
-  totalAmmStakerFeesUsd: BigDecimal!
-  totalTradingFeesUsd: BigDecimal!
-  totalLendingFeesUsd: BigDecimal!
-  totalBorrowingFeesUsd: BigDecimal!
-  totalLendVolumeUsd: BigDecimal!
-  totalUnlendVolumeUsd: BigDecimal!
-  totalBorrowVolumeUsd: BigDecimal!
-  totalCloseWithDepositVolumeUsd: BigDecimal!
-  # totalTransactedVolumeUsd: BigInt! # TODO: Implement
+  """
+  All the converters (AMM pools) associated with this registry
+  """
+  converters: [LiquidityPool!] @derivedFrom(field: "currentConverterRegistry")
+  smartTokens: [SmartToken!] @derivedFrom(field: "currentConverterRegistry")
+  connectorTokens: [Token!] @derivedFrom(field: "currentConverterRegistry")
+  owner: Bytes! # address
+  addedToContractRegistryAtBlockTimestamp: BigInt
+  addedToContractRegistryAtTransactionHash: String
+  addedToContractRegistryAtBlockNumber: BigInt
+  lastUsedAtBlockTimestamp: BigInt
+  lastUsedAtTransactionHash: String
+  lastUsedAtBlockNumber: BigInt
+  numConverters: BigInt!
 }
 
 """
@@ -160,218 +73,6 @@ type TokenSmartToken @entity {
 }
 
 """
-The ConverterRegistry registers each new AMM pool added to the Sovryn Protocol
-"""
-type ConverterRegistry @entity {
-  """
-  ID is the address of the converter registry contract
-  """
-  id: ID!
-  """
-  All the converters (AMM pools) associated with this registry
-  """
-  converters: [LiquidityPool!] @derivedFrom(field: "currentConverterRegistry")
-  smartTokens: [SmartToken!] @derivedFrom(field: "currentConverterRegistry")
-  connectorTokens: [Token!] @derivedFrom(field: "currentConverterRegistry")
-  owner: Bytes! # address
-  addedToContractRegistryAtBlockTimestamp: BigInt
-  addedToContractRegistryAtTransactionHash: String
-  addedToContractRegistryAtBlockNumber: BigInt
-  lastUsedAtBlockTimestamp: BigInt
-  lastUsedAtTransactionHash: String
-  lastUsedAtBlockNumber: BigInt
-  numConverters: BigInt!
-}
-
-"""
-Transaction data, including hash and timestamp
-"""
-type Transaction @entity {
-  """
-  ID is transaction hash
-  """
-  id: ID!
-  blockNumber: BigInt!
-  """
-  The timestamp the transaction was confirmed
-  """
-  timestamp: BigInt!
-  gasPrice: BigInt!
-  """
-  The index of this transaction within the block
-  """
-  index: BigInt!
-  """
-  The account that initiated this transaction. This must be an Account and not a Contract.
-  """
-  from: Bytes! # TODO: Change to User entity
-  to: Bytes
-  value: BigInt!
-  gasLimit: BigInt!
-}
-
-"""
-This entity contains all user-specific data displayed on the dapp, including all user actions
-"""
-type User @entity {
-  """
-  ID is user wallet address
-  """
-  id: ID!
-  """
-  Swaps here refers to only user-triggered swaps. For example, a swap that is part of a margin trade would not be included.
-  Swaps involving multiple amm pools are stored as a single swap, comprised of multiple Conversion events
-  """
-  swaps: [Swap!] @derivedFrom(field: "user")
-  """
-  An array of all LiquidityAdded and LiquidityRemoved events
-  """
-  liquidityHistory: [UserLiquidityHistory!] @derivedFrom(field: "user")
-  """
-  An array of margin trade Trade events
-  """
-  trades: [Trade!] @derivedFrom(field: "user")
-  """
-  An array of Borrow events
-  """
-  borrows: [Borrow!] @derivedFrom(field: "user")
-  """
-  An array of Liquidation events linked to this user
-  """
-  liquidations: [Liquidate!] @derivedFrom(field: "user")
-  """
-  All loans taken out by this user, including for margin trading and for borrowing
-  """
-  loans: [Loan!] @derivedFrom(field: "user")
-  """
-  The lending history of a User, separated into lending pools. Explore the UserLendingHistory entity for more granular events.
-  """
-  lendingHistory: [UserLendingHistory!] @derivedFrom(field: "user")
-  """
-  The SOV Staking history of a user. This includes withdrawing vested tokens. Explore the UserStakeHistory entity for more granular events.
-  """
-  stakeHistory: [UserStakeHistory!] @derivedFrom(field: "user")
-  """
-  The Rewards history of one user. This includes actions like EarnReward, RewardSovDeposited, and RewardSovStaked.
-  Explore the UserRewardsEarnedHistory entity for more granular events
-  """
-  rewardsEarnedHistory: [UserRewardsEarnedHistory!] @derivedFrom(field: "user")
-  """
-  Vesting contracts owned by User, labelled by type
-  """
-  vestingContracts: [VestingContract!] @derivedFrom(field:"user")
-  """
-  Voting history of User
-  """
-  votes: [VoteCast!] @derivedFrom(field: "voter")
-  """
-  See UserTotals entity for full documentation
-  """
-  userTotals: UserTotal @derivedFrom(field: "user")
-}
-
-"""
-This entity contains the lending and unlending history of one User
-"""
-type UserLendingHistory @entity {
-  """
-  ID is userAddress + lendingPoolAddress (lendingPool in this case is the lending pool token)
-  """
-  id: ID!
-  user: User!
-  lendingPool: LendingPool!
-  """
-  Granular Lend/UnLend events. Derived from Mint/Burn events on the contracts
-  """
-  lendingHistory: [LendingHistoryItem!] @derivedFrom(field: "userLendingHistory")
-  """
-  Total volume this User has lent to this pool over all time (in the underlying asset currency, ie rBTC for the rBTC lending pool)
-  """
-  totalLendVolume: BigInt!
-  """
-  Total volume this User has withdrawn from this pool over all time
-  """
-  totalUnlendVolume: BigInt!
-}
-
-enum LendingHistoryType {
-  Lend
-  UnLend
-}
-
-type LendingHistoryItem @entity {
-  id: ID! # tx hash
-  lender: User!
-  type: LendingHistoryType!
-  lendingPool: LendingPool!
-  """
-  The underlying asset for this pool (eg USDT for the iUSDT pool)
-  """
-  asset: Token 
-  amount: BigInt! #TODO: Change to BigDecimal
-  loanTokenAmount: BigInt!
-  transaction: Transaction!
-  emittedBy: String!
-  userLendingHistory: UserLendingHistory!
-}
-
-"""
-This entity represents an ERC20 token traded on the Sovryn Protocol
-"""
-type Token @entity {
-  """
-  The ID is the contract address of the token on RSK
-  """
-  id: ID!
-  name: String
-  symbol: String
-  decimals: Int
-  version: Int
-  """
-  The addresses of the LiquidityPools where this token is a reserve asset
-  """
-  liquidityPools: [LiquidityPoolToken!] @derivedFrom(field: "token")
-  """
-  The smart tokens that have this token as an underlying asset
-  """
-  smartTokens: [TokenSmartToken!] @derivedFrom(field: "token")
-  # tokenSwapTotals: [TokenSwapTotals!]
-  """
-  previous BTC price used for candleSticks
-  """
-  prevPriceBtc: BigDecimal!
-  lastPriceBtc: BigDecimal!
-  """
-  previous BTC price used for candleSticks
-  """
-  prevPriceUsd: BigDecimal!
-  lastPriceUsd: BigDecimal!
-  """
-  The total volume of this token that has been traded through the protocol quoted in BTC
-  """
-  btcVolume: BigDecimal!
-  """
-  The total volume of this token that has been traded through the protocol quoted in USD
-  """
-  usdVolume: BigDecimal!
-  """
-  The total volume of this token that has been traded through the protocol
-  """
-  tokenVolume: BigDecimal!
-  # marketCap: BigInt!
-  # circulatingSupply: BigInt!
-  currentConverterRegistry: ConverterRegistry
-  """
-  Does this token have an AMM pool with rBTC as the other reserve asset?
-  """
-  hasBtcPool: Boolean
-  """
-  Does this token have an AMM pool with the protocol stablecoin as the other reserve asset?
-  """
-  hasStablecoinPool: Boolean
-}
-
-"""
 For the V1 pools, the pool token and smart token are the same. However, for V2 pools, there is one pool token per asset and only one smart token for the pool.
 """
 type PoolToken @entity {
@@ -416,6 +117,24 @@ type Swap @entity {
   isBorrow: Boolean!
   timestamp: BigInt!
   transaction: Transaction!
+}
+
+"""
+Autogenerated for debugging - to be eventually deleted. Although this is pretty useful, maybe keep
+"""
+type Conversion @entity {
+  id: ID!
+  _fromToken: Token! # address
+  _toToken: Token! # address
+  _trader: Bytes! # address
+  _amount: BigInt! # uint256
+  _return: BigInt! # uint256
+  _conversionFee: BigInt! # int256
+  _protocolFee: BigInt! # int256
+  timestamp: BigInt!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+  swapTransaction: Swap!
 }
 
 """
@@ -494,90 +213,6 @@ type TokenPoolToken @entity {
   liquidityPool: LiquidityPool!
 }
 
-# Loans
-enum LoanType {
-  Trade
-  Borrow
-}
-
-"""
-A Loan can be initialized by either a Margin Trade event or a Borrow event
-"""
-type Loan @entity {
-  id: ID! # ID is LoanId
-  loanToken: Token!
-  collateralToken: Token!
-  """
-  LoanType is either Trade (for Margin Trades) or Borrow (for Borrows)
-  """
-  type: LoanType!
-  startTimestamp: BigInt!
-  endTimestamp: BigInt
-  """
-  The amount borrowed in loan tokens
-  """
-  borrowedAmount: BigDecimal!
-  startBorrowedAmount: BigDecimal!
-  maxBorrowedAmount: BigDecimal!
-
-  """
-  Total of collateral (user collateral in a Borrow, and user collateral + borrowed amount in a Trade) in collateral tokens
-  """
-  positionSize: BigDecimal!
-  """
-  Initial size of the position
-  """
-  startPositionSize: BigDecimal!
-  """
-  The maximum this position size was - mainly for debugging purposes
-  """
-  maximumPositionSize: BigDecimal!
-  """
-  The start rate of the loan in loan tokens (eg if it is a long USD/BTC margin trade, this is the BTC price in USD)
-  """
-  startRate: BigDecimal!
-  """
-  If a Liquidate, CloseWithSwap or CloseWithDeposit event occurs with 0 margin or 0 leverage, this property changes to false
-  """
-  isOpen: Boolean!
-  user: User
-  trade: [Trade!] @derivedFrom(field: "loanId")
-  borrow: [Borrow!] @derivedFrom(field: "loanId")
-  closeWithSwaps: [CloseWithSwap!] @derivedFrom(field: "loanId")
-  closewithDeposits: [CloseWithDeposit!] @derivedFrom(field: "loanId")
-  liquidates: [Liquidate!] @derivedFrom(field: "loanId")
-  depositCollateral: [DepositCollateral!] @derivedFrom(field: "loanId")
-  totalBought: BigDecimal!
-  totalSold: BigDecimal!
-  averageBuyPrice: BigDecimal!
-  averageSellPrice: BigDecimal!
-  """
-  The realized PnL is quoted in the collateral currency
-  """
-  realizedPnL: BigDecimal!
-  realizedPnLPercent: BigDecimal!
-}
-
-"""
-A Lending Pool (iToken), where Users can lend assets to earn interest, and Users can borrow assets to Margin Trade or just as a regular loan.
-"""
-type LendingPool @entity {
-  """
-  ID is the contract address of the iToken
-  """
-  id: ID! 
-  """
-  The actual asset being lent and borrowed in this pool
-  """
-  underlyingAsset: Token!
-  poolTokenBalance: BigInt!
-  assetBalance: BigInt!
-  """
-  Total asset volume lent over all time
-  """
-  totalAssetLent: BigInt!
-}
-
 #### GENERATED BY SCAFFOLD SCRIPT - Add any custom entities before this line
 
 type NewConverter @entity {
@@ -633,6 +268,134 @@ type SmartTokenRemoved @entity {
   transaction: Transaction!
 }
 
+
+# Candlesticks
+
+type CandleStick @entity {
+  id: ID! # fromToken + toToken + timestamp + interval
+  baseToken: Token
+  quoteToken: Token
+  interval: CandleSticksInterval
+  open: BigDecimal # opening price
+  high: BigDecimal! # high price
+  low: BigDecimal! # low price
+  close: BigDecimal! # close price
+  txCount: Int! # number of transactions during period
+  totalVolume: BigDecimal! # total volume in quote currency
+  periodStartUnix: Int! # unix timestamp for start of candle
+}
+
+enum CandleSticksInterval {
+  MinuteInterval
+  FifteenMintuesInterval
+  HourInterval
+  FourHourInterval
+  DayInterval
+}
+
+
+# Governor Contracts
+type Proposal @entity {
+  id: ID! # contract address + id
+  created: Transaction!
+  canceled: Transaction
+  executed: Transaction
+  queued: Transaction
+  votesFor: BigInt!
+  votesAgainst: BigInt!
+  countVotersFor: BigInt!
+  countVotersAgainst: BigInt!
+  votes: [VoteCast!] @derivedFrom(field: "proposal")
+  proposalId: BigInt!
+  proposer: Bytes! # address
+  targets: [String!]! # address[]
+  values: [BigInt!]! # uint256[]
+  signatures: [String!]! # string[]
+  startBlock: BigInt! # uint256
+  endBlock: BigInt! # uint256
+  description: String! # string
+  timestamp: BigInt!
+  emittedBy: Bytes! #address
+}
+
+type VoteCast @entity {
+  id: ID!
+  voter: User! # address
+  proposalId: BigInt! # uint256
+  proposal: Proposal!
+  support: Boolean! # bool
+  votes: BigInt! # uint256
+  timestamp: BigInt!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
+
+"""
+A Lending Pool (iToken), where Users can lend assets to earn interest, and Users can borrow assets to Margin Trade or just as a regular loan.
+"""
+type LendingPool @entity {
+  """
+  ID is the contract address of the iToken
+  """
+  id: ID! 
+  """
+  The actual asset being lent and borrowed in this pool
+  """
+  underlyingAsset: Token!
+  poolTokenBalance: BigInt!
+  assetBalance: BigInt!
+  """
+  Total asset volume lent over all time
+  """
+  totalAssetLent: BigInt!
+}
+
+"""
+This entity contains the lending and unlending history of one User
+"""
+type UserLendingHistory @entity {
+  """
+  ID is userAddress + lendingPoolAddress (lendingPool in this case is the lending pool token)
+  """
+  id: ID!
+  user: User!
+  lendingPool: LendingPool!
+  """
+  Granular Lend/UnLend events. Derived from Mint/Burn events on the contracts
+  """
+  lendingHistory: [LendingHistoryItem!] @derivedFrom(field: "userLendingHistory")
+  """
+  Total volume this User has lent to this pool over all time (in the underlying asset currency, ie rBTC for the rBTC lending pool)
+  """
+  totalLendVolume: BigInt!
+  """
+  Total volume this User has withdrawn from this pool over all time
+  """
+  totalUnlendVolume: BigInt!
+}
+
+enum LendingHistoryType {
+  Lend
+  UnLend
+}
+
+type LendingHistoryItem @entity {
+  id: ID! # tx hash
+  lender: User!
+  type: LendingHistoryType!
+  lendingPool: LendingPool!
+  """
+  The underlying asset for this pool (eg USDT for the iUSDT pool)
+  """
+  asset: Token 
+  amount: BigInt! #TODO: Change to BigDecimal
+  loanTokenAmount: BigInt!
+  transaction: Transaction!
+  emittedBy: String!
+  userLendingHistory: UserLendingHistory!
+}
+
 """
 This entity stores one Users history of adding and removing liquidity from one AMM pool
 """
@@ -671,22 +434,80 @@ type LiquidityHistoryItem @entity {
   transaction: Transaction!
 }
 
+# Loans
+enum LoanType {
+  Trade
+  Borrow
+}
+
 """
-Autogenerated for debugging - to be eventually deleted. Although this is pretty useful, maybe keep
+A Loan can be initialized by either a Margin Trade event or a Borrow event
 """
-type Conversion @entity {
-  id: ID!
-  _fromToken: Token! # address
-  _toToken: Token! # address
-  _trader: Bytes! # address
-  _amount: BigInt! # uint256
-  _return: BigInt! # uint256
-  _conversionFee: BigInt! # int256
-  _protocolFee: BigInt! # int256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-  swapTransaction: Swap!
+type Loan @entity {
+  id: ID! # ID is LoanId
+  loanToken: Token!
+  collateralToken: Token!
+  """
+  LoanType is either Trade (for Margin Trades) or Borrow (for Borrows)
+  """
+  type: LoanType!
+  startTimestamp: BigInt!
+  endTimestamp: BigInt
+  """
+  The amount borrowed in loan tokens
+  """
+  borrowedAmount: BigDecimal!
+  startBorrowedAmount: BigDecimal!
+  maxBorrowedAmount: BigDecimal!
+
+  """
+  Total of collateral (user collateral in a Borrow, and user collateral + borrowed amount in a Trade) in collateral tokens
+  """
+  positionSize: BigDecimal!
+  """
+  Initial size of the position
+  """
+  startPositionSize: BigDecimal!
+  """
+  The maximum this position size was - mainly for debugging purposes
+  """
+  maximumPositionSize: BigDecimal!
+  """
+  The start rate of the loan in loan tokens (eg if it is a long USD/BTC margin trade, this is the BTC price in USD)
+  """
+  startRate: BigDecimal!
+  """
+  If a Liquidate, CloseWithSwap or CloseWithDeposit event occurs with 0 margin or 0 leverage, this property changes to false
+  """
+  isOpen: Boolean!
+  user: User!
+  trade: [Trade!] @derivedFrom(field: "loanId")
+  borrow: [Borrow!] @derivedFrom(field: "loanId")
+  closeWithSwaps: [CloseWithSwap!] @derivedFrom(field: "loanId")
+  closewithDeposits: [CloseWithDeposit!] @derivedFrom(field: "loanId")
+  liquidates: [Liquidate!] @derivedFrom(field: "loanId")
+  depositCollateral: [DepositCollateral!] @derivedFrom(field: "loanId")
+  """
+  Sum of position volume from Trade, Borrow and DepositCollateral events in this loan, in collateral token
+  """
+  totalBought: BigDecimal!
+  """
+  Sum of position change volume from CloseWithSwap, CloseWithDeposit and Liquidate events in this loan, in collateral token
+  """
+  totalSold: BigDecimal!
+  """
+  Average price per token from all loan open events
+  """
+  averageBuyPrice: BigDecimal!
+  """
+  Average price per token from all loan close events
+  """
+  averageSellPrice: BigDecimal!
+  """
+  The realized PnL is quoted in the collateral currency
+  """
+  realizedPnL: BigDecimal!
+  realizedPnLPercent: BigDecimal!
 }
 
 """
@@ -798,7 +619,7 @@ type PayBorrowingFee @entity {
 }
 
 """
-Granular event data for the Loan entity. Emitted when a user Lends or Unle and when a loan is rolled over
+Granular event data for the Loan entity. Emitted when a user Lends or Unlends and when a loan is rolled over
 """
 type PayLendingFee @entity {
   id: ID!
@@ -844,48 +665,221 @@ type Trade @entity {
   transaction: Transaction!
 }
 
-# Vesting Resistry
+# PROTOCOL LEVEL ENTITIES
 
-enum VestingContractType {
-  Origins
-  Genesis
-  Fish
-  FishTeam
-  Team
-  Rewards
-}
-
-type VestingContract @entity {
-  id: ID! # vesting contract id
-  user: User!
-  createdAtTimestamp: BigInt!
-  cliff: BigInt # uint256
-  duration: BigInt # uint256
-  startingBalance: BigInt! # uint256
-  currentBalance: BigInt!
-  type: VestingContractType!
-  emittedBy: Bytes!
-  createdAtTransaction: Transaction!
-  stakeHistory: [VestingHistoryItem!] @derivedFrom(field: "staker")
-}
-
-enum VestingHistoryItemAction {
-  TokensStaked,
-  TeamTokensRevoked,
-  TokensWithdrawn
-}
-
-type VestingHistoryItem @entity {
+"""
+This entity will have only one instance and will be used to store protocol-wide data like list of tokens and number or users.
+The ID of this one entity is "0"
+"""
+type ProtocolStats @entity {
+  """
+  Only one entity should be created, with ID "0"
+  """
   id: ID!
-  action: VestingHistoryItemAction!
-  staker: VestingContract!
-  amount: BigInt! # uint256
-  lockedUntil: BigInt! # uint256
-  totalStaked: BigInt! # uint256
+  """
+  An array of all tokens in the protocol
+  """
+  tokens: [Token!]!
+  usdStablecoin: Token!
+  btcUsdPrice: BigDecimal!
+  """
+  Total number of users of the protocol. This number is incremented each time a user initiates a transaction with the Protocol.
+  Currently this is incremented by specific user actions, but could be incremented on a per Transaction basis.
+  """
+  totalUsers: BigInt!
+  """
+  Total of positionSize property in Trade event (in usd). This includes user collateral and borrowed amount
+  """
+  totalMarginTradeVolumeUsd: BigDecimal!
+  """
+  Total position volume closed for Margin Trades (in usd)
+  """
+  totalCloseWithSwapVolumeUsd: BigDecimal!
+  """
+  Total additional collateral deposited for Margin Trades and Borrows (in usd)
+  """
+  totalDepositCollateralVolumeUsd: BigDecimal!
+  """
+  Total Margin Trade and Borrow position size that has been liquidated (in usd)
+  """
+  totalLiquidateVolumeUsd: BigDecimal!
+  """
+  Total volume that has passed through every AMM pool of the Sovryn protocol (in usd)
+  """
+  totalAmmVolumeUsd: BigDecimal!
+  """
+  Total volume of fees earned by liquidity providers to AMM pools (in usd)
+  """
+  totalAmmLpFeesUsd: BigDecimal!
+  """
+  Total volume of fees earned by SOV stakers from AMM conversion events (in usd). These fees began after the fee-sharing SIP was executed.
+  """
+  totalAmmStakerFeesUsd: BigDecimal!
+  """
+  Total fees from Margin Trading earned by SOV stakers (in usd)
+  """
+  totalTradingFeesUsd: BigDecimal!
+  """
+  Total fees from Lending and Unlending earned by SOV stakers (in usd)
+  """
+  totalLendingFeesUsd: BigDecimal!
+  """
+  Total fees from Borrowing earned by SOV stakers (in usd)
+  """
+  totalBorrowingFeesUsd: BigDecimal!
+  """
+  Total volume supplied to Lending Pools over all time (in usd)
+  """
+  totalLendVolumeUsd: BigDecimal!
+  """
+  Total volume withdrawn from Lending Pool over all time (in usd)
+  """
+  totalUnlendVolumeUsd: BigDecimal!
+  """
+  Total of collateral property in Trade event (in usd). This may be changed to borrowed amount volume, but collateral keeps it consistent with margin trading
+  """
+  totalBorrowVolumeUsd: BigDecimal!
+  """
+  Total volume of Borrows closed (in usd)
+  """
+  totalCloseWithDepositVolumeUsd: BigDecimal!
+  """
+  This is SOV staked by users (not vesting contracts). It is incremented when users stake tokens, and decremented when users withdraw tokens from the staking contract
+  """
+  totalVoluntarilyStakedSov: BigInt!
+  """
+  This is SOV staked by vesting contracts. It in incremented when the contracts stake the tokens, and decremented when users claim their unlocked tokens
+  """
+  totalStakedByVestingSov: BigInt!
+  """
+  NOT YET IMPLEMENTED: This will be a total of volumes of all transaction types (AMM Swaps, Margin Trades, CloseWithSwap etc etc)
+  """
+  totalTransactedVolumeUsd: BigInt! # TODO: Implement
+}
+
+"""
+Transaction data, including hash and timestamp
+"""
+type Transaction @entity {
+  """
+  ID is transaction hash
+  """
+  id: ID!
+  blockNumber: BigInt!
+  """
+  The timestamp the transaction was confirmed
+  """
   timestamp: BigInt!
-  emittedBy: Bytes! #address
+  gasPrice: BigInt!
+  """
+  The index of this transaction within the block
+  """
+  index: BigInt!
+  """
+  The account that initiated this transaction. This must be an Account and not a Contract.
+  """
+  from: Bytes! # TODO: Change to User entity
+  to: Bytes
+  value: BigInt!
+  gasLimit: BigInt!
+}
+
+"""
+This entity represents an ERC20 token traded on the Sovryn Protocol
+"""
+type Token @entity {
+  """
+  The ID is the contract address of the token on RSK
+  """
+  id: ID!
+  name: String
+  symbol: String
+  decimals: Int
+  version: Int
+  """
+  The addresses of the LiquidityPools where this token is a reserve asset
+  """
+  liquidityPools: [LiquidityPoolToken!] @derivedFrom(field: "token")
+  """
+  The smart tokens that have this token as an underlying asset
+  """
+  smartTokens: [TokenSmartToken!] @derivedFrom(field: "token")
+  # tokenSwapTotals: [TokenSwapTotals!]
+  """
+  previous BTC price used for candleSticks
+  """
+  prevPriceBtc: BigDecimal!
+  lastPriceBtc: BigDecimal!
+  """
+  previous BTC price used for candleSticks
+  """
+  prevPriceUsd: BigDecimal!
+  lastPriceUsd: BigDecimal!
+  """
+  The total volume of this token that has been traded through the protocol quoted in BTC
+  """
+  btcVolume: BigDecimal!
+  """
+  The total volume of this token that has been traded through the protocol quoted in USD
+  """
+  usdVolume: BigDecimal!
+  """
+  The total volume of this token that has been traded through the protocol
+  """
+  tokenVolume: BigDecimal!
+  # marketCap: BigInt!
+  # circulatingSupply: BigInt!
+  currentConverterRegistry: ConverterRegistry
+  """
+  Does this token have an AMM pool with rBTC as the other reserve asset?
+  """
+  hasBtcPool: Boolean
+  """
+  Does this token have an AMM pool with the protocol stablecoin as the other reserve asset?
+  """
+  hasStablecoinPool: Boolean
+}
+
+
+
+"""
+This entity contains the history, fees and totals regarding one users' SOV rewards
+"""
+type UserRewardsEarnedHistory @entity {
+  id: ID! # user
+  user: User!
+  """
+  This is the total of all EarnReward and RewardClaimed events
+  """
+  totalFeesAndRewardsEarned: BigInt!
+  """
+  This is incremented by EarnReward events, and set to 0 by TokensStaked events on the LockedSOV contract
+  """
+  availableTradingRewards: BigInt!
+  """
+  This is incremented by EarnReward and RewardClaimed events, and set to 0 by RewardWithdrawn events
+  """
+  availableRewardSov: BigInt!
+  rewardsEarnedHistory: [RewardsEarnedHistoryItem!] @derivedFrom(field: "user")
+}
+
+enum RewardsEarnedAction {
+  StakingRewardWithdrawn
+  EarnReward
+  RewardClaimed
+  RewardSovStaked
+}
+
+type RewardsEarnedHistoryItem @entity {
+  id: ID! # transaction hash
+  action: RewardsEarnedAction!
+  user: UserRewardsEarnedHistory!
+  token: Token
+  amount: BigInt!
+  timestamp: BigInt!
   transaction: Transaction!
 }
+
 
 type TokensStaked @entity {
   id: ID!
@@ -930,104 +924,6 @@ type StakeHistoryItem @entity {
   lockedUntil: BigInt
 }
 
-"""
-This entity contains the history, fees and totals regarding one users' SOV rewards
-"""
-type UserRewardsEarnedHistory @entity {
-  id: ID! # user
-  user: User!
-  """
-  This is the total of all EarnReward and RewardClaimed events
-  """
-  totalFeesAndRewardsEarned: BigInt!
-  """
-  This is incremented by EarnReward events, and set to 0 by TokensStaked events on the LockedSOV contract
-  """
-  availableTradingRewards: BigInt!
-  """
-  This is incremented by EarnReward and RewardClaimed events, and set to 0 by RewardWithdrawn events
-  """
-  availableRewardSov: BigInt!
-  rewardsEarnedHistory: [RewardsEarnedHistoryItem!] @derivedFrom(field: "user")
-}
-
-enum RewardsEarnedAction {
-  StakingRewardWithdrawn
-  EarnReward
-  RewardClaimed
-  RewardSovStaked
-}
-
-type RewardsEarnedHistoryItem @entity {
-  id: ID! # transaction hash
-  action: RewardsEarnedAction!
-  user: UserRewardsEarnedHistory!
-  token: Token
-  amount: BigInt!
-  timestamp: BigInt!
-  transaction: Transaction!
-}
-
-# Candlesticks
-
-enum CandleSticksInterval {
-  MinuteInterval
-  FifteenMintuesInterval
-  HourInterval
-  FourHourInterval
-  DayInterval
-}
-
-type CandleStick @entity {
-  id: ID! # fromToken + toToken + timestamp + interval
-  baseToken: Token
-  quoteToken: Token
-  interval: CandleSticksInterval
-  open: BigDecimal # opening price
-  high: BigDecimal! # high price
-  low: BigDecimal! # low price
-  close: BigDecimal! # close price
-  txCount: Int! # number of transactions during period
-  totalVolume: BigDecimal! # total volume in quote currency
-  periodStartUnix: Int! # unix timestamp for start of candle
-}
-
-# Governor Contracts
-type Proposal @entity {
-  id: ID! # contract address + id
-  created: Transaction!
-  canceled: Transaction
-  executed: Transaction
-  queued: Transaction
-  votesFor: BigInt!
-  votesAgainst: BigInt!
-  countVotersFor: BigInt!
-  countVotersAgainst: BigInt!
-  votes: [VoteCast!] @derivedFrom(field: "proposal")
-  proposalId: BigInt!
-  proposer: Bytes! # address
-  targets: [String!]! # address[]
-  values: [BigInt!]! # uint256[]
-  signatures: [String!]! # string[]
-  startBlock: BigInt! # uint256
-  endBlock: BigInt! # uint256
-  description: String! # string
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-}
-
-type VoteCast @entity {
-  id: ID!
-  voter: User! # address
-  proposalId: BigInt! # uint256
-  proposal: Proposal!
-  support: Boolean! # bool
-  votes: BigInt! # uint256
-  timestamp: BigInt!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
 # This event is emitted when tokens are transferred to the Protocol contract as fees
 # It is needed because this is a flag for if staked tokens were unstaked early
 
@@ -1037,3 +933,133 @@ type FeeSharingTokensTransferred @entity {
   token: Bytes!
   amount: BigInt!
 }
+
+
+# USER SCHEMA
+
+"""
+This entity contains all user-specific data displayed on the dapp, including all user actions
+"""
+type User @entity {
+  """
+  ID is user wallet address
+  """
+  id: ID!
+  """
+  Swaps here refers to only user-triggered swaps. For example, a swap that is part of a margin trade would not be included.
+  Swaps involving multiple amm pools are stored as a single swap, comprised of multiple Conversion events
+  """
+  swaps: [Swap!] @derivedFrom(field: "user")
+  """
+  An array of all LiquidityAdded and LiquidityRemoved events
+  """
+  liquidityHistory: [UserLiquidityHistory!] @derivedFrom(field: "user")
+  """
+  An array of margin trade Trade events
+  """
+  trades: [Trade!] @derivedFrom(field: "user")
+  """
+  An array of Borrow events
+  """
+  borrows: [Borrow!] @derivedFrom(field: "user")
+  """
+  An array of Liquidation events linked to this user
+  """
+  liquidations: [Liquidate!] @derivedFrom(field: "user")
+  """
+  All loans taken out by this user, including for margin trading and for borrowing
+  """
+  loans: [Loan!] @derivedFrom(field: "user")
+  """
+  The lending history of a User, separated into lending pools. Explore the UserLendingHistory entity for more granular events.
+  """
+  lendingHistory: [UserLendingHistory!] @derivedFrom(field: "user")
+  """
+  The SOV Staking history of a user. This includes withdrawing vested tokens. Explore the UserStakeHistory entity for more granular events.
+  """
+  stakeHistory: [UserStakeHistory!] @derivedFrom(field: "user")
+  """
+  The Rewards history of one user. This includes actions like EarnReward, RewardSovDeposited, and RewardSovStaked.
+  Explore the UserRewardsEarnedHistory entity for more granular events
+  """
+  rewardsEarnedHistory: [UserRewardsEarnedHistory!] @derivedFrom(field: "user")
+  """
+  Vesting contracts owned by User, labelled by type
+  """
+  vestingContracts: [VestingContract!] @derivedFrom(field:"user")
+  """
+  Voting history of User
+  """
+  votes: [VoteCast!] @derivedFrom(field: "voter")
+  """
+  See UserTotals entity for full documentation
+  """
+  userTotals: UserTotal @derivedFrom(field: "user")
+}
+
+"""
+This is the total volumes of different actions for one user. See ProtocolStats entity for full descriptions.
+"""
+type UserTotal @entity {
+  id: ID!
+  user: User!
+  totalMarginTradeVolumeUsd: BigDecimal!
+  totalCloseWithSwapVolumeUsd: BigDecimal!
+  totalDepositCollateralVolumeUsd: BigDecimal!
+  totalLiquidateVolumeUsd: BigDecimal!
+  totalAmmVolumeUsd: BigDecimal!
+  totalAmmLpFeesUsd: BigDecimal!
+  totalAmmStakerFeesUsd: BigDecimal!
+  totalTradingFeesUsd: BigDecimal!
+  totalLendingFeesUsd: BigDecimal!
+  totalBorrowingFeesUsd: BigDecimal!
+  totalLendVolumeUsd: BigDecimal!
+  totalUnlendVolumeUsd: BigDecimal!
+  totalBorrowVolumeUsd: BigDecimal!
+  totalCloseWithDepositVolumeUsd: BigDecimal!
+  # totalTransactedVolumeUsd: BigInt! # TODO: Implement
+}
+
+# Vesting Resistry
+
+enum VestingContractType {
+  Origins
+  Genesis
+  Fish
+  FishTeam
+  Team
+  Rewards
+}
+
+type VestingContract @entity {
+  id: ID! # vesting contract id
+  user: User!
+  createdAtTimestamp: BigInt!
+  cliff: BigInt # uint256
+  duration: BigInt # uint256
+  startingBalance: BigInt! # uint256
+  currentBalance: BigInt!
+  type: VestingContractType!
+  emittedBy: Bytes!
+  createdAtTransaction: Transaction!
+  stakeHistory: [VestingHistoryItem!] @derivedFrom(field: "staker")
+}
+
+enum VestingHistoryItemAction {
+  TokensStaked,
+  TeamTokensRevoked,
+  TokensWithdrawn
+}
+
+type VestingHistoryItem @entity {
+  id: ID!
+  action: VestingHistoryItemAction!
+  staker: VestingContract!
+  amount: BigInt! # uint256
+  lockedUntil: BigInt! # uint256
+  totalStaked: BigInt! # uint256
+  timestamp: BigInt!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
