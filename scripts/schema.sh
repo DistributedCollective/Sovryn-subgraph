@@ -12,10 +12,10 @@ reset=`tput sgr0`
 [ ! "$(ls -A schema/)" ] && echo "❌ Error: schema/ directory is empty. Please add some .graphql schema files." && exit 1;
 
 # Else if schema.graphql exists, delete it
-[ -f "generated.schema.graphql" ] && rm generated.schema.graphql;
+[ -f "schema.graphql" ] && rm schema.graphql;
 
 # Rewrite schema.graphql
-for f in schema/*.graphql; do (cat "${f}"; echo; echo) >> generated.schema.graphql;
-echo "${green}✔ ${reset}Schema for ${yellow}$f${reset} has been written to generatedschema.graphql";
+for f in schema/*.graphql; do (cat "${f}"; echo; echo) >> schema.graphql;
+echo "${green}✔ ${reset}Schema for ${yellow}$f${reset} has been written to schema.graphql";
 done;
 echo; echo "Schema.graphql is ready";
