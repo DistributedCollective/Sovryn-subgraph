@@ -11,10 +11,11 @@ import {
 } from '../generated/VestingRegistry1/VestingRegistry'
 import { VestingContract } from '../generated/schema'
 import { BigInt } from '@graphprotocol/graph-ts'
-import { loadTransaction } from './utils/Transaction'
+import { createAndReturnTransaction } from './utils/Transaction'
 import { vestingRegistry1, vestingRegistry2, vestingRegistry3, vestingRegistryFish } from './contracts/contracts'
 import { createAndReturnUser } from './utils/User'
 import { log } from '@graphprotocol/graph-ts'
+import { VestingContractType } from './utils/types'
 
 export function handleAdminAdded(event: AdminAddedEvent): void {}
 
@@ -34,10 +35,10 @@ export function handleOwnershipTransferred(event: OwnershipTransferredEvent): vo
 export function handleSOVTransferred(event: SOVTransferredEvent): void {}
 
 const vestingContractTypes = new Map<string, string>()
-vestingContractTypes.set(vestingRegistry1.toLowerCase(), 'Origins')
-vestingContractTypes.set(vestingRegistry2.toLowerCase(), 'Origins')
-vestingContractTypes.set(vestingRegistry3.toLowerCase(), 'Rewards')
-vestingContractTypes.set(vestingRegistryFish.toLowerCase(), 'Fish')
+vestingContractTypes.set(vestingRegistry1.toLowerCase(), VestingContractType.Origins)
+vestingContractTypes.set(vestingRegistry2.toLowerCase(), VestingContractType.Origins)
+vestingContractTypes.set(vestingRegistry3.toLowerCase(), VestingContractType.Rewards)
+vestingContractTypes.set(vestingRegistryFish.toLowerCase(), VestingContractType.Fish)
 
 export function handleTeamVestingCreated(event: TeamVestingCreatedEvent): void {
   let entity = new VestingContract(event.params.vesting.toHexString())
@@ -47,11 +48,12 @@ export function handleTeamVestingCreated(event: TeamVestingCreatedEvent): void {
   entity.duration = event.params.duration
   entity.startingBalance = event.params.amount
   entity.currentBalance = BigInt.zero()
-  let transaction = loadTransaction(event)
+  let transaction = createAndReturnTransaction(event)
   entity.createdAtTransaction = transaction.id
   entity.createdAtTimestamp = transaction.timestamp
   entity.emittedBy = event.address
-  entity.type = vestingContractTypes.get(event.address.toHexString().toLowerCase()) == 'Fish' ? 'FishTeam' : 'Team'
+  entity.type =
+    vestingContractTypes.get(event.address.toHexString().toLowerCase()) == VestingContractType.Fish ? VestingContractType.FishTeam : VestingContractType.Team
   entity.save()
 }
 
@@ -66,7 +68,7 @@ export function handleVestingCreated(event: VestingCreatedEvent): void {
   entity.duration = event.params.duration
   entity.startingBalance = event.params.amount
   entity.currentBalance = BigInt.zero()
-  let transaction = loadTransaction(event)
+  let transaction = createAndReturnTransaction(event)
   entity.createdAtTransaction = transaction.id
   entity.createdAtTimestamp = transaction.timestamp
   entity.emittedBy = event.address

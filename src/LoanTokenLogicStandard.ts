@@ -1,17 +1,18 @@
 import { Burn as BurnEvent, FlashBorrow as FlashBorrowEvent, Mint as MintEvent } from '../generated/templates/LoanTokenLogicStandard/LoanTokenLogicStandard'
 import { UserLendingHistory, LendingHistoryItem, LendingPool } from '../generated/schema'
-import { loadTransaction } from './utils/Transaction'
+import { createAndReturnTransaction } from './utils/Transaction'
 import { createAndReturnUser } from './utils/User'
 import { Address, BigInt, dataSource } from '@graphprotocol/graph-ts'
 import { createAndReturnProtocolStats, createAndReturnUserTotals } from './utils/ProtocolStats'
 import { convertToUsd } from './utils/Prices'
+import { LendingHistoryType } from './utils/types'
 
 export function handleBurn(event: BurnEvent): void {
   let context = dataSource.context()
   let underlyingAsset = context.getString('underlyingAsset')
   createAndReturnUser(event.params.burner)
   const userAddress = event.params.burner.toHexString()
-  loadTransaction(event)
+  createAndReturnTransaction(event)
 
   let userHistoryEntity = UserLendingHistory.load(userAddress + dataSource.address().toHexString())
   if (userHistoryEntity != null) {
@@ -22,7 +23,7 @@ export function handleBurn(event: BurnEvent): void {
   let lendingHistoryItem = new LendingHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   lendingHistoryItem.userLendingHistory = userAddress + dataSource.address().toHexString()
   lendingHistoryItem.lender = userAddress
-  lendingHistoryItem.type = 'UnLend'
+  lendingHistoryItem.type = LendingHistoryType.UnLend
   lendingHistoryItem.transaction = event.transaction.hash.toHexString()
   lendingHistoryItem.emittedBy = dataSource.address().toHexString()
   lendingHistoryItem.lendingPool = dataSource.address().toHexString()
@@ -56,7 +57,7 @@ export function handleMint(event: MintEvent): void {
   let underlyingAsset = context.getString('underlyingAsset')
   createAndReturnUser(event.params.minter)
   const userAddress = event.params.minter.toHexString()
-  loadTransaction(event)
+  createAndReturnTransaction(event)
 
   let userHistoryEntity = UserLendingHistory.load(userAddress + dataSource.address().toHexString())
   if (userHistoryEntity != null) {
@@ -74,7 +75,7 @@ export function handleMint(event: MintEvent): void {
   let lendingHistoryItem = new LendingHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   lendingHistoryItem.userLendingHistory = userAddress + dataSource.address().toHexString()
   lendingHistoryItem.lender = userAddress
-  lendingHistoryItem.type = 'Lend'
+  lendingHistoryItem.type = LendingHistoryType.Lend
   lendingHistoryItem.transaction = event.transaction.hash.toHexString()
   lendingHistoryItem.emittedBy = dataSource.address().toHexString()
   lendingHistoryItem.lendingPool = dataSource.address().toHexString()

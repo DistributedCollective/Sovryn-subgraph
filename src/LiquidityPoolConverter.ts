@@ -21,7 +21,7 @@ import {
 import { UserLiquidityHistory, LiquidityHistoryItem, Conversion, LiquidityPool, LiquidityPoolToken, SmartToken } from '../generated/schema'
 import { ConversionEventForSwap, createAndReturnSwap, updatePricing } from './utils/Swap'
 import { createAndReturnToken } from './utils/Token'
-import { loadTransaction } from './utils/Transaction'
+import { createAndReturnTransaction } from './utils/Transaction'
 import { BigInt, BigDecimal, dataSource, log, store } from '@graphprotocol/graph-ts'
 import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnPoolToken } from './utils/PoolToken'
@@ -30,6 +30,7 @@ import { updateVolumes } from './utils/Volumes'
 import { decimal } from '@protofire/subgraph-toolkit'
 import { liquidityPoolV1ChangeBlock } from './contracts/contracts'
 import { updateCandleSticks } from './utils/Candlesticks'
+import { LiquidityHistoryType } from './utils/types'
 
 export function handlePriceDataUpdate(event: PriceDataUpdateEvent): void {}
 
@@ -107,12 +108,12 @@ export function handleLiquidityAdded(event: LiquidityAddedEvent): void {
     }
   }
 
-  loadTransaction(event)
+  createAndReturnTransaction(event)
   createLiquidityHistoryItem({
     id: event.transaction.hash.toHex() + '-' + event.logIndex.toString(),
     user: event.transaction.from.toHexString(),
     userLiquidityHistory: userLiquidityHistoryId,
-    type: 'Added',
+    type: LiquidityHistoryType.Added,
     provider: event.params._provider.toHexString(),
     reserveToken: event.params._reserveToken.toHexString(),
     amount: event.params._amount,
@@ -140,12 +141,12 @@ export function handleLiquidityRemoved(event: LiquidityRemovedEvent): void {
     }
   }
 
-  loadTransaction(event)
+  createAndReturnTransaction(event)
   createLiquidityHistoryItem({
     id: event.transaction.hash.toHex() + '-' + event.logIndex.toString(),
     user: event.transaction.from.toHexString(),
     userLiquidityHistory: userLiquidityHistoryId,
-    type: 'Removed',
+    type: LiquidityHistoryType.Removed,
     provider: event.params._provider.toHexString(),
     reserveToken: event.params._reserveToken.toHexString(),
     amount: event.params._amount,
@@ -160,7 +161,7 @@ export function handleLiquidityRemoved(event: LiquidityRemovedEvent): void {
 
 /** This event is triggered when a pool is activated or deactivated */
 export function handleActivation(event: ActivationEvent): void {
-  loadTransaction(event)
+  createAndReturnTransaction(event)
   let liquidityPool = LiquidityPool.load(dataSource.address().toHex())
 
   if (liquidityPool != null) {
@@ -247,7 +248,7 @@ export function handleConversionV1(event: ConversionEventV1): void {
   entity._return = event.params._return
   entity._conversionFee = event.params._conversionFee
   entity._protocolFee = BigInt.zero()
-  let transaction = loadTransaction(event)
+  let transaction = createAndReturnTransaction(event)
   entity.transaction = transaction.id
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
@@ -282,7 +283,7 @@ export function handleConversionV2(event: ConversionEventV2): void {
   entity._return = event.params._return
   entity._conversionFee = event.params._conversionFee
   entity._protocolFee = BigInt.zero()
-  let transaction = loadTransaction(event)
+  let transaction = createAndReturnTransaction(event)
   entity.transaction = transaction.id
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
@@ -317,7 +318,7 @@ export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void
   entity._return = event.params._return
   entity._conversionFee = event.params._conversionFee
   entity._protocolFee = event.params._protocolFee
-  let transaction = loadTransaction(event)
+  let transaction = createAndReturnTransaction(event)
   entity.transaction = transaction.id
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address

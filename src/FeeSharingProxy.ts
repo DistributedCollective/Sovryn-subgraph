@@ -9,8 +9,8 @@ import {
   WhitelistedConverter as WhitelistedConverterEvent,
 } from '../generated/FeeSharingProxy/FeeSharingProxy'
 import { StakeHistoryItem, FeeSharingTokensTransferred } from '../generated/schema'
-
-import { loadTransaction } from './utils/Transaction'
+import { StakeHistoryAction } from './utils/types'
+import { createAndReturnTransaction } from './utils/Transaction'
 
 export function handleCheckpointAdded(event: CheckpointAddedEvent): void {}
 
@@ -36,10 +36,10 @@ export function handleTokensTransferred(event: TokensTransferredEvent): void {
 export function handleUnwhitelistedConverter(event: UnwhitelistedConverterEvent): void {}
 
 export function handleUserFeeWithdrawn(event: UserFeeWithdrawnEvent): void {
-  loadTransaction(event)
+  createAndReturnTransaction(event)
   let stakeHistoryItem = new StakeHistoryItem(event.params.sender.toHexString())
   stakeHistoryItem.user = event.params.sender.toHexString()
-  stakeHistoryItem.action = 'FeeWithdrawn'
+  stakeHistoryItem.action = StakeHistoryAction.FeeWithdrawn
   stakeHistoryItem.timestamp = event.block.timestamp
   stakeHistoryItem.amount = event.params.amount
   stakeHistoryItem.transaction = event.transaction.hash.toHexString()

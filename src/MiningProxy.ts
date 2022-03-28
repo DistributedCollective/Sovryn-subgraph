@@ -1,12 +1,13 @@
 import { RewardClaimed as RewardClaimedEvent } from '../generated/MiningProxy/MiningProxy'
 import { UserRewardsEarnedHistory, RewardsEarnedHistoryItem } from '../generated/schema'
 
-import { loadTransaction } from './utils/Transaction'
+import { createAndReturnTransaction } from './utils/Transaction'
 import { createAndReturnUser } from './utils/User'
 import { BigInt } from '@graphprotocol/graph-ts'
+import { RewardsEarnedAction } from './utils/types'
 
 export function handleRewardClaimed(event: RewardClaimedEvent): void {
-  loadTransaction(event)
+  createAndReturnTransaction(event)
   createAndReturnUser(event.params.user)
 
   let userRewardsEarnedHistory = UserRewardsEarnedHistory.load(event.params.user.toHexString())
@@ -23,7 +24,7 @@ export function handleRewardClaimed(event: RewardClaimedEvent): void {
   }
 
   let rewardsEarnedHistoryItem = new RewardsEarnedHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  rewardsEarnedHistoryItem.action = 'RewardClaimed'
+  rewardsEarnedHistoryItem.action = RewardsEarnedAction.RewardClaimed
   rewardsEarnedHistoryItem.user = event.params.user.toHexString()
   rewardsEarnedHistoryItem.amount = event.params.amount
   rewardsEarnedHistoryItem.timestamp = event.block.timestamp

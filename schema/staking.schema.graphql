@@ -29,6 +29,7 @@ enum StakeHistoryAction {
   Delegate
   Unstake
   WithdrawStaked
+  FeeWithdrawn
 }
 
 type StakeHistoryItem @entity {

@@ -1,6 +1,7 @@
 import { BigInt } from '@graphprotocol/graph-ts'
 import { TokenStaked as TokenStakedEvent } from '../generated/LockedSov/LockedSov'
 import { UserRewardsEarnedHistory, RewardsEarnedHistoryItem } from '../generated/schema'
+import { RewardsEarnedAction } from './utils/types'
 import { createAndReturnUser } from './utils/User'
 
 export function handleTokenStaked(event: TokenStakedEvent): void {
@@ -19,7 +20,7 @@ export function handleTokenStaked(event: TokenStakedEvent): void {
   }
 
   let rewardsEarnedHistoryItem = new RewardsEarnedHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  rewardsEarnedHistoryItem.action = 'RewardSovStaked'
+  rewardsEarnedHistoryItem.action = RewardsEarnedAction.RewardSovStaked
   rewardsEarnedHistoryItem.user = event.params._initiator.toHexString()
   rewardsEarnedHistoryItem.amount = event.params._amount
   rewardsEarnedHistoryItem.timestamp = event.block.timestamp
