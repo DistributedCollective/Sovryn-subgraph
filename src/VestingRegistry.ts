@@ -11,12 +11,13 @@ import {
 } from '../generated/VestingRegistry1/VestingRegistry'
 import { VestingCreated as VestingCreatedProxyEvent, TeamVestingCreated as TeamVestingCreatedProxyEvent } from '../generated/VestingRegistryProxy/VestingProxy'
 import { VestingContract } from '../generated/schema'
-import { BigInt } from '@graphprotocol/graph-ts'
+import { BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 import { createAndReturnTransaction } from './utils/Transaction'
 import { vestingRegistry1, vestingRegistry2, vestingRegistry3, vestingRegistryFish } from './contracts/contracts'
 import { createAndReturnUser } from './utils/User'
 import { log } from '@graphprotocol/graph-ts'
 import { VestingContractType } from './utils/types'
+import { DEFAULT_DECIMALS, decimal } from '@protofire/subgraph-toolkit'
 
 export function handleAdminAdded(event: AdminAddedEvent): void {}
 
@@ -47,8 +48,8 @@ export function handleTeamVestingCreated(event: TeamVestingCreatedEvent): void {
   entity.user = user.id
   entity.cliff = event.params.cliff
   entity.duration = event.params.duration
-  entity.startingBalance = event.params.amount
-  entity.currentBalance = BigInt.zero()
+  entity.startingBalance = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
+  entity.currentBalance = BigDecimal.zero()
   let transaction = createAndReturnTransaction(event)
   entity.createdAtTransaction = transaction.id
   entity.createdAtTimestamp = transaction.timestamp
@@ -64,8 +65,8 @@ export function handleTeamVestingCreatedProxy(event: TeamVestingCreatedEvent): v
   entity.user = user.id
   entity.cliff = event.params.cliff
   entity.duration = event.params.duration
-  entity.startingBalance = event.params.amount
-  entity.currentBalance = BigInt.zero()
+  entity.startingBalance = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
+  entity.currentBalance = BigDecimal.zero()
   let transaction = createAndReturnTransaction(event)
   entity.createdAtTransaction = transaction.id
   entity.createdAtTimestamp = transaction.timestamp
@@ -84,8 +85,8 @@ export function handleVestingCreated(event: VestingCreatedEvent): void {
   entity.user = user.id
   entity.cliff = event.params.cliff
   entity.duration = event.params.duration
-  entity.startingBalance = event.params.amount
-  entity.currentBalance = BigInt.zero()
+  entity.startingBalance = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
+  entity.currentBalance = BigDecimal.zero()
   let transaction = createAndReturnTransaction(event)
   entity.createdAtTransaction = transaction.id
   entity.createdAtTimestamp = transaction.timestamp
@@ -101,8 +102,8 @@ export function handleVestingCreatedProxy(event: VestingCreatedProxyEvent): void
   entity.user = user.id
   entity.cliff = event.params.cliff
   entity.duration = event.params.duration
-  entity.startingBalance = event.params.amount
-  entity.currentBalance = BigInt.zero()
+  entity.startingBalance = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
+  entity.currentBalance = BigDecimal.zero()
   let transaction = createAndReturnTransaction(event)
   entity.createdAtTransaction = transaction.id
   entity.createdAtTimestamp = transaction.timestamp

@@ -5,10 +5,10 @@ type UserLiquidityHistory @entity {
   id: ID! # user + '-' + smartToken
   user: User!
   poolToken: PoolToken!
-  totalAsset0LiquidityAdded: BigInt!
-  totalAsset0LiquidityRemoved: BigInt!
-  totalAsset1LiquidityAdded: BigInt!
-  totalAsset1LiquidityRemoved: BigInt!
+  totalAsset0LiquidityAdded: BigDecimal!
+  totalAsset0LiquidityRemoved: BigDecimal!
+  totalAsset1LiquidityAdded: BigDecimal!
+  totalAsset1LiquidityRemoved: BigDecimal!
   liquidityHistory: [LiquidityHistoryItem!] @derivedFrom(field: "userLiquidityHistory")
 }
 

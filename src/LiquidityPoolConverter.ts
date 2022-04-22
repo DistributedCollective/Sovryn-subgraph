@@ -27,7 +27,7 @@ import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnPoolToken } from './utils/PoolToken'
 import { createAndReturnUser } from './utils/User'
 import { updateVolumes } from './utils/Volumes'
-import { decimal } from '@protofire/subgraph-toolkit'
+import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
 import { liquidityPoolV1ChangeBlock } from './contracts/contracts'
 import { updateCandleSticks } from './utils/Candlesticks'
 import { LiquidityHistoryType } from './utils/types'
@@ -71,8 +71,8 @@ function updateUserLiquidityHistory(
   liquidityPool: LiquidityPool,
   userLiquidityHistory: UserLiquidityHistory,
   token: string,
-  amountAdded: BigInt,
-  amountRemoved: BigInt,
+  amountAdded: BigDecimal,
+  amountRemoved: BigDecimal,
 ): void {
   /** This would be more efficient with another if/else statement for type, but less readable? */
   if (liquidityPool.token0 == token) {
@@ -97,14 +97,20 @@ export function handleLiquidityAdded(event: LiquidityAddedEvent): void {
       userLiquidityHistory = new UserLiquidityHistory(userLiquidityHistoryId)
       userLiquidityHistory.user = event.transaction.from.toHexString()
       userLiquidityHistory.poolToken = liquidityPoolToken.poolToken
-      userLiquidityHistory.totalAsset0LiquidityAdded = BigInt.zero()
-      userLiquidityHistory.totalAsset0LiquidityRemoved = BigInt.zero()
-      userLiquidityHistory.totalAsset1LiquidityAdded = BigInt.zero()
-      userLiquidityHistory.totalAsset1LiquidityRemoved = BigInt.zero()
+      userLiquidityHistory.totalAsset0LiquidityAdded = BigDecimal.zero()
+      userLiquidityHistory.totalAsset0LiquidityRemoved = BigDecimal.zero()
+      userLiquidityHistory.totalAsset1LiquidityAdded = BigDecimal.zero()
+      userLiquidityHistory.totalAsset1LiquidityRemoved = BigDecimal.zero()
     }
 
     if (userLiquidityHistory != null) {
-      updateUserLiquidityHistory(liquidityPool, userLiquidityHistory, event.params._reserveToken.toHexString(), event.params._amount, BigInt.zero())
+      updateUserLiquidityHistory(
+        liquidityPool,
+        userLiquidityHistory,
+        event.params._reserveToken.toHexString(),
+        decimal.fromBigInt(event.params._amount, DEFAULT_DECIMALS),
+        BigDecimal.zero(),
+      )
     }
   }
 
@@ -136,7 +142,13 @@ export function handleLiquidityRemoved(event: LiquidityRemovedEvent): void {
     let userLiquidityHistory = UserLiquidityHistory.load(userLiquidityHistoryId)
     if (userLiquidityHistory != null) {
       if (userLiquidityHistory != null) {
-        updateUserLiquidityHistory(liquidityPool, userLiquidityHistory, event.params._reserveToken.toHexString(), BigInt.zero(), event.params._amount)
+        updateUserLiquidityHistory(
+          liquidityPool,
+          userLiquidityHistory,
+          event.params._reserveToken.toHexString(),
+          BigDecimal.zero(),
+          decimal.fromBigInt(event.params._amount, DEFAULT_DECIMALS),
+        )
       }
     }
   }
@@ -244,10 +256,10 @@ export function handleConversionV1(event: ConversionEventV1): void {
   entity._fromToken = event.params._fromToken.toHexString()
   entity._toToken = event.params._toToken.toHexString()
   entity._trader = event.params._trader
-  entity._amount = event.params._amount
-  entity._return = event.params._return
-  entity._conversionFee = event.params._conversionFee
-  entity._protocolFee = BigInt.zero()
+  entity._amount = decimal.fromBigInt(event.params._amount, DEFAULT_DECIMALS)
+  entity._return = decimal.fromBigInt(event.params._return, DEFAULT_DECIMALS)
+  entity._conversionFee = decimal.fromBigInt(event.params._conversionFee, DEFAULT_DECIMALS)
+  entity._protocolFee = BigDecimal.zero()
   let transaction = createAndReturnTransaction(event)
   entity.transaction = transaction.id
   entity.timestamp = transaction.timestamp
@@ -279,10 +291,10 @@ export function handleConversionV2(event: ConversionEventV2): void {
   entity._fromToken = event.params._fromToken.toHexString()
   entity._toToken = event.params._toToken.toHexString()
   entity._trader = event.params._trader
-  entity._amount = event.params._amount
-  entity._return = event.params._return
-  entity._conversionFee = event.params._conversionFee
-  entity._protocolFee = BigInt.zero()
+  entity._amount = decimal.fromBigInt(event.params._amount, DEFAULT_DECIMALS)
+  entity._return = decimal.fromBigInt(event.params._return, DEFAULT_DECIMALS)
+  entity._conversionFee = decimal.fromBigInt(event.params._conversionFee, DEFAULT_DECIMALS)
+  entity._protocolFee = BigDecimal.zero()
   let transaction = createAndReturnTransaction(event)
   entity.transaction = transaction.id
   entity.timestamp = transaction.timestamp
@@ -314,10 +326,10 @@ export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void
   entity._fromToken = event.params._fromToken.toHexString()
   entity._toToken = event.params._toToken.toHexString()
   entity._trader = event.params._trader
-  entity._amount = event.params._amount
-  entity._return = event.params._return
-  entity._conversionFee = event.params._conversionFee
-  entity._protocolFee = event.params._protocolFee
+  entity._amount = decimal.fromBigInt(event.params._amount, DEFAULT_DECIMALS)
+  entity._return = decimal.fromBigInt(event.params._return, DEFAULT_DECIMALS)
+  entity._conversionFee = decimal.fromBigInt(event.params._conversionFee, DEFAULT_DECIMALS)
+  entity._protocolFee = decimal.fromBigInt(event.params._protocolFee, DEFAULT_DECIMALS)
   let transaction = createAndReturnTransaction(event)
   entity.transaction = transaction.id
   entity.timestamp = transaction.timestamp

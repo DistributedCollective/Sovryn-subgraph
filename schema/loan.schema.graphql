@@ -84,12 +84,12 @@ type Borrow @entity {
   loanId: Loan! # bytes32
   loanToken: Bytes! # address
   collateralToken: Bytes! # address
-  newPrincipal: BigInt! # uint256
-  newCollateral: BigInt! # uint256
-  interestRate: BigInt! # uint256
-  interestDuration: BigInt! # uint256
-  collateralToLoanRate: BigInt! # uint256
-  currentMargin: BigInt! # uint256
+  newPrincipal: BigDecimal! # uint256
+  newCollateral: BigDecimal! # uint256
+  interestRate: BigDecimal! # uint256
+  interestDuration: BigDecimal! # uint256
+  collateralToLoanRate: BigDecimal! # uint256
+  currentMargin: BigDecimal! # uint256
   timestamp: BigInt!
   emittedBy: Bytes! #address
   transaction: Transaction!
@@ -106,10 +106,10 @@ type CloseWithDeposit @entity {
   closer: Bytes! # address
   loanToken: Bytes! # address
   collateralToken: Bytes! # address
-  repayAmount: BigInt! # uint256
-  collateralWithdrawAmount: BigInt! # uint256
-  collateralToLoanRate: BigInt! # uint256
-  currentMargin: BigInt! # uint256
+  repayAmount: BigDecimal! # uint256
+  collateralWithdrawAmount: BigDecimal! # uint256
+  collateralToLoanRate: BigDecimal! # uint256
+  currentMargin: BigDecimal! # uint256
   timestamp: BigInt!
   emittedBy: Bytes! #address
   transaction: Transaction!
@@ -126,10 +126,10 @@ type CloseWithSwap @entity {
   collateralToken: Bytes! # address
   loanToken: Bytes! # address
   closer: Bytes! # address
-  positionCloseSize: BigInt! # uint256
-  loanCloseAmount: BigInt! # uint256
-  exitPrice: BigInt! # uint256
-  currentLeverage: BigInt! # uint256
+  positionCloseSize: BigDecimal! # uint256
+  loanCloseAmount: BigDecimal! # uint256
+  exitPrice: BigDecimal! # uint256
+  currentLeverage: BigDecimal! # uint256
   timestamp: BigInt!
   emittedBy: Bytes! #address
   transaction: Transaction!
@@ -141,8 +141,8 @@ Granular event data for the Loan entity. Emitted when a user closes adds collate
 type DepositCollateral @entity {
   id: ID!
   loanId: Loan! # bytes32
-  depositAmount: BigInt! # uint256
-  rate: BigInt # uint256
+  depositAmount: BigDecimal! # uint256
+  rate: BigDecimal # uint256
   timestamp: BigInt!
   emittedBy: Bytes! #address
   transaction: Transaction!
@@ -159,10 +159,10 @@ type Liquidate @entity {
   lender: Bytes! # address
   loanToken: Bytes! # address
   collateralToken: Bytes! # address
-  repayAmount: BigInt! # uint256
-  collateralWithdrawAmount: BigInt! # uint256
-  collateralToLoanRate: BigInt! # uint256
-  currentMargin: BigInt! # uint256
+  repayAmount: BigDecimal! # uint256
+  collateralWithdrawAmount: BigDecimal! # uint256
+  collateralToLoanRate: BigDecimal! # uint256
+  currentMargin: BigDecimal! # uint256
   timestamp: BigInt!
   emittedBy: Bytes! #address
   transaction: Transaction!
@@ -176,7 +176,7 @@ type PayBorrowingFee @entity {
   payer: Bytes! # address
   token: Bytes! # address
   loanId: Loan! # bytes32
-  amount: BigInt! # uint256
+  amount: BigDecimal! # uint256
   timestamp: BigInt!
   emittedBy: Bytes! #address
   transaction: Transaction!
@@ -189,7 +189,7 @@ type PayLendingFee @entity {
   id: ID!
   payer: Bytes! # address
   token: Bytes! # address
-  amount: BigInt! # uint256
+  amount: BigDecimal! # uint256
   timestamp: BigInt!
   emittedBy: Bytes! #address
   transaction: Transaction!
@@ -203,7 +203,7 @@ type PayTradingFee @entity {
   payer: Bytes! # address
   token: Bytes! # address
   loanId: Loan! # bytes32
-  amount: BigInt! # uint256
+  amount: BigDecimal! # uint256
   timestamp: BigInt!
   emittedBy: Bytes! #address
   transaction: Transaction!
@@ -217,13 +217,13 @@ type Trade @entity {
   loanId: Loan! 
   collateralToken: Token! 
   loanToken: Token! 
-  positionSize: BigInt! 
-  borrowedAmount: BigInt! 
-  interestRate: BigInt! 
+  positionSize: BigDecimal! 
+  borrowedAmount: BigDecimal! 
+  interestRate: BigDecimal! 
   settlementDate: BigInt! 
-  entryPrice: BigInt! 
-  entryLeverage: BigInt! 
-  currentLeverage: BigInt! 
+  entryPrice: BigDecimal! 
+  entryLeverage: BigDecimal! 
+  currentLeverage: BigDecimal! 
   timestamp: BigInt!
   emittedBy: Bytes!
   transaction: Transaction!

@@ -134,10 +134,10 @@ type Conversion @entity {
   _fromToken: Token! # address
   _toToken: Token! # address
   _trader: Bytes! # address
-  _amount: BigInt! # uint256
-  _return: BigInt! # uint256
-  _conversionFee: BigInt! # int256
-  _protocolFee: BigInt! # int256
+  _amount: BigDecimal! # uint256
+  _return: BigDecimal! # uint256
+  _conversionFee: BigDecimal! # int256
+  _protocolFee: BigDecimal! # int256
   timestamp: BigInt!
   emittedBy: Bytes! #address
   transaction: Transaction!
@@ -167,7 +167,7 @@ type LiquidityPool @entity {
   poolTokens: [TokenPoolToken!]! @derivedFrom(field: "liquidityPool")
   owner: String
   conversionFee: BigInt
-  weight: BigInt
+  # weight: BigDecimal
   """
   Activated with be true when this pool is activated, and will change to false is the pool is deactivated
   """

@@ -15,8 +15,8 @@ type VestingContract @entity {
   createdAtTimestamp: BigInt!
   cliff: BigInt # uint256
   duration: BigInt # uint256
-  startingBalance: BigInt! # uint256
-  currentBalance: BigInt!
+  startingBalance: BigDecimal! # uint256
+  currentBalance: BigDecimal!
   type: VestingContractType!
   emittedBy: Bytes!
   createdAtTransaction: Transaction!
@@ -33,9 +33,9 @@ type VestingHistoryItem @entity {
   id: ID!
   action: VestingHistoryItemAction!
   staker: VestingContract!
-  amount: BigInt! # uint256
+  amount: BigDecimal! # uint256
   lockedUntil: BigInt! # uint256
-  totalStaked: BigInt! # uint256
+  totalStaked: BigDecimal! # uint256
   timestamp: BigInt!
   emittedBy: Bytes! #address
   transaction: Transaction!

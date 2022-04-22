@@ -1,4 +1,4 @@
-import { Address, BigInt } from '@graphprotocol/graph-ts'
+import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 import { User, UserStakeHistory } from '../../generated/schema'
 import { createAndReturnProtocolStats } from './ProtocolStats'
 
@@ -21,9 +21,9 @@ export function createAndReturnUserStakeHistory(address: Address): UserStakeHist
   if (historyEntity == null) {
     historyEntity = new UserStakeHistory(address.toHex())
     historyEntity.user = address.toHex()
-    historyEntity.totalStaked = BigInt.zero()
-    historyEntity.totalWithdrawn = BigInt.zero()
-    historyEntity.totalRemaining = BigInt.zero()
+    historyEntity.totalStaked = BigDecimal.zero()
+    historyEntity.totalWithdrawn = BigDecimal.zero()
+    historyEntity.totalRemaining = BigDecimal.zero()
     historyEntity.save()
   }
   return historyEntity

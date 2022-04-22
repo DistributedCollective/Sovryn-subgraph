@@ -79,11 +79,11 @@ type ProtocolStats @entity {
   """
   This is SOV staked by users (not vesting contracts). It is incremented when users stake tokens, and decremented when users withdraw tokens from the staking contract
   """
-  totalVoluntarilyStakedSov: BigInt!
+  currentVoluntarilyStakedSov: BigDecimal!
   """
   This is SOV staked by vesting contracts. It in incremented when the contracts stake the tokens, and decremented when users claim their unlocked tokens
   """
-  totalStakedByVestingSov: BigInt!
+  currentStakedByVestingSov: BigDecimal!
   """
   NOT YET IMPLEMENTED: This will be a total of volumes of all transaction types (AMM Swaps, Margin Trades, CloseWithSwap etc etc)
   """

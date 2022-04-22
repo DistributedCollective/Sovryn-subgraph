@@ -7,7 +7,13 @@ type Proposal @entity {
   queued: Transaction
   votesFor: BigInt!
   votesAgainst: BigInt!
+  """
+  Number of unique wallets that voted for this proposal
+  """
   countVotersFor: BigInt!
+    """
+  Number of unique wallets that voted against this proposal
+  """
   countVotersAgainst: BigInt!
   votes: [VoteCast!] @derivedFrom(field: "proposal")
   proposalId: BigInt!
