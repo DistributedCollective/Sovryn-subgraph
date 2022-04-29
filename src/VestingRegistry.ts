@@ -15,7 +15,6 @@ import { BigInt } from '@graphprotocol/graph-ts'
 import { createAndReturnTransaction } from './utils/Transaction'
 import { vestingRegistry1, vestingRegistry2, vestingRegistry3, vestingRegistryFish } from './contracts/contracts'
 import { createAndReturnUser } from './utils/User'
-import { log } from '@graphprotocol/graph-ts'
 import { VestingContractType } from './utils/types'
 
 export function handleAdminAdded(event: AdminAddedEvent): void {}
@@ -65,7 +64,7 @@ export function handleTeamVestingCreated(event: TeamVestingCreatedEvent): void {
   }
 }
 
-export function handleTeamVestingCreatedProxy(event: TeamVestingCreatedEvent): void {
+export function handleTeamVestingCreatedProxy(event: TeamVestingCreatedProxyEvent): void {
   let existingContract = VestingContract.load(event.params.vesting.toHexString())
   if (existingContract == null) {
     let entity = new VestingContract(event.params.vesting.toHexString())
