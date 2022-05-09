@@ -3,10 +3,11 @@ import { DEFAULT_DECIMALS, decimal } from '@protofire/subgraph-toolkit'
 import { TokenStaked as TokenStakedEvent } from '../generated/LockedSov/LockedSov'
 import { UserRewardsEarnedHistory, RewardsEarnedHistoryItem } from '../generated/schema'
 import { RewardsEarnedAction } from './utils/types'
-import { createAndReturnUser } from './utils/User'
+import { createAndReturnTransaction } from './utils/Transaction'
 
 export function handleTokenStaked(event: TokenStakedEvent): void {
-  createAndReturnUser(event.params._initiator)
+  createAndReturnTransaction(event)
+
   let userRewardsEarnedHistory = UserRewardsEarnedHistory.load(event.params._initiator.toHexString())
   if (userRewardsEarnedHistory != null) {
     userRewardsEarnedHistory.availableTradingRewards = BigDecimal.zero()

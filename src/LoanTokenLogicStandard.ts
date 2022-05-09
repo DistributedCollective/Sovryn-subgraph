@@ -9,11 +9,11 @@ import { LendingHistoryType } from './utils/types'
 import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
 
 export function handleBurn(event: BurnEvent): void {
+  createAndReturnTransaction(event)
+
   let context = dataSource.context()
   let underlyingAsset = context.getString('underlyingAsset')
-  createAndReturnUser(event.params.burner)
   const userAddress = event.params.burner.toHexString()
-  createAndReturnTransaction(event)
 
   const assetAmount = decimal.fromBigInt(event.params.assetAmount, DEFAULT_DECIMALS)
   const tokenAmount = decimal.fromBigInt(event.params.tokenAmount, DEFAULT_DECIMALS)
@@ -57,11 +57,11 @@ export function handleBurn(event: BurnEvent): void {
 export function handleFlashBorrow(event: FlashBorrowEvent): void {}
 
 export function handleMint(event: MintEvent): void {
+  createAndReturnTransaction(event)
+
   let context = dataSource.context()
   let underlyingAsset = context.getString('underlyingAsset')
-  createAndReturnUser(event.params.minter)
   const userAddress = event.params.minter.toHexString()
-  createAndReturnTransaction(event)
 
   const assetAmount = decimal.fromBigInt(event.params.assetAmount, DEFAULT_DECIMALS)
   const tokenAmount = decimal.fromBigInt(event.params.tokenAmount, DEFAULT_DECIMALS)

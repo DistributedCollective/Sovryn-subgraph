@@ -44,7 +44,7 @@ vestingContractTypes.set(vestingRegistryFish.toLowerCase(), VestingContractType.
 
 export function handleTeamVestingCreated(event: TeamVestingCreatedEvent): void {
   let entity = new VestingContract(event.params.vesting.toHexString())
-  let user = createAndReturnUser(event.params.tokenOwner)
+  let user = createAndReturnUser(event.params.tokenOwner, event.block.timestamp)
   entity.user = user.id
   entity.cliff = event.params.cliff
   entity.duration = event.params.duration
@@ -54,14 +54,17 @@ export function handleTeamVestingCreated(event: TeamVestingCreatedEvent): void {
   entity.createdAtTransaction = transaction.id
   entity.createdAtTimestamp = transaction.timestamp
   entity.emittedBy = event.address
-  entity.type =
+  const contractType =
     vestingContractTypes.get(event.address.toHexString().toLowerCase()) == VestingContractType.Fish ? VestingContractType.FishTeam : VestingContractType.Team
+  if (contractType != null) {
+    entity.type = contractType
+  }
   entity.save()
 }
 
 export function handleTeamVestingCreatedProxy(event: TeamVestingCreatedEvent): void {
   let entity = new VestingContract(event.params.vesting.toHexString())
-  let user = createAndReturnUser(event.params.tokenOwner)
+  let user = createAndReturnUser(event.params.tokenOwner, event.block.timestamp)
   entity.user = user.id
   entity.cliff = event.params.cliff
   entity.duration = event.params.duration
@@ -71,8 +74,7 @@ export function handleTeamVestingCreatedProxy(event: TeamVestingCreatedEvent): v
   entity.createdAtTransaction = transaction.id
   entity.createdAtTimestamp = transaction.timestamp
   entity.emittedBy = event.address
-  entity.type =
-    vestingContractTypes.get(event.address.toHexString().toLowerCase()) == VestingContractType.Fish ? VestingContractType.FishTeam : VestingContractType.Team
+  entity.type = VestingContractType.Team
   entity.save()
 }
 
@@ -81,7 +83,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {}
 export function handleVestingCreated(event: VestingCreatedEvent): void {
   log.debug('VESTING CREATED', [event.params.vesting.toHexString()])
   let entity = new VestingContract(event.params.vesting.toHexString())
-  let user = createAndReturnUser(event.params.tokenOwner)
+  let user = createAndReturnUser(event.params.tokenOwner, event.block.timestamp)
   entity.user = user.id
   entity.cliff = event.params.cliff
   entity.duration = event.params.duration
@@ -98,7 +100,7 @@ export function handleVestingCreated(event: VestingCreatedEvent): void {
 export function handleVestingCreatedProxy(event: VestingCreatedProxyEvent): void {
   log.debug('VESTING CREATED', [event.params.vesting.toHexString()])
   let entity = new VestingContract(event.params.vesting.toHexString())
-  let user = createAndReturnUser(event.params.tokenOwner)
+  let user = createAndReturnUser(event.params.tokenOwner, event.block.timestamp)
   entity.user = user.id
   entity.cliff = event.params.cliff
   entity.duration = event.params.duration

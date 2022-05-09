@@ -34,7 +34,6 @@ import { LoanTokenLogicStandard as LoanTokenTemplate } from '../generated/templa
 import { createAndReturnTransaction } from './utils/Transaction'
 import { createAndReturnLoan, LoanStartState, updateLoanReturnPnL, ChangeLoanState, LoanActionType } from './utils/Loan'
 import { BigDecimal, BigInt, DataSourceContext } from '@graphprotocol/graph-ts'
-import { createAndReturnUser } from './utils/User'
 import { createAndReturnProtocolStats, createAndReturnUserTotals } from './utils/ProtocolStats'
 import { convertToUsd } from './utils/Prices'
 import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
@@ -42,6 +41,8 @@ import { createAndReturnLendingPool } from './utils/LendingPool'
 import { RewardsEarnedAction } from './utils/types'
 
 export function handleBorrow(event: BorrowEvent): void {
+  createAndReturnTransaction(event)
+
   let entity = new Borrow(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   const newPrincipal = decimal.fromBigInt(event.params.newPrincipal, DEFAULT_DECIMALS)
   const newCollateral = decimal.fromBigInt(event.params.newCollateral, DEFAULT_DECIMALS)
@@ -61,7 +62,6 @@ export function handleBorrow(event: BorrowEvent): void {
     positionSize: newCollateral,
     startRate: collateralToLoanRate,
   }
-  createAndReturnUser(event.params.user)
   createAndReturnLoan(loanParams)
   entity.user = event.params.user.toHexString()
   entity.lender = event.params.lender
@@ -239,8 +239,6 @@ export function handleEarnReward(event: EarnRewardEvent): void {
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
 
   createAndReturnTransaction(event)
-
-  createAndReturnUser(event.params.receiver)
   let userRewardsEarnedHistory = UserRewardsEarnedHistory.load(event.params.receiver.toHexString())
   if (userRewardsEarnedHistory != null) {
     userRewardsEarnedHistory.availableRewardSov = userRewardsEarnedHistory.availableRewardSov.plus(amount)
@@ -268,8 +266,8 @@ export function handleEarnReward(event: EarnRewardEvent): void {
 export function handleExternalSwap(event: ExternalSwapEvent): void {
   let swapEntity = Swap.load(event.transaction.hash.toHexString())
   if (swapEntity != null) {
-    let user = createAndReturnUser(event.transaction.from)
-    swapEntity.user = user.id
+    createAndReturnTransaction(event)
+    swapEntity.user = event.transaction.from.toHexString()
     swapEntity.save()
   }
 }
@@ -403,6 +401,8 @@ export function handleTrade(event: TradeEvent): void {
   const entryPrice = decimal.fromBigInt(event.params.entryPrice, DEFAULT_DECIMALS)
   const entryLeverage = decimal.fromBigInt(event.params.entryLeverage, DEFAULT_DECIMALS)
   const currentLeverage = decimal.fromBigInt(event.params.currentLeverage, DEFAULT_DECIMALS)
+  
+  createAndReturnTransaction(event)
 
   let entity = new Trade(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   let loanParams: LoanStartState = {
@@ -416,7 +416,6 @@ export function handleTrade(event: TradeEvent): void {
     positionSize: positionSize,
     startRate: entryPrice,
   }
-  createAndReturnUser(event.params.user)
   createAndReturnLoan(loanParams)
   let swapEntity = Swap.load(event.transaction.hash.toHexString())
   if (swapEntity != null) {
@@ -438,6 +437,7 @@ export function handleTrade(event: TradeEvent): void {
   entity.entryPrice = entryPrice
   entity.entryLeverage = entryLeverage
   entity.currentLeverage = currentLeverage
+
   let transaction = createAndReturnTransaction(event)
   entity.transaction = transaction.id
   entity.timestamp = transaction.timestamp

@@ -9,7 +9,7 @@ import { DEFAULT_DECIMALS, decimal } from '@protofire/subgraph-toolkit'
 
 export function handleRewardClaimed(event: RewardClaimedEvent): void {
   createAndReturnTransaction(event)
-  createAndReturnUser(event.params.user)
+  createAndReturnUser(event.params.user, event.block.timestamp)
 
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
 
