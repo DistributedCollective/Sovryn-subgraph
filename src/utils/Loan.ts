@@ -2,9 +2,9 @@
  * This file is a work in progress - the goal is to have all PnL calculations and ot
  */
 
-import { BigDecimal, BigInt, Bytes, log } from '@graphprotocol/graph-ts'
+import { BigDecimal, BigInt, Bytes } from '@graphprotocol/graph-ts'
 import { Loan } from '../../generated/schema'
-import { integer, decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
+import { decimal } from '@protofire/subgraph-toolkit'
 export class LoanStartState {
   loanId: Bytes
   user: Bytes

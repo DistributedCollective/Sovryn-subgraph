@@ -20,7 +20,7 @@ import {
 } from '../generated/templates/LiquidityPoolV1ConverterProtocolFee/LiquidityPoolV1ConverterProtocolFee'
 import { UserLiquidityHistory, LiquidityHistoryItem, Conversion, LiquidityPool, LiquidityPoolToken, SmartToken } from '../generated/schema'
 import { ConversionEventForSwap, createAndReturnSwap, updatePricing } from './utils/Swap'
-import { createAndReturnToken } from './utils/Token'
+import { createAndReturnToken, decimalize } from './utils/Token'
 import { createAndReturnTransaction } from './utils/Transaction'
 import { BigInt, BigDecimal, dataSource, log, store } from '@graphprotocol/graph-ts'
 import { createAndReturnSmartToken } from './utils/SmartToken'
@@ -40,9 +40,9 @@ class LiquidityHistoryItemParams {
   type: string
   provider: string
   reserveToken: string
-  amount: BigInt
-  newBalance: BigInt
-  newSupply: BigInt
+  amount: BigDecimal
+  newBalance: BigDecimal
+  newSupply: BigDecimal
   transaction: string
   timestamp: BigInt
   emittedBy: string
@@ -107,7 +107,7 @@ export function handleLiquidityAdded(event: LiquidityAddedEvent): void {
         liquidityPool,
         userLiquidityHistory,
         event.params._reserveToken.toHexString(),
-        decimal.fromBigInt(event.params._amount, DEFAULT_DECIMALS),
+        decimalize(event.params._amount, event.params._reserveToken),
         BigDecimal.zero(),
       )
     }
@@ -119,9 +119,10 @@ export function handleLiquidityAdded(event: LiquidityAddedEvent): void {
     type: LiquidityHistoryType.Added,
     provider: event.params._provider.toHexString(),
     reserveToken: event.params._reserveToken.toHexString(),
-    amount: event.params._amount,
-    newBalance: event.params._newBalance,
-    newSupply: event.params._newSupply,
+    /** TODO: The decimalize functions will load the same token entity 3 times - optimize */
+    amount: decimalize(event.params._amount, event.params._reserveToken),
+    newBalance: decimalize(event.params._newBalance, event.params._reserveToken),
+    newSupply: decimalize(event.params._newSupply, event.params._reserveToken),
     transaction: event.transaction.hash.toHexString(),
     timestamp: event.block.timestamp,
     emittedBy: event.address.toHexString(),
@@ -144,7 +145,7 @@ export function handleLiquidityRemoved(event: LiquidityRemovedEvent): void {
           userLiquidityHistory,
           event.params._reserveToken.toHexString(),
           BigDecimal.zero(),
-          decimal.fromBigInt(event.params._amount, DEFAULT_DECIMALS),
+          decimalize(event.params._amount, event.params._reserveToken),
         )
       }
     }
@@ -157,9 +158,9 @@ export function handleLiquidityRemoved(event: LiquidityRemovedEvent): void {
     type: LiquidityHistoryType.Removed,
     provider: event.params._provider.toHexString(),
     reserveToken: event.params._reserveToken.toHexString(),
-    amount: event.params._amount,
-    newBalance: event.params._newBalance,
-    newSupply: event.params._newSupply,
+    amount: decimalize(event.params._amount, event.params._reserveToken),
+    newBalance: decimalize(event.params._newBalance, event.params._reserveToken),
+    newSupply: decimalize(event.params._newSupply, event.params._reserveToken),
     transaction: event.transaction.hash.toHexString(),
     timestamp: event.block.timestamp,
     emittedBy: event.address.toHexString(),

@@ -58,7 +58,7 @@
     "VestingRegistryProxy": {
         "network": "mainnet",
         "address": "0xe24ABdB7DcaB57F3cbe4cBDDd850D52F143eE920",
-        "startBlock": 1802584
+        "startBlock": 3769649
     },
     "VestingRegistryFish": {
         "network": "mainnet",

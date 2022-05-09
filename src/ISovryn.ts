@@ -42,7 +42,6 @@ import { RewardsEarnedAction } from './utils/types'
 
 export function handleBorrow(event: BorrowEvent): void {
   createAndReturnTransaction(event)
-
   let entity = new Borrow(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   const newPrincipal = decimal.fromBigInt(event.params.newPrincipal, DEFAULT_DECIMALS)
   const newCollateral = decimal.fromBigInt(event.params.newCollateral, DEFAULT_DECIMALS)
