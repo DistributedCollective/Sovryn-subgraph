@@ -1,0 +1,22 @@
+enum Network {
+  Mainnet
+  Testnet
+}
+
+type OrderCreated @entity {
+  id: ID!
+  hash: Bytes! # bytes32
+  network: Network!
+  order_maker: User! # address
+  order_fromToken: Bytes! # address
+  order_toToken: Bytes! # address
+  order_amountIn: BigInt! # uint256
+  order_amountOutMin: BigInt! # uint256
+  order_recipient: Bytes! # address
+  order_deadline: BigInt! # uint256
+  order_created: BigInt! # uint256
+  limitPrice: BigInt! # uint256
+  timestamp: BigInt!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
