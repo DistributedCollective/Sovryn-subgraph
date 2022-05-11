@@ -70,8 +70,6 @@ dataSources:
       eventHandlers:
         - event: NewConverter(indexed uint16,indexed address,indexed address)
           handler: handleNewConverter
-        - event: OwnerUpdate(indexed address,indexed address)
-          handler: handleOwnerUpdate
       file: ./src/ConverterFactory.ts
 
   #Converter Registry
@@ -129,8 +127,6 @@ dataSources:
           handler: handleSmartTokenAdded
         - event: SmartTokenRemoved(indexed address)
           handler: handleSmartTokenRemoved
-        - event: OwnerUpdate(indexed address,indexed address)
-          handler: handleOwnerUpdate
       file: ./src/ConverterRegistry.ts
 
   # ISovryn
@@ -737,8 +733,6 @@ templates:
           handler: handleConversionV1
         - event: ConversionFeeUpdate(uint32,uint32)
           handler: handleConversionFeeUpdate
-        - event: OwnerUpdate(indexed address,indexed address)
-          handler: handleOwnerUpdate
       file: ./src/LiquidityPoolConverter.ts
 
   # LiquidityPoolV2Converter
@@ -780,8 +774,7 @@ templates:
           handler: handleTokenRateUpdate
         - event: ConversionFeeUpdate(uint32,uint32)
           handler: handleConversionFeeUpdate
-        - event: OwnerUpdate(indexed address,indexed address)
-          handler: handleOwnerUpdate
+
       file: ./src/LiquidityPoolConverter.ts
 
   # SmartToken
@@ -800,9 +793,13 @@ templates:
       abis:
         - name: SmartToken
           file: ./abis/SmartToken.json
+        - name: LiquidityPoolV1Converter
+          file: ./abis/LiquidityPoolV1Converter.json
+        - name: LiquidityPoolV2Converter
+          file: ./abis/LiquidityPoolV2Converter.json
+        - name: LiquidityPoolV1ConverterProtocolFee
+          file: ./abis/LiquidityPoolV1ConverterProtocolFee.json
       eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
         - event: OwnerUpdate(indexed address,indexed address)
           handler: handleOwnerUpdate
       file: ./src/SmartToken.ts
@@ -873,6 +870,4 @@ templates:
           handler: handleTokenRateUpdate
         - event: ConversionFeeUpdate(uint32,uint32)
           handler: handleConversionFeeUpdate
-        - event: OwnerUpdate(indexed address,indexed address)
-          handler: handleOwnerUpdate
       file: ./src/LiquidityPoolConverter.ts

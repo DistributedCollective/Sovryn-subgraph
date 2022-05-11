@@ -86,6 +86,17 @@ const wrapperProxyContractsMainnet = {
     ]
 }
 
+const converterRegistryTestnet = {
+    originalName: "ConverterRegistry",
+    changeBlocks: [
+        {
+            name: "ConverterRegistry",
+            address: '0x0E7CcF6A67e614B507Aa524572F72C7e5Dec23CB',
+            startBlock: 1839810
+        }
+    ]
+}
+
 module.exports = {
     newDataSources: process.env.NETWORK === 'mainnet' ? [
         wrapperProxyContractsMainnet,
@@ -93,6 +104,7 @@ module.exports = {
     ] : [
         wrapperProxyContractsTestnet,
         feeSharingProxyContractsTestnet,
-        governorContractsTestnet
+        governorContractsTestnet,
+        converterRegistryTestnet
     ]
 }

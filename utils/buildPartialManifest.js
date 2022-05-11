@@ -10,7 +10,8 @@ const { dump } = require('js-yaml')
 
 const manifestSections = {
     amm: ["ConverterRegistry", "ConverterFactory", "LiquidityPoolV1Converter", "LiquidityPoolV2Converter", "LiquidityPoolV1ConverterProtocolFee", "SmartToken"],
-    test: []
+    governance: [],
+    trading: []
 }
 
 const pruneManifest = (section) => {

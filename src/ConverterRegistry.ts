@@ -11,57 +11,31 @@ import {
   SmartTokenRemoved as SmartTokenRemovedEvent,
   OwnerUpdate as OwnerUpdateEvent,
 } from '../generated/ConverterRegistry/ConverterRegistry'
-import { LiquidityPoolAdded, LiquidityPoolRemoved, SmartTokenAdded, SmartTokenRemoved, LiquidityPool, ConverterRegistry } from '../generated/schema'
+import { LiquidityPoolAdded, LiquidityPoolRemoved, SmartTokenAdded, SmartTokenRemoved, LiquidityPool, ConverterRegistry, SmartToken } from '../generated/schema'
 import { SmartToken as SmartTokenContract } from '../generated/ConverterRegistry/SmartToken'
 import { log } from '@graphprotocol/graph-ts'
 import { createAndReturnTransaction } from './utils/Transaction'
 import { createAndReturnToken } from './utils/Token'
 import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnLiquidityPool } from './utils/LiquidityPool'
+import { createAndReturnConverterRegistry } from './utils/ConverterRegistry'
 
-export function handleConverterAnchorAdded(event: ConverterAnchorAddedEvent): void {}
+export function handleConverterAnchorAdded(event: ConverterAnchorAddedEvent): void {
+  /** This adds a SmartToken to a V2 pool */
+}
 
 export function handleConverterAnchorRemoved(event: ConverterAnchorRemovedEvent): void {}
 
 export function handleLiquidityPoolAdded(event: LiquidityPoolAddedEvent): void {
-  let entity = new LiquidityPoolAdded(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity._liquidityPool = event.params._liquidityPool
-  let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-
-  let converterRegistryEntity = ConverterRegistry.load(event.address.toHex())
-  if (converterRegistryEntity == null) {
-    converterRegistryEntity = new ConverterRegistry(event.address.toHex())
-    converterRegistryEntity.numConverters = BigInt.zero()
-  }
-  converterRegistryEntity.lastUsedAtBlockTimestamp = event.block.timestamp
-  converterRegistryEntity.lastUsedAtTransactionHash = event.transaction.hash.toHex()
-  converterRegistryEntity.lastUsedAtBlockNumber = event.block.number
-  converterRegistryEntity.numConverters = converterRegistryEntity.numConverters.plus(BigInt.fromI32(1))
-
-  converterRegistryEntity.save()
-  entity.save()
-
-  let liquidityPoolEntity = LiquidityPool.load(event.params._liquidityPool.toHex())
-  if (liquidityPoolEntity != null) {
-    liquidityPoolEntity.currentConverterRegistry = event.address.toHex()
-    liquidityPoolEntity.save()
-  }
+  /** This adds pool token, not a pool!!!! The _liquidityPool property is a new pool token!! */
 }
 
 export function handleLiquidityPoolRemoved(event: LiquidityPoolRemovedEvent): void {
-  let entity = new LiquidityPoolRemoved(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity._liquidityPool = event.params._liquidityPool
-  let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
+  /** This removes a pool token - this is not necessary to handle */
 }
 
 export function handleConvertibleTokenAdded(event: ConvertibleTokenAddedEvent): void {
+  /** This adds a token / smartToken pair */
   const smartTokenAddress = event.params._smartToken
   const smartTokenContract = SmartTokenContract.bind(smartTokenAddress)
   const converterAddress = smartTokenContract.owner()
@@ -70,51 +44,33 @@ export function handleConvertibleTokenAdded(event: ConvertibleTokenAddedEvent): 
   token.save()
 }
 
-export function handleConvertibleTokenRemoved(event: ConvertibleTokenRemovedEvent): void {}
+export function handleConvertibleTokenRemoved(event: ConvertibleTokenRemovedEvent): void {
+  /** This removes a token / smartToken pair */
+}
 
 export function handleSmartTokenAdded(event: SmartTokenAddedEvent): void {
+  createAndReturnConverterRegistry(event.address)
   let smartTokenAddress = event.params._smartToken
   let smartTokenObj = createAndReturnSmartToken(smartTokenAddress)
-
   const isNew = smartTokenObj.isNew
   let smartTokenEntity = smartTokenObj.smartToken
   if (isNew) {
     log.debug('Smart Token created: {}', [smartTokenAddress.toHex()])
   }
-
-  const smartTokenContract = SmartTokenContract.bind(smartTokenAddress)
-
   if (smartTokenEntity.addedToRegistryBlockNumber === null) {
     smartTokenEntity.addedToRegistryBlockNumber = event.block.number
     smartTokenEntity.addedToRegistryTransactionHash = event.transaction.hash
   }
-
   log.debug('Smart Token added to registry: {}', [smartTokenAddress.toHex()])
-
-  smartTokenEntity.currentConverterRegistry = event.address.toHex()
-
+  smartTokenEntity.currentConverterRegistry = event.address.toHexString()
   smartTokenEntity.save()
-
-  const converterAddress = smartTokenContract.owner()
-  let liquidityPoolEntity = LiquidityPool.load(converterAddress.toHexString())
-  if (liquidityPoolEntity != null) {
-    liquidityPoolEntity.currentConverterRegistry = event.address.toHex()
-    liquidityPoolEntity.save()
-  }
-
   let entity = new SmartTokenAdded(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   entity._smartToken = event.params._smartToken
   entity.save()
 }
 
 export function handleSmartTokenRemoved(event: SmartTokenRemovedEvent): void {
-  let entity = new SmartTokenRemoved(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity._smartToken = event.params._smartToken
-  let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
+  /** This event has never been emitted - no need to handle */
 }
 
 export function handleOwnerUpdate(event: OwnerUpdateEvent): void {}

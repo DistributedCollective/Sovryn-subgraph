@@ -1,13 +1,28 @@
-import { BigInt } from '@graphprotocol/graph-ts'
-import { SmartToken, Issuance, Destruction, Transfer, Approval, OwnerUpdate } from '../generated/templates/SmartToken/SmartToken'
-// import { ExampleEntity } from '../generated/schema'
+import { BigInt, Bytes, Address } from '@graphprotocol/graph-ts'
+import { SmartToken, LiquidityPool, OwnerUpdate } from '../generated/schema'
+import { OwnerUpdate as OwnerUpdateEvent } from '../generated/templates/SmartToken/SmartToken'
+import { createAndReturnLiquidityPool } from './utils/LiquidityPool'
 
-export function handleIssuance(event: Issuance): void {}
+export function handleOwnerUpdate(event: OwnerUpdateEvent): void {
+  let smartTokenEntity = SmartToken.load(event.address.toHexString())
+  let oldConverterEntity = LiquidityPool.load(event.params._prevOwner.toHexString())
+  let newConverterEntity = LiquidityPool.load(event.params._newOwner.toHexString())
 
-export function handleDestruction(event: Destruction): void {}
+  /** Trying to create a liquidity pool here always throws an error on the converterType method. I don't know why. */
 
-export function handleTransfer(event: Transfer): void {}
+  if (smartTokenEntity != null) {
+    smartTokenEntity.owner = event.params._newOwner.toHexString()
+    smartTokenEntity.save()
+  }
 
-export function handleApproval(event: Approval): void {}
+  if (oldConverterEntity !== null && newConverterEntity !== null) {
+    /** TODO: copy balance and other stats from old converter to new converter */
+  }
 
-export function handleOwnerUpdate(event: OwnerUpdate): void {}
+  let ownerUpdate = new OwnerUpdate(event.transaction.hash.toHexString())
+  ownerUpdate.emittedBy = event.address.toHexString()
+  ownerUpdate.timestamp = event.block.timestamp
+  ownerUpdate.prevOwner = event.params._prevOwner.toHexString()
+  ownerUpdate.newOwner = event.params._newOwner.toHexString()
+  ownerUpdate.save()
+}

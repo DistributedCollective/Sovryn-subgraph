@@ -50,7 +50,7 @@ type SmartToken @entity {
   connectorTokens are the entity that holds the many-to-many relationship between the underlying token asset and the smart token
   """
   connectorTokens: [TokenSmartToken!] @derivedFrom(field: "smartToken")
-  owner: Bytes!
+  owner: String!
   # tokenSwapTotals: [TokenSwapTotal!] @derivedFrom(field: "toToken")
   currentConverterRegistry: ConverterRegistry
   addedToRegistryBlockNumber: BigInt
