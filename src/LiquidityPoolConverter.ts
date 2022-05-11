@@ -22,11 +22,10 @@ import { UserLiquidityHistory, LiquidityHistoryItem, Conversion, LiquidityPool, 
 import { ConversionEventForSwap, createAndReturnSwap, updatePricing } from './utils/Swap'
 import { createAndReturnToken, decimalize } from './utils/Token'
 import { createAndReturnTransaction } from './utils/Transaction'
-import { BigInt, BigDecimal, dataSource, log, store } from '@graphprotocol/graph-ts'
+import { BigInt, BigDecimal, dataSource } from '@graphprotocol/graph-ts'
 import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnPoolToken } from './utils/PoolToken'
 import { updateVolumes } from './utils/Volumes'
-import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
 import { liquidityPoolV1ChangeBlock } from './contracts/contracts'
 import { updateCandleSticks } from './utils/Candlesticks'
 import { LiquidityHistoryType } from './utils/types'
@@ -249,13 +248,17 @@ export function handleActivation(event: ActivationEvent): void {
 }
 
 export function handleConversionV1(event: ConversionEventV1): void {
+  const fromAmount = decimalize(event.params._amount, event.params._fromToken)
+  const toAmount = decimalize(event.params._return, event.params._toToken)
+  const conversionFee = decimalize(event.params._conversionFee, event.params._toToken)
+
   let entity = new Conversion(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   entity._fromToken = event.params._fromToken.toHexString()
   entity._toToken = event.params._toToken.toHexString()
   entity._trader = event.params._trader
-  entity._amount = decimal.fromBigInt(event.params._amount, DEFAULT_DECIMALS)
-  entity._return = decimal.fromBigInt(event.params._return, DEFAULT_DECIMALS)
-  entity._conversionFee = decimal.fromBigInt(event.params._conversionFee, DEFAULT_DECIMALS)
+  entity._amount = fromAmount
+  entity._return = toAmount
+  entity._conversionFee = conversionFee
   entity._protocolFee = BigDecimal.zero()
   let transaction = createAndReturnTransaction(event)
   entity.transaction = transaction.id
@@ -268,12 +271,12 @@ export function handleConversionV1(event: ConversionEventV1): void {
     transactionHash: event.transaction.hash,
     fromToken: event.params._fromToken,
     toToken: event.params._toToken,
-    fromAmount: decimal.fromBigInt(event.params._amount, 18),
-    toAmount: decimal.fromBigInt(event.params._return, 18),
+    fromAmount: fromAmount,
+    toAmount: toAmount,
     timestamp: event.block.timestamp,
     user: event.transaction.from,
     trader: event.params._trader,
-    lpFee: BigDecimal.zero(),
+    lpFee: conversionFee,
     protocolFee: BigDecimal.zero(),
   }
 
@@ -284,13 +287,17 @@ export function handleConversionV1(event: ConversionEventV1): void {
 }
 
 export function handleConversionV2(event: ConversionEventV2): void {
+  const fromAmount = decimalize(event.params._amount, event.params._fromToken)
+  const toAmount = decimalize(event.params._return, event.params._toToken)
+  const conversionFee = decimalize(event.params._conversionFee, event.params._toToken)
+
   let entity = new Conversion(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   entity._fromToken = event.params._fromToken.toHexString()
   entity._toToken = event.params._toToken.toHexString()
   entity._trader = event.params._trader
-  entity._amount = decimal.fromBigInt(event.params._amount, DEFAULT_DECIMALS)
-  entity._return = decimal.fromBigInt(event.params._return, DEFAULT_DECIMALS)
-  entity._conversionFee = decimal.fromBigInt(event.params._conversionFee, DEFAULT_DECIMALS)
+  entity._amount = fromAmount
+  entity._return = toAmount
+  entity._conversionFee = conversionFee
   entity._protocolFee = BigDecimal.zero()
   let transaction = createAndReturnTransaction(event)
   entity.transaction = transaction.id
@@ -303,12 +310,12 @@ export function handleConversionV2(event: ConversionEventV2): void {
     transactionHash: event.transaction.hash,
     fromToken: event.params._fromToken,
     toToken: event.params._toToken,
-    fromAmount: decimal.fromBigInt(event.params._amount, 18),
-    toAmount: decimal.fromBigInt(event.params._return, 18),
+    fromAmount: fromAmount,
+    toAmount: toAmount,
     timestamp: event.block.timestamp,
     user: event.transaction.from,
     trader: event.params._trader,
-    lpFee: decimal.fromBigInt(event.params._conversionFee, 18),
+    lpFee: conversionFee,
     protocolFee: BigDecimal.zero(),
   }
 
@@ -319,14 +326,19 @@ export function handleConversionV2(event: ConversionEventV2): void {
 }
 
 export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void {
+  const fromAmount = decimalize(event.params._amount, event.params._fromToken)
+  const toAmount = decimalize(event.params._return, event.params._toToken)
+  const conversionFee = decimalize(event.params._conversionFee, event.params._toToken)
+  const protocolFee = decimalize(event.params._protocolFee, event.params._toToken)
+
   let entity = new Conversion(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   entity._fromToken = event.params._fromToken.toHexString()
   entity._toToken = event.params._toToken.toHexString()
   entity._trader = event.params._trader
-  entity._amount = decimal.fromBigInt(event.params._amount, DEFAULT_DECIMALS)
-  entity._return = decimal.fromBigInt(event.params._return, DEFAULT_DECIMALS)
-  entity._conversionFee = decimal.fromBigInt(event.params._conversionFee, DEFAULT_DECIMALS)
-  entity._protocolFee = decimal.fromBigInt(event.params._protocolFee, DEFAULT_DECIMALS)
+  entity._amount = fromAmount
+  entity._return = toAmount
+  entity._conversionFee = conversionFee
+  entity._protocolFee = protocolFee
   let transaction = createAndReturnTransaction(event)
   entity.transaction = transaction.id
   entity.timestamp = transaction.timestamp
@@ -337,13 +349,13 @@ export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void
     transactionHash: event.transaction.hash,
     fromToken: event.params._fromToken,
     toToken: event.params._toToken,
-    fromAmount: decimal.fromBigInt(event.params._amount, 18),
-    toAmount: decimal.fromBigInt(event.params._return, 18),
+    fromAmount: fromAmount,
+    toAmount: toAmount,
     timestamp: event.block.timestamp,
     user: event.transaction.from,
     trader: event.params._trader,
-    lpFee: decimal.fromBigInt(event.params._conversionFee, 18),
-    protocolFee: decimal.fromBigInt(event.params._protocolFee, 18),
+    lpFee: conversionFee,
+    protocolFee: protocolFee,
   }
 
   createAndReturnSwap(parsedEvent)
