@@ -17,6 +17,14 @@ export function handleOwnerUpdate(event: OwnerUpdateEvent): void {
 
   if (oldConverterEntity !== null && newConverterEntity !== null) {
     /** TODO: copy balance and other stats from old converter to new converter */
+    const registry = oldConverterEntity.currentConverterRegistry
+    newConverterEntity.currentConverterRegistry = registry
+    newConverterEntity.smartToken = event.address.toHexString()
+    oldConverterEntity.currentConverterRegistry = null
+    oldConverterEntity.smartToken = null
+
+    newConverterEntity.save()
+    oldConverterEntity.save()
   }
 
   let ownerUpdate = new OwnerUpdate(event.transaction.hash.toHexString())

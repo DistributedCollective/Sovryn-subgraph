@@ -36,12 +36,13 @@ export function handleLiquidityPoolRemoved(event: LiquidityPoolRemovedEvent): vo
 
 export function handleConvertibleTokenAdded(event: ConvertibleTokenAddedEvent): void {
   /** This adds a token / smartToken pair */
-  const smartTokenAddress = event.params._smartToken
-  const smartTokenContract = SmartTokenContract.bind(smartTokenAddress)
-  const converterAddress = smartTokenContract.owner()
-  const token = createAndReturnToken(event.params._convertibleToken, converterAddress, smartTokenAddress)
-  token.currentConverterRegistry = event.address.toHex()
-  token.save()
+  /** Tokens get added from Factory/LiquidityPool, they don't need to be added here as well. It makes the build bigger  */
+  // const smartTokenAddress = event.params._smartToken
+  // const smartTokenContract = SmartTokenContract.bind(smartTokenAddress)
+  // const converterAddress = smartTokenContract.owner()
+  // const token = createAndReturnToken(event.params._convertibleToken, converterAddress, smartTokenAddress)
+  // token.currentConverterRegistry = event.address.toHex()
+  // token.save()
 }
 
 export function handleConvertibleTokenRemoved(event: ConvertibleTokenRemovedEvent): void {
@@ -64,6 +65,13 @@ export function handleSmartTokenAdded(event: SmartTokenAddedEvent): void {
   log.debug('Smart Token added to registry: {}', [smartTokenAddress.toHex()])
   smartTokenEntity.currentConverterRegistry = event.address.toHexString()
   smartTokenEntity.save()
+
+  let liquidityPoolEntity = LiquidityPool.load(smartTokenEntity.owner)
+  if (liquidityPoolEntity !== null) {
+    liquidityPoolEntity.currentConverterRegistry = event.address.toHexString()
+    liquidityPoolEntity.save()
+  }
+
   let entity = new SmartTokenAdded(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   entity._smartToken = event.params._smartToken
   entity.save()

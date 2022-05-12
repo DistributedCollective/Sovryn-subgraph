@@ -178,11 +178,6 @@ export function handleActivation(event: ActivationEvent): void {
     if (event.params._activated == true) {
       let smartToken = createAndReturnSmartToken(event.params._anchor)
       liquidityPool.smartToken = smartToken.smartToken.id
-      liquidityPool.currentConverterRegistry = smartToken.smartToken.currentConverterRegistry
-    } else {
-      /** This either means the liquidity pool is not yet activated, or that the liquidity pool has been deactivated */
-      liquidityPool.smartToken = null
-      liquidityPool.currentConverterRegistry = null
     }
 
     if (event.params._type == 1) {
