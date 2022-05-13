@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
+import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 import { LiquidityPool, Token } from '../../generated/schema'
 import { LiquidityPoolV1Converter as LiquidityPoolV1ConverterContract } from '../../generated/templates/LiquidityPoolV1Converter/LiquidityPoolV1Converter'
 import { LiquidityPoolV2Converter as LiquidityPoolV2ConverterContract } from '../../generated/templates/LiquidityPoolV2Converter/LiquidityPoolV2Converter'
@@ -9,9 +9,9 @@ import {
   LiquidityPoolV1ConverterProtocolFee as LiquidityPoolV1ConverterTemplate_V2,
 } from '../../generated/templates'
 import { version2Block } from '../blockNumbers/blockNumbers'
-import { decimal } from '@protofire/subgraph-toolkit'
 import { ConversionEventForSwap } from './Swap'
-import { LiquidityHistoryType } from './types'
+import { decimalize } from './Token'
+import { decimal } from '@protofire/subgraph-toolkit'
 
 export class IGetLiquidityPool {
   liquidityPool: LiquidityPool
@@ -133,4 +133,11 @@ export function replaceLiquidityPoolBalance(liquidityPool: LiquidityPool, token:
 }
 
 /** Called on WithdrawFees */
-export function withdrawFeesFromPool(liquidityPool: LiquidityPool, token: string, feeAmount: BigInt): void {}
+export function withdrawFeesFromPool(liquidityPool: LiquidityPool, token: Token, feeAmount: BigDecimal): void {
+  if (liquidityPool.token0 == token.id) {
+    liquidityPool.token0Balance = liquidityPool.token0Balance.minus(feeAmount)
+  } else if (liquidityPool.token1 == token.id) {
+    liquidityPool.token1Balance = liquidityPool.token1Balance.minus(feeAmount)
+  }
+  liquidityPool.save()
+}

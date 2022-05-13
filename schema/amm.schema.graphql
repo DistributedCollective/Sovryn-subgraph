@@ -190,7 +190,7 @@ type LiquidityPool @entity {
 
 """
 This entity stores the relationship between liquidity pools and underlying tokens
-It also currently stores the total volumes bought and so
+It also currently stores the total volumes bought and sold, but this should be moved to the LiquidityPool
 """
 type LiquidityPoolToken @entity {
   """

@@ -26,8 +26,9 @@ import { updateVolumes } from './utils/Volumes'
 import { liquidityPoolV1ChangeBlock } from './contracts/contracts'
 import { updateCandleSticks } from './utils/Candlesticks'
 import { LiquidityHistoryType } from './utils/types'
-import { updatePoolBalanceFromConversion } from './utils/LiquidityPool'
+import { updatePoolBalanceFromConversion, withdrawFeesFromPool } from './utils/LiquidityPool'
 import { updateLiquidityHistory } from './utils/UserLiqudityHistory'
+import { decimal } from '@protofire/subgraph-toolkit'
 
 export function handleLiquidityAdded(event: LiquidityAddedEvent): void {
   createAndReturnTransaction(event)
@@ -273,5 +274,10 @@ function handleConversion(event: IConversionEvent): void {
 }
 
 export function handleWithdrawFees(event: WithdrawFeesEvent): void {
-  /** TODO: Decrement liquidity pool balance when protocol fees are withdrawn */
+  let liquidityPool = LiquidityPool.load(event.address.toHexString())
+  let token = Token.load(event.params.token.toHexString())
+  if (liquidityPool !== null && token !== null) {
+    const feeAmount = decimal.fromBigInt(event.params.protocolFeeAmount, token.decimals)
+    withdrawFeesFromPool(liquidityPool, token, feeAmount)
+  }
 }
