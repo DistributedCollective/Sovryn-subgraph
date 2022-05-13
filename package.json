@@ -23,7 +23,7 @@
     "build-tests": "sudo docker build -t matchstick .",
     "run-tests": "docker run --rm matchstick",
     "schema": "sh ./scripts/schema.sh",
-    "partial-mainfest": "node utils/buildPartialManifest.js"
+    "partial-manifest": "node utils/buildPartialManifest.js"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.25.3",

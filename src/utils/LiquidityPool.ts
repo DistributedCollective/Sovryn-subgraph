@@ -1,5 +1,5 @@
-import { Address, BigInt } from '@graphprotocol/graph-ts'
-import { LiquidityPool } from '../../generated/schema'
+import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
+import { LiquidityPool, Token } from '../../generated/schema'
 import { LiquidityPoolV1Converter as LiquidityPoolV1ConverterContract } from '../../generated/templates/LiquidityPoolV1Converter/LiquidityPoolV1Converter'
 import { LiquidityPoolV2Converter as LiquidityPoolV2ConverterContract } from '../../generated/templates/LiquidityPoolV2Converter/LiquidityPoolV2Converter'
 import { LiquidityPoolV1ConverterProtocolFee as LiquidityPoolV1ConverterContract_V2 } from '../../generated/templates/LiquidityPoolV1ConverterProtocolFee/LiquidityPoolV1ConverterProtocolFee'
@@ -9,6 +9,9 @@ import {
   LiquidityPoolV1ConverterProtocolFee as LiquidityPoolV1ConverterTemplate_V2,
 } from '../../generated/templates'
 import { version2Block } from '../blockNumbers/blockNumbers'
+import { decimal } from '@protofire/subgraph-toolkit'
+import { ConversionEventForSwap } from './Swap'
+import { LiquidityHistoryType } from './types'
 
 export class IGetLiquidityPool {
   liquidityPool: LiquidityPool
@@ -79,6 +82,8 @@ export function createAndReturnLiquidityPool(
     liquidityPool.createdAtBlockNumber = createdAtBlockNumber
     liquidityPool.createdAtTimestamp = createdAtTimestamp
     liquidityPool.createdAtTransaction = createdAtTransaction
+    liquidityPool.token0Balance = BigDecimal.zero()
+    liquidityPool.token1Balance = BigDecimal.zero()
     liquidityPool.save()
     isNew = true
   }
@@ -95,3 +100,37 @@ function getPoolType(address: Address): number {
 
   return type
 }
+
+/** TODO: Can we make these methods into one generic method for incrementing / decrementing balances? */
+
+/** Called on Conversion */
+export function updatePoolBalanceFromConversion(params: ConversionEventForSwap, liquidityPool: LiquidityPool): void {
+  /** For from token, increment balance */
+  if (liquidityPool.token0 == params.fromToken.toHexString()) {
+    liquidityPool.token0Balance = liquidityPool.token0Balance.plus(params.fromAmount)
+  } else if (liquidityPool.token1 == params.fromToken.toHexString()) {
+    liquidityPool.token1Balance = liquidityPool.token1Balance.plus(params.fromAmount)
+  }
+
+  /** For to token, decrement balance. LP Fees are removed in LiquidityRemoved events. TODO: handle when protocol fees are removed */
+  if (liquidityPool.token0 == params.toToken.toHexString()) {
+    liquidityPool.token0Balance = liquidityPool.token0Balance.minus(params.toAmount)
+  } else if (liquidityPool.token1 == params.toToken.toHexString()) {
+    liquidityPool.token1Balance = liquidityPool.token1Balance.minus(params.toAmount)
+  }
+
+  liquidityPool.save()
+}
+
+/** Called on LiquidityAdded or LiquidityRemoved */
+export function replaceLiquidityPoolBalance(liquidityPool: LiquidityPool, token: string, newBalance: BigDecimal): void {
+  if (liquidityPool.token0 == token) {
+    liquidityPool.token0Balance = newBalance
+  } else if (liquidityPool.token1 == token) {
+    liquidityPool.token1Balance = newBalance
+  }
+  liquidityPool.save()
+}
+
+/** Called on WithdrawFees */
+export function withdrawFeesFromPool(liquidityPool: LiquidityPool, token: string, feeAmount: BigInt): void {}

@@ -1,7 +1,6 @@
-import { BigInt, Bytes, Address } from '@graphprotocol/graph-ts'
+import { BigDecimal } from '@graphprotocol/graph-ts'
 import { SmartToken, LiquidityPool, OwnerUpdate } from '../generated/schema'
 import { OwnerUpdate as OwnerUpdateEvent } from '../generated/templates/SmartToken/SmartToken'
-import { createAndReturnLiquidityPool } from './utils/LiquidityPool'
 
 export function handleOwnerUpdate(event: OwnerUpdateEvent): void {
   let smartTokenEntity = SmartToken.load(event.address.toHexString())
@@ -16,21 +15,24 @@ export function handleOwnerUpdate(event: OwnerUpdateEvent): void {
   }
 
   if (oldConverterEntity !== null && newConverterEntity !== null) {
-    /** TODO: copy balance and other stats from old converter to new converter */
     const registry = oldConverterEntity.currentConverterRegistry
+    const token0Balance = oldConverterEntity.token0Balance
+    const token1Balance = oldConverterEntity.token1Balance
+
     newConverterEntity.currentConverterRegistry = registry
     newConverterEntity.smartToken = event.address.toHexString()
+
+    newConverterEntity.token0Balance = token0Balance
+    oldConverterEntity.token0Balance = BigDecimal.zero()
+
+    newConverterEntity.token1Balance = token1Balance
+    oldConverterEntity.token1Balance = BigDecimal.zero()
+
     oldConverterEntity.currentConverterRegistry = null
     oldConverterEntity.smartToken = null
+    oldConverterEntity.activated = false
 
     newConverterEntity.save()
     oldConverterEntity.save()
   }
-
-  let ownerUpdate = new OwnerUpdate(event.transaction.hash.toHexString())
-  ownerUpdate.emittedBy = event.address.toHexString()
-  ownerUpdate.timestamp = event.block.timestamp
-  ownerUpdate.prevOwner = event.params._prevOwner.toHexString()
-  ownerUpdate.newOwner = event.params._newOwner.toHexString()
-  ownerUpdate.save()
 }

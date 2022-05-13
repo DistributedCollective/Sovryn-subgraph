@@ -7,7 +7,7 @@ import { decimal } from '@protofire/subgraph-toolkit'
 import { createAndReturnProtocolStats, createAndReturnUserTotals } from './ProtocolStats'
 
 export class ConversionEventForSwap {
-  transactionHash: Bytes
+  transactionHash: string
   fromToken: Address
   toToken: Address
   fromAmount: BigDecimal
@@ -25,11 +25,11 @@ export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
   if (event.user.toHexString() == event.trader.toHexString()) {
     userEntity = createAndReturnUser(event.user, event.timestamp)
   }
-  let swapEntity = Swap.load(event.transactionHash.toHex())
+  let swapEntity = Swap.load(event.transactionHash)
 
   /** Create swap  */
   if (swapEntity == null) {
-    swapEntity = new Swap(event.transactionHash.toHexString())
+    swapEntity = new Swap(event.transactionHash)
     swapEntity.numConversions = 1
     swapEntity.fromToken = event.fromToken.toHexString()
     swapEntity.toToken = event.toToken.toHexString()
@@ -44,7 +44,7 @@ export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
     swapEntity.isBorrow = false
     swapEntity.isLimit = false
     swapEntity.timestamp = event.timestamp
-    swapEntity.transaction = event.transactionHash.toHexString()
+    swapEntity.transaction = event.transactionHash
   } else {
     /** Swap already exists - this means it has multiple conversion events */
     swapEntity.numConversions += 1

@@ -85,15 +85,7 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - ConverterAnchorAdded
-        - ConverterAnchorRemoved
-        - LiquidityPoolAdded
-        - LiquidityPoolRemoved
-        - ConvertibleTokenAdded
-        - ConvertibleTokenRemoved
         - SmartTokenAdded
-        - SmartTokenRemoved
-        - OwnerUpdate
         - LiquidityPool
         - SmartToken
       abis:
@@ -110,23 +102,8 @@ dataSources:
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
-        
-        - event: ConverterAnchorAdded(indexed address)
-          handler: handleConverterAnchorAdded
-        - event: ConverterAnchorRemoved(indexed address)
-          handler: handleConverterAnchorRemoved
-        - event: LiquidityPoolAdded(indexed address)
-          handler: handleLiquidityPoolAdded
-        - event: LiquidityPoolRemoved(indexed address)
-          handler: handleLiquidityPoolRemoved
-        - event: ConvertibleTokenAdded(indexed address,indexed address)
-          handler: handleConvertibleTokenAdded
-        - event: ConvertibleTokenRemoved(indexed address,indexed address)
-          handler: handleConvertibleTokenRemoved
         - event: SmartTokenAdded(indexed address)
           handler: handleSmartTokenAdded
-        - event: SmartTokenRemoved(indexed address)
-          handler: handleSmartTokenRemoved
       file: ./src/ConverterRegistry.ts
 
   # ISovryn
@@ -770,8 +747,6 @@ templates:
           handler: handleActivation
         - event: Conversion(indexed address,indexed address,indexed address,uint256,uint256,int256)
           handler: handleConversionV2
-        - event: TokenRateUpdate(indexed address,indexed address,uint256,uint256)
-          handler: handleTokenRateUpdate
         - event: ConversionFeeUpdate(uint32,uint32)
           handler: handleConversionFeeUpdate
 
@@ -866,8 +841,6 @@ templates:
           handler: handleActivation
         - event: Conversion(indexed address,indexed address,indexed address,uint256,uint256,int256,int256)
           handler: handleConversionV1_2
-        - event: TokenRateUpdate(indexed address,indexed address,uint256,uint256)
-          handler: handleTokenRateUpdate
         - event: ConversionFeeUpdate(uint32,uint32)
           handler: handleConversionFeeUpdate
       file: ./src/LiquidityPoolConverter.ts

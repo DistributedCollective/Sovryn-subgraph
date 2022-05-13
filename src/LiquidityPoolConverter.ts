@@ -1,14 +1,11 @@
 import {
-  PriceDataUpdate as PriceDataUpdateEvent,
   LiquidityAdded as LiquidityAddedEvent,
   LiquidityRemoved as LiquidityRemovedEvent,
   Activation as ActivationEvent,
   Conversion as ConversionEventV1,
-  TokenRateUpdate as TokenRateUpdateEvent,
   ConversionFeeUpdate as ConversionFeeUpdateEvent,
-  WithdrawFees as WithdrawFeesEvent,
-  OwnerUpdate as OwnerUpdateEvent,
   LiquidityPoolV1Converter as LiquidityPoolV1Contract,
+  WithdrawFees as WithdrawFeesEvent,
 } from '../generated/templates/LiquidityPoolV1Converter/LiquidityPoolV1Converter'
 import {
   Conversion as ConversionEventV2,
@@ -18,156 +15,75 @@ import {
   Conversion as ConversionEventV1WithProtocol,
   LiquidityPoolV1ConverterProtocolFee as LiquidityPoolV1ConverterProtocolFeeContract,
 } from '../generated/templates/LiquidityPoolV1ConverterProtocolFee/LiquidityPoolV1ConverterProtocolFee'
-import { UserLiquidityHistory, LiquidityHistoryItem, Conversion, LiquidityPool, LiquidityPoolToken, SmartToken } from '../generated/schema'
+import { Conversion, LiquidityPool, LiquidityPoolToken, Token, Transaction } from '../generated/schema'
 import { ConversionEventForSwap, createAndReturnSwap, updatePricing } from './utils/Swap'
-import { createAndReturnToken, decimalize } from './utils/Token'
+import { createAndReturnToken, decimalize, decimalizeFromToken } from './utils/Token'
 import { createAndReturnTransaction } from './utils/Transaction'
-import { BigInt, BigDecimal, dataSource } from '@graphprotocol/graph-ts'
+import { BigInt, dataSource, Address } from '@graphprotocol/graph-ts'
 import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnPoolToken } from './utils/PoolToken'
 import { updateVolumes } from './utils/Volumes'
 import { liquidityPoolV1ChangeBlock } from './contracts/contracts'
 import { updateCandleSticks } from './utils/Candlesticks'
 import { LiquidityHistoryType } from './utils/types'
-
-export function handlePriceDataUpdate(event: PriceDataUpdateEvent): void {}
-
-class LiquidityHistoryItemParams {
-  id: string
-  user: string
-  userLiquidityHistory: string
-  type: string
-  provider: string
-  reserveToken: string
-  amount: BigDecimal
-  newBalance: BigDecimal
-  newSupply: BigDecimal
-  transaction: string
-  timestamp: BigInt
-  emittedBy: string
-  liquidityPool: string
-}
-
-function createLiquidityHistoryItem(params: LiquidityHistoryItemParams): void {
-  let liquidityHistoryItem = new LiquidityHistoryItem(params.id)
-  liquidityHistoryItem.user = params.user
-  liquidityHistoryItem.userLiquidityHistory = params.userLiquidityHistory
-  liquidityHistoryItem.type = params.type
-  liquidityHistoryItem.provider = params.provider
-  liquidityHistoryItem.reserveToken = params.reserveToken
-  liquidityHistoryItem.amount = params.amount
-  liquidityHistoryItem.newBalance = params.newBalance
-  liquidityHistoryItem.newSupply = params.newSupply
-  liquidityHistoryItem.transaction = params.transaction
-  liquidityHistoryItem.timestamp = params.timestamp
-  liquidityHistoryItem.emittedBy = params.emittedBy
-  liquidityHistoryItem.liquidityPool = params.liquidityPool
-  liquidityHistoryItem.save()
-}
-
-function updateUserLiquidityHistory(
-  liquidityPool: LiquidityPool,
-  userLiquidityHistory: UserLiquidityHistory,
-  token: string,
-  amountAdded: BigDecimal,
-  amountRemoved: BigDecimal,
-): void {
-  /** This would be more efficient with another if/else statement for type, but less readable? */
-  if (liquidityPool.token0 == token) {
-    userLiquidityHistory.totalAsset0LiquidityAdded = userLiquidityHistory.totalAsset0LiquidityAdded.plus(amountAdded)
-    userLiquidityHistory.totalAsset0LiquidityRemoved = userLiquidityHistory.totalAsset0LiquidityRemoved.plus(amountRemoved)
-  } else if (liquidityPool.token1 == token) {
-    userLiquidityHistory.totalAsset1LiquidityAdded = userLiquidityHistory.totalAsset1LiquidityAdded.plus(amountAdded)
-    userLiquidityHistory.totalAsset1LiquidityRemoved = userLiquidityHistory.totalAsset1LiquidityRemoved.plus(amountRemoved)
-  }
-  userLiquidityHistory.save()
-}
+import { updatePoolBalanceFromConversion } from './utils/LiquidityPool'
+import { updateLiquidityHistory } from './utils/UserLiqudityHistory'
 
 export function handleLiquidityAdded(event: LiquidityAddedEvent): void {
   createAndReturnTransaction(event)
   let liquidityPool = LiquidityPool.load(event.address.toHexString())
   let liquidityPoolToken = LiquidityPoolToken.load(event.address.toHexString() + event.params._reserveToken.toHexString())
-  let userLiquidityHistoryId = ''
-  if (liquidityPool != null && liquidityPoolToken != null) {
-    userLiquidityHistoryId = event.transaction.from.toHexString() + liquidityPoolToken.poolToken
-    let userLiquidityHistory = UserLiquidityHistory.load(userLiquidityHistoryId)
-    if (userLiquidityHistory == null) {
-      userLiquidityHistory = new UserLiquidityHistory(userLiquidityHistoryId)
-      userLiquidityHistory.user = event.transaction.from.toHexString()
-      userLiquidityHistory.poolToken = liquidityPoolToken.poolToken
-      userLiquidityHistory.totalAsset0LiquidityAdded = BigDecimal.zero()
-      userLiquidityHistory.totalAsset0LiquidityRemoved = BigDecimal.zero()
-      userLiquidityHistory.totalAsset1LiquidityAdded = BigDecimal.zero()
-      userLiquidityHistory.totalAsset1LiquidityRemoved = BigDecimal.zero()
-    }
+  let token = Token.load(event.params._reserveToken.toHexString())
 
-    if (userLiquidityHistory != null) {
-      updateUserLiquidityHistory(
-        liquidityPool,
-        userLiquidityHistory,
-        event.params._reserveToken.toHexString(),
-        decimalize(event.params._amount, event.params._reserveToken),
-        BigDecimal.zero(),
-      )
-    }
+  if (liquidityPool != null && liquidityPoolToken != null && token != null) {
+    updateLiquidityHistory({
+      id: event.transaction.hash.toHex() + '-' + event.logIndex.toString(),
+      user: event.transaction.from.toHexString(),
+      type: LiquidityHistoryType.Added,
+      provider: event.params._provider.toHexString(),
+      reserveToken: event.params._reserveToken.toHexString(),
+      amount: decimalizeFromToken(event.params._amount, token),
+      newBalance: decimalizeFromToken(event.params._newBalance, token),
+      newSupply: decimalizeFromToken(event.params._newSupply, token),
+      transaction: event.transaction.hash.toHexString(),
+      timestamp: event.block.timestamp,
+      emittedBy: event.address.toHexString(),
+      liquidityPool: liquidityPool,
+      liquidityPoolToken: liquidityPoolToken,
+      token: event.params._reserveToken,
+    })
   }
-  createLiquidityHistoryItem({
-    id: event.transaction.hash.toHex() + '-' + event.logIndex.toString(),
-    user: event.transaction.from.toHexString(),
-    userLiquidityHistory: userLiquidityHistoryId,
-    type: LiquidityHistoryType.Added,
-    provider: event.params._provider.toHexString(),
-    reserveToken: event.params._reserveToken.toHexString(),
-    /** TODO: The decimalize functions will load the same token entity 3 times - optimize */
-    amount: decimalize(event.params._amount, event.params._reserveToken),
-    newBalance: decimalize(event.params._newBalance, event.params._reserveToken),
-    newSupply: decimalize(event.params._newSupply, event.params._reserveToken),
-    transaction: event.transaction.hash.toHexString(),
-    timestamp: event.block.timestamp,
-    emittedBy: event.address.toHexString(),
-    liquidityPool: event.address.toHexString(),
-  })
 }
 
 export function handleLiquidityRemoved(event: LiquidityRemovedEvent): void {
   createAndReturnTransaction(event)
   let liquidityPool = LiquidityPool.load(event.address.toHexString())
   let liquidityPoolToken = LiquidityPoolToken.load(event.address.toHexString() + event.params._reserveToken.toHexString())
-  let userLiquidityHistoryId = ''
-  if (liquidityPool != null && liquidityPoolToken != null) {
-    userLiquidityHistoryId = event.transaction.from.toHexString() + liquidityPoolToken.poolToken
-    let userLiquidityHistory = UserLiquidityHistory.load(userLiquidityHistoryId)
-    if (userLiquidityHistory != null) {
-      if (userLiquidityHistory != null) {
-        updateUserLiquidityHistory(
-          liquidityPool,
-          userLiquidityHistory,
-          event.params._reserveToken.toHexString(),
-          BigDecimal.zero(),
-          decimalize(event.params._amount, event.params._reserveToken),
-        )
-      }
-    }
-  }
+  let token = Token.load(event.params._reserveToken.toHexString())
 
-  createLiquidityHistoryItem({
-    id: event.transaction.hash.toHex() + '-' + event.logIndex.toString(),
-    user: event.transaction.from.toHexString(),
-    userLiquidityHistory: userLiquidityHistoryId,
-    type: LiquidityHistoryType.Removed,
-    provider: event.params._provider.toHexString(),
-    reserveToken: event.params._reserveToken.toHexString(),
-    amount: decimalize(event.params._amount, event.params._reserveToken),
-    newBalance: decimalize(event.params._newBalance, event.params._reserveToken),
-    newSupply: decimalize(event.params._newSupply, event.params._reserveToken),
-    transaction: event.transaction.hash.toHexString(),
-    timestamp: event.block.timestamp,
-    emittedBy: event.address.toHexString(),
-    liquidityPool: event.address.toHexString(),
-  })
+  if (liquidityPool != null && liquidityPoolToken != null && token != null) {
+    updateLiquidityHistory({
+      id: event.transaction.hash.toHex() + '-' + event.logIndex.toString(),
+      user: event.transaction.from.toHexString(),
+      type: LiquidityHistoryType.Removed,
+      provider: event.params._provider.toHexString(),
+      reserveToken: event.params._reserveToken.toHexString(),
+      amount: decimalizeFromToken(event.params._amount, token),
+      newBalance: decimalizeFromToken(event.params._newBalance, token),
+      newSupply: decimalizeFromToken(event.params._newSupply, token),
+      transaction: event.transaction.hash.toHexString(),
+      timestamp: event.block.timestamp,
+      emittedBy: event.address.toHexString(),
+      liquidityPool: liquidityPool,
+      liquidityPoolToken: liquidityPoolToken,
+      token: event.params._reserveToken,
+    })
+  }
 }
 
-/** This event is triggered when a pool is activated or deactivated */
+/** This event is triggered when a pool is activated or deactivated
+ * TODO: Dry up this code by creating a base ABI with only the methods shared by all liquidity pools
+ */
 export function handleActivation(event: ActivationEvent): void {
   createAndReturnTransaction(event)
   let liquidityPool = LiquidityPool.load(dataSource.address().toHex())
@@ -244,112 +160,105 @@ export function handleActivation(event: ActivationEvent): void {
 }
 
 export function handleConversionV1(event: ConversionEventV1): void {
-  const fromAmount = decimalize(event.params._amount, event.params._fromToken)
-  const toAmount = decimalize(event.params._return, event.params._toToken)
-  const conversionFee = decimalize(event.params._conversionFee, event.params._toToken)
-
-  let entity = new Conversion(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity._fromToken = event.params._fromToken.toHexString()
-  entity._toToken = event.params._toToken.toHexString()
-  entity._trader = event.params._trader
-  entity._amount = fromAmount
-  entity._return = toAmount
-  entity._conversionFee = conversionFee
-  entity._protocolFee = BigDecimal.zero()
   let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.swapTransaction = event.transaction.hash.toHex()
-  entity.save()
 
-  let parsedEvent: ConversionEventForSwap = {
-    transactionHash: event.transaction.hash,
+  handleConversion({
+    transaction: transaction,
+    logIndex: event.logIndex,
+    liquidityPool: event.address,
     fromToken: event.params._fromToken,
     toToken: event.params._toToken,
-    fromAmount: fromAmount,
-    toAmount: toAmount,
-    timestamp: event.block.timestamp,
-    user: event.transaction.from,
+    fromAmount: event.params._amount,
+    toAmount: event.params._return,
     trader: event.params._trader,
-    lpFee: conversionFee,
-    protocolFee: BigDecimal.zero(),
-  }
-
-  createAndReturnSwap(parsedEvent)
-  updatePricing(parsedEvent)
-  updateVolumes(parsedEvent, dataSource.address())
-  updateCandleSticks(parsedEvent)
+    user: event.transaction.from,
+    conversionFee: event.params._conversionFee,
+    protocolFee: BigInt.zero(),
+  })
 }
 
 export function handleConversionV2(event: ConversionEventV2): void {
-  const fromAmount = decimalize(event.params._amount, event.params._fromToken)
-  const toAmount = decimalize(event.params._return, event.params._toToken)
-  const conversionFee = decimalize(event.params._conversionFee, event.params._toToken)
-
-  let entity = new Conversion(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity._fromToken = event.params._fromToken.toHexString()
-  entity._toToken = event.params._toToken.toHexString()
-  entity._trader = event.params._trader
-  entity._amount = fromAmount
-  entity._return = toAmount
-  entity._conversionFee = conversionFee
-  entity._protocolFee = BigDecimal.zero()
   let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.swapTransaction = event.transaction.hash.toHex()
-  entity.save()
 
-  let parsedEvent: ConversionEventForSwap = {
-    transactionHash: event.transaction.hash,
+  handleConversion({
+    transaction: transaction,
+    logIndex: event.logIndex,
+    liquidityPool: event.address,
     fromToken: event.params._fromToken,
     toToken: event.params._toToken,
-    fromAmount: fromAmount,
-    toAmount: toAmount,
-    timestamp: event.block.timestamp,
-    user: event.transaction.from,
+    fromAmount: event.params._amount,
+    toAmount: event.params._return,
     trader: event.params._trader,
-    lpFee: conversionFee,
-    protocolFee: BigDecimal.zero(),
-  }
-
-  createAndReturnSwap(parsedEvent)
-  updatePricing(parsedEvent)
-  updateVolumes(parsedEvent, dataSource.address())
-  updateCandleSticks(parsedEvent)
+    user: event.transaction.from,
+    conversionFee: event.params._conversionFee,
+    protocolFee: BigInt.zero(),
+  })
 }
 
 export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void {
-  const fromAmount = decimalize(event.params._amount, event.params._fromToken)
-  const toAmount = decimalize(event.params._return, event.params._toToken)
-  const conversionFee = decimalize(event.params._conversionFee, event.params._toToken)
-  const protocolFee = decimalize(event.params._protocolFee, event.params._toToken)
+  let transaction = createAndReturnTransaction(event)
 
-  let entity = new Conversion(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity._fromToken = event.params._fromToken.toHexString()
-  entity._toToken = event.params._toToken.toHexString()
-  entity._trader = event.params._trader
+  handleConversion({
+    transaction: transaction,
+    logIndex: event.logIndex,
+    liquidityPool: event.address,
+    fromToken: event.params._fromToken,
+    toToken: event.params._toToken,
+    fromAmount: event.params._amount,
+    toAmount: event.params._return,
+    trader: event.params._trader,
+    user: event.transaction.from,
+    conversionFee: event.params._conversionFee,
+    protocolFee: event.params._protocolFee,
+  })
+}
+
+class IConversionEvent {
+  transaction: Transaction
+  logIndex: BigInt
+  liquidityPool: Address
+  fromToken: Address
+  toToken: Address
+  fromAmount: BigInt
+  toAmount: BigInt
+  trader: Address
+  user: Address
+  conversionFee: BigInt
+  protocolFee: BigInt
+}
+
+export function handleConversionFeeUpdate(event: ConversionFeeUpdateEvent): void {}
+
+function handleConversion(event: IConversionEvent): void {
+  const fromAmount = decimalize(event.fromAmount, event.fromToken)
+  const toAmount = decimalize(event.toAmount, event.toToken)
+  const conversionFee = decimalize(event.conversionFee, event.toToken)
+  const protocolFee = decimalize(event.protocolFee, event.toToken)
+  const liquidityPool = LiquidityPool.load(event.liquidityPool.toHexString())
+
+  let entity = new Conversion(event.transaction.id + '-' + event.logIndex.toString())
+  entity._fromToken = event.fromToken.toHexString()
+  entity._toToken = event.toToken.toHexString()
+  entity._trader = event.trader
   entity._amount = fromAmount
   entity._return = toAmount
   entity._conversionFee = conversionFee
   entity._protocolFee = protocolFee
-  let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
+  entity.transaction = event.transaction.id
+  entity.timestamp = event.transaction.timestamp
+  entity.emittedBy = event.liquidityPool
+  entity.blockNumber = event.transaction.blockNumber
   entity.save()
 
-  let parsedEvent: ConversionEventForSwap = {
-    transactionHash: event.transaction.hash,
-    fromToken: event.params._fromToken,
-    toToken: event.params._toToken,
+  const parsedEvent: ConversionEventForSwap = {
+    transactionHash: event.transaction.id,
+    fromToken: event.fromToken,
+    toToken: event.toToken,
     fromAmount: fromAmount,
     toAmount: toAmount,
-    timestamp: event.block.timestamp,
-    user: event.transaction.from,
-    trader: event.params._trader,
+    timestamp: event.transaction.timestamp,
+    user: event.user,
+    trader: event.trader,
     lpFee: conversionFee,
     protocolFee: protocolFee,
   }
@@ -358,12 +267,11 @@ export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void
   updatePricing(parsedEvent)
   updateVolumes(parsedEvent, dataSource.address())
   updateCandleSticks(parsedEvent)
+  if (liquidityPool !== null) {
+    updatePoolBalanceFromConversion(parsedEvent, liquidityPool)
+  }
 }
 
-export function handleTokenRateUpdate(event: TokenRateUpdateEvent): void {}
-
-export function handleConversionFeeUpdate(event: ConversionFeeUpdateEvent): void {}
-
-export function handleWithdrawFees(event: WithdrawFeesEvent): void {}
-
-export function handleOwnerUpdate(event: OwnerUpdateEvent): void {}
+export function handleWithdrawFees(event: WithdrawFeesEvent): void {
+  /** TODO: Decrement liquidity pool balance when protocol fees are withdrawn */
+}
