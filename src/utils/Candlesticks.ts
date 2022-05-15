@@ -96,8 +96,6 @@ export function updateCandleSticks(event: ConversionEventForSwap): void {
         updateAllIntervals(baseToken, quoteToken, oldPrice, newPrice, volume, txCount, blockTimestamp)
       }
     }
-  } else {
-    log.warning('Candlesticks Unhandled Conversion - fromToken: {}, toToken {}', [event.fromToken.toHex(), event.toToken.toHex()])
   }
 }
 
