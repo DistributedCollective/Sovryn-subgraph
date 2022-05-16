@@ -7,9 +7,9 @@ export function createAndReturnUser(address: Address, timestamp: BigInt): User {
 
   if (userEntity == null) {
     userEntity = new User(address.toHex())
-    userEntity.createdAtTimestamp = timestamp
+    userEntity.createdAtTimestamp = timestamp.toI32()
     let protocolStats = createAndReturnProtocolStats()
-    protocolStats.totalUsers = protocolStats.totalUsers.plus(BigInt.fromI32(1))
+    protocolStats.totalUsers++
     protocolStats.save()
   }
 

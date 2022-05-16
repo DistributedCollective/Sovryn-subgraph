@@ -6,7 +6,7 @@ export function createAndReturnProtocolStats(): ProtocolStats {
   let protocolStatsEntity = ProtocolStats.load('0')
   if (protocolStatsEntity == null) {
     protocolStatsEntity = new ProtocolStats('0')
-    protocolStatsEntity.totalUsers = BigInt.zero()
+    protocolStatsEntity.totalUsers = 0
     protocolStatsEntity.totalMarginTradeVolumeUsd = BigDecimal.zero()
     protocolStatsEntity.totalCloseWithSwapVolumeUsd = BigDecimal.zero()
     protocolStatsEntity.totalDepositCollateralVolumeUsd = BigDecimal.zero()

@@ -79,8 +79,8 @@ export function createAndReturnLiquidityPool(
         liquidityPool.conversionFee = conversionFee.value
       }
     }
-    liquidityPool.createdAtBlockNumber = createdAtBlockNumber
-    liquidityPool.createdAtTimestamp = createdAtTimestamp
+    liquidityPool.createdAtBlockNumber = createdAtBlockNumber.toI32()
+    liquidityPool.createdAtTimestamp = createdAtTimestamp.toI32()
     liquidityPool.createdAtTransaction = createdAtTransaction
     liquidityPool.token0Balance = BigDecimal.zero()
     liquidityPool.token1Balance = BigDecimal.zero()

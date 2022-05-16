@@ -30,7 +30,7 @@ type LiquidityHistoryItem @entity {
   amount: BigDecimal! # uint256
   newBalance: BigDecimal! # uint256
   newSupply: BigDecimal! # uint256
-  timestamp: BigInt!
+  timestamp: Int!
   liquidityPool: LiquidityPool!
   emittedBy: String! #address
   transaction: Transaction!

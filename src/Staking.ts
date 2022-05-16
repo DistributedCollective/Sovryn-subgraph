@@ -26,9 +26,9 @@ export function handleDelegateChanged(event: DelegateChangedEvent): void {
     let stakeHistoryItem = new StakeHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
     stakeHistoryItem.user = event.params.delegator.toHexString()
     stakeHistoryItem.action = StakeHistoryAction.Delegate
-    stakeHistoryItem.timestamp = event.block.timestamp
+    stakeHistoryItem.timestamp = event.block.timestamp.toI32()
     stakeHistoryItem.transaction = transaction.id
-    stakeHistoryItem.lockedUntil = event.params.lockedUntil
+    stakeHistoryItem.lockedUntil = event.params.lockedUntil.toI32()
     stakeHistoryItem.save()
   }
 }
@@ -40,9 +40,9 @@ export function handleExtendedStakingDuration(event: ExtendedStakingDurationEven
   let stakeHistoryItem = new StakeHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   stakeHistoryItem.user = event.params.staker.toHexString()
   stakeHistoryItem.action = StakeHistoryAction.ExtendStake
-  stakeHistoryItem.timestamp = event.block.timestamp
+  stakeHistoryItem.timestamp = event.block.timestamp.toI32()
   stakeHistoryItem.transaction = transaction.id
-  stakeHistoryItem.lockedUntil = event.params.newDate
+  stakeHistoryItem.lockedUntil = event.params.newDate.toI32()
   stakeHistoryItem.save()
 }
 
@@ -55,7 +55,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
   let transaction = createAndReturnTransaction(event)
   entity.staker = event.params.staker
   entity.amount = amount
-  entity.lockedUntil = event.params.lockedUntil
+  entity.lockedUntil = event.params.lockedUntil.toI32()
   entity.totalStaked = totalStaked
   entity.transaction = transaction.id
   entity.timestamp = transaction.timestamp
@@ -78,7 +78,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     let user = createAndReturnUser(event.transaction.from, event.block.timestamp)
     newVestingContract.user = user.id
     newVestingContract.type = VestingContractType.Genesis
-    newVestingContract.createdAtTimestamp = event.block.timestamp
+    newVestingContract.createdAtTimestamp = event.block.timestamp.toI32()
     newVestingContract.emittedBy = event.address
     newVestingContract.createdAtTransaction = transaction.id
     newVestingContract.startingBalance = amount
@@ -103,10 +103,10 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
       let stakeHistoryItem = new StakeHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
       stakeHistoryItem.user = event.params.staker.toHexString()
       stakeHistoryItem.action = event.params.amount < event.params.totalStaked ? StakeHistoryAction.IncreaseStake : StakeHistoryAction.Stake
-      stakeHistoryItem.timestamp = event.block.timestamp
+      stakeHistoryItem.timestamp = event.block.timestamp.toI32()
       stakeHistoryItem.transaction = transaction.id
       stakeHistoryItem.amount = amount
-      stakeHistoryItem.lockedUntil = event.params.lockedUntil
+      stakeHistoryItem.lockedUntil = event.params.lockedUntil.toI32()
       stakeHistoryItem.save()
 
       let protocolStatsEntity = createAndReturnProtocolStats()
@@ -140,9 +140,9 @@ function createVestingTokensStaked(event: TokensStakedEvent): void {
   vestingTokensStakedEntity.staker = event.params.staker.toHexString()
   vestingTokensStakedEntity.action = VestingHistoryActionItem.TokensStaked
   vestingTokensStakedEntity.amount = amount
-  vestingTokensStakedEntity.lockedUntil = event.params.lockedUntil
+  vestingTokensStakedEntity.lockedUntil = event.params.lockedUntil.toI32()
   vestingTokensStakedEntity.totalStaked = totalStaked
-  vestingTokensStakedEntity.timestamp = event.block.timestamp
+  vestingTokensStakedEntity.timestamp = event.block.timestamp.toI32()
   vestingTokensStakedEntity.emittedBy = event.address
   vestingTokensStakedEntity.transaction = event.transaction.hash.toHex()
   vestingTokensStakedEntity.save()

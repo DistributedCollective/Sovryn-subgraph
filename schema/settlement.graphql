@@ -4,7 +4,7 @@ type Deposit @entity {
   id: ID!
   to: Bytes! # address
   amount: BigDecimal! # uint256
-  timestamp: BigInt!
+  timestamp: Int!
   emittedBy: Bytes! #address
   transaction: Transaction!
 }
@@ -13,7 +13,7 @@ type MarginOrderCanceled @entity {
   id: ID!
   hash: Bytes! # bytes32
   trader: Bytes! # address
-  timestamp: BigInt!
+  timestamp: Int!
   emittedBy: Bytes! #address
   transaction: Transaction!
 }
@@ -30,7 +30,7 @@ type MarginOrderFilled @entity {
   collateralTokenSent: BigDecimal! # uint256
   collateralTokenAddress: Bytes! # address
   filledPrice: BigDecimal! # uint256
-  timestamp: BigInt!
+  timestamp: Int!
   emittedBy: Bytes! #address
   transaction: Transaction!
 }
@@ -39,7 +39,7 @@ type OrderCanceled @entity {
   id: ID!
   hash: Bytes! # bytes32
   maker: Bytes! # address
-  timestamp: BigInt!
+  timestamp: Int!
   emittedBy: Bytes! #address
   transaction: Transaction!
 }
@@ -52,7 +52,7 @@ type OrderFilled @entity {
   amountOut: BigDecimal! # uint256
   path: [String!]! # address[]
   filledPrice: BigDecimal! # uint256
-  timestamp: BigInt!
+  timestamp: Int!
   emittedBy: Bytes! #address
   transaction: Transaction!
 }
@@ -61,7 +61,7 @@ type Withdrawal @entity {
   id: ID!
   receiver: Bytes! # address
   amount: BigDecimal! # uint256
-  timestamp: BigInt!
+  timestamp: Int!
   emittedBy: Bytes! #address
   transaction: Transaction!
 }

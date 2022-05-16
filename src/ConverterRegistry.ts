@@ -9,10 +9,8 @@ export function handleSmartTokenAdded(event: SmartTokenAddedEvent): void {
   let smartTokenObj = createAndReturnSmartToken(smartTokenAddress)
   let smartTokenEntity = smartTokenObj.smartToken
 
-  if (smartTokenEntity.addedToRegistryBlockNumber === null) {
-    smartTokenEntity.addedToRegistryBlockNumber = event.block.number
-    smartTokenEntity.addedToRegistryTransactionHash = event.transaction.hash
-  }
+  smartTokenEntity.addedToRegistryBlockNumber = event.block.number.toI32()
+  smartTokenEntity.addedToRegistryTransactionHash = event.transaction.hash
 
   smartTokenEntity.currentConverterRegistry = event.address.toHexString()
   smartTokenEntity.save()

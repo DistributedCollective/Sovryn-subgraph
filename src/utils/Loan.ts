@@ -41,7 +41,7 @@ export function createAndReturnLoan(startParams: LoanStartState): Loan {
     loanEntity = new Loan(startParams.loanId.toHexString())
     loanEntity.type = startParams.type
     loanEntity.isOpen = true
-    loanEntity.startTimestamp = startParams.startTimestamp
+    loanEntity.startTimestamp = startParams.startTimestamp.toI32()
     loanEntity.user = startParams.user.toHexString()
     loanEntity.collateralToken = startParams.collateralToken.toHexString()
     loanEntity.loanToken = startParams.loanToken.toHexString()
@@ -70,7 +70,7 @@ export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
     loanEntity.borrowedAmount = loanEntity.borrowedAmount.plus(params.borrowedAmountChange)
     loanEntity.isOpen = params.isOpen
     if (params.isOpen == false) {
-      loanEntity.endTimestamp = params.timestamp
+      loanEntity.endTimestamp = params.timestamp.toI32()
     }
     if (loanEntity.positionSize.gt(loanEntity.maximumPositionSize)) {
       loanEntity.maximumPositionSize = loanEntity.positionSize

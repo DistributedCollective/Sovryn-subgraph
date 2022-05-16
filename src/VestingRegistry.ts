@@ -48,8 +48,8 @@ export function handleTeamVestingCreated(event: TeamVestingCreatedEvent): void {
     let entity = new VestingContract(event.params.vesting.toHexString())
     let user = createAndReturnUser(event.params.tokenOwner, event.block.timestamp)
     entity.user = user.id
-    entity.cliff = event.params.cliff
-    entity.duration = event.params.duration
+    entity.cliff = event.params.cliff.toI32()
+    entity.duration = event.params.duration.toI32()
     entity.startingBalance = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
     entity.currentBalance = BigDecimal.zero()
     let transaction = createAndReturnTransaction(event)
@@ -71,8 +71,8 @@ export function handleTeamVestingCreatedProxy(event: TeamVestingCreatedProxyEven
     let entity = new VestingContract(event.params.vesting.toHexString())
     let user = createAndReturnUser(event.params.tokenOwner, event.block.timestamp)
     entity.user = user.id
-    entity.cliff = event.params.cliff
-    entity.duration = event.params.duration
+    entity.cliff = event.params.cliff.toI32()
+    entity.duration = event.params.duration.toI32()
     entity.startingBalance = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
     entity.currentBalance = BigDecimal.zero()
     let transaction = createAndReturnTransaction(event)
@@ -92,8 +92,8 @@ export function handleVestingCreated(event: VestingCreatedEvent): void {
     let entity = new VestingContract(event.params.vesting.toHexString())
     let user = createAndReturnUser(event.params.tokenOwner, event.block.timestamp)
     entity.user = user.id
-    entity.cliff = event.params.cliff
-    entity.duration = event.params.duration
+    entity.cliff = event.params.cliff.toI32()
+    entity.duration = event.params.duration.toI32()
     entity.startingBalance = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
     entity.currentBalance = BigDecimal.zero()
     let transaction = createAndReturnTransaction(event)
@@ -111,8 +111,8 @@ export function handleVestingCreatedProxy(event: VestingCreatedProxyEvent): void
     let entity = new VestingContract(event.params.vesting.toHexString())
     let user = createAndReturnUser(event.params.tokenOwner, event.block.timestamp)
     entity.user = user.id
-    entity.cliff = event.params.cliff
-    entity.duration = event.params.duration
+    entity.cliff = event.params.cliff.toI32()
+    entity.duration = event.params.duration.toI32()
     entity.startingBalance = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
     entity.currentBalance = BigDecimal.zero()
     let transaction = createAndReturnTransaction(event)
