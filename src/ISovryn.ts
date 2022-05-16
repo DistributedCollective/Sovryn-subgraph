@@ -257,7 +257,7 @@ export function handleEarnReward(event: EarnRewardEvent): void {
   rewardsEarnedHistoryItem.action = RewardsEarnedAction.EarnReward
   rewardsEarnedHistoryItem.user = event.params.receiver.toHexString()
   rewardsEarnedHistoryItem.amount = amount
-  rewardsEarnedHistoryItem.timestamp = event.block.timestamp
+  rewardsEarnedHistoryItem.timestamp = event.block.timestamp.toI32()
   rewardsEarnedHistoryItem.transaction = event.transaction.hash.toHexString()
   rewardsEarnedHistoryItem.save()
 }
@@ -400,7 +400,7 @@ export function handleTrade(event: TradeEvent): void {
   const entryPrice = decimal.fromBigInt(event.params.entryPrice, DEFAULT_DECIMALS)
   const entryLeverage = decimal.fromBigInt(event.params.entryLeverage, DEFAULT_DECIMALS)
   const currentLeverage = decimal.fromBigInt(event.params.currentLeverage, DEFAULT_DECIMALS)
-  
+
   createAndReturnTransaction(event)
 
   let entity = new Trade(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
@@ -432,7 +432,7 @@ export function handleTrade(event: TradeEvent): void {
   /** In Loan tokens */
   entity.borrowedAmount = borrowedAmount
   entity.interestRate = interestRate
-  entity.settlementDate = event.params.settlementDate
+  entity.settlementDate = event.params.settlementDate.toI32()
   entity.entryPrice = entryPrice
   entity.entryLeverage = entryLeverage
   entity.currentLeverage = currentLeverage

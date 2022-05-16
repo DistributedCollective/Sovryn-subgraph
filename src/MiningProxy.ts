@@ -30,7 +30,7 @@ export function handleRewardClaimed(event: RewardClaimedEvent): void {
   rewardsEarnedHistoryItem.action = RewardsEarnedAction.RewardClaimed
   rewardsEarnedHistoryItem.user = event.params.user.toHexString()
   rewardsEarnedHistoryItem.amount = amount
-  rewardsEarnedHistoryItem.timestamp = event.block.timestamp
+  rewardsEarnedHistoryItem.timestamp = event.block.timestamp.toI32()
   rewardsEarnedHistoryItem.transaction = event.transaction.hash.toHexString()
   rewardsEarnedHistoryItem.save()
 }

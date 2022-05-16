@@ -59,7 +59,7 @@ function createLiquidityHistoryItem(params: LiquidityHistoryItemParams): void {
   liquidityHistoryItem.newBalance = params.newBalance
   liquidityHistoryItem.newSupply = params.newSupply
   liquidityHistoryItem.transaction = params.transaction
-  liquidityHistoryItem.timestamp = params.timestamp
+  liquidityHistoryItem.timestamp = params.timestamp.toI32()
   liquidityHistoryItem.emittedBy = params.emittedBy
   liquidityHistoryItem.liquidityPool = params.liquidityPool
   liquidityHistoryItem.save()

@@ -3,9 +3,9 @@ type TokensStaked @entity {
   user: User
   staker: Bytes! # address
   amount: BigDecimal! # uint256
-  lockedUntil: BigInt! # uint256
+  lockedUntil: Int! # uint256
   totalStaked: BigDecimal! # uint256
-  timestamp: BigInt!
+  timestamp: Int!
   emittedBy: Bytes! #address
   transaction: Transaction!
   isUserStaked: Boolean!
@@ -36,10 +36,10 @@ type StakeHistoryItem @entity {
   id: ID! # transaction hash
   user: UserStakeHistory!
   action: StakeHistoryAction!
-  timestamp: BigInt!
+  timestamp: Int!
   transaction: Transaction!
   amount: BigDecimal
-  lockedUntil: BigInt
+  lockedUntil: Int
 }
 
 # This event is emitted when tokens are transferred to the Protocol contract as fees

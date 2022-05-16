@@ -15,8 +15,8 @@ type Loan @entity {
   LoanType is either Trade (for Margin Trades) or Borrow (for Borrows)
   """
   type: LoanType!
-  startTimestamp: BigInt!
-  endTimestamp: BigInt
+  startTimestamp: Int!
+  endTimestamp: Int
   """
   The amount borrowed in loan tokens
   """
@@ -90,7 +90,7 @@ type Borrow @entity {
   interestDuration: BigDecimal! # uint256
   collateralToLoanRate: BigDecimal! # uint256
   currentMargin: BigDecimal! # uint256
-  timestamp: BigInt!
+  timestamp: Int!
   emittedBy: Bytes! #address
   transaction: Transaction!
 }
@@ -110,7 +110,7 @@ type CloseWithDeposit @entity {
   collateralWithdrawAmount: BigDecimal! # uint256
   collateralToLoanRate: BigDecimal! # uint256
   currentMargin: BigDecimal! # uint256
-  timestamp: BigInt!
+  timestamp: Int!
   emittedBy: Bytes! #address
   transaction: Transaction!
 }
@@ -130,7 +130,7 @@ type CloseWithSwap @entity {
   loanCloseAmount: BigDecimal! # uint256
   exitPrice: BigDecimal! # uint256
   currentLeverage: BigDecimal! # uint256
-  timestamp: BigInt!
+  timestamp: Int!
   emittedBy: Bytes! #address
   transaction: Transaction!
 }
@@ -143,7 +143,7 @@ type DepositCollateral @entity {
   loanId: Loan! # bytes32
   depositAmount: BigDecimal! # uint256
   rate: BigDecimal # uint256
-  timestamp: BigInt!
+  timestamp: Int!
   emittedBy: Bytes! #address
   transaction: Transaction!
 }
@@ -163,7 +163,7 @@ type Liquidate @entity {
   collateralWithdrawAmount: BigDecimal! # uint256
   collateralToLoanRate: BigDecimal! # uint256
   currentMargin: BigDecimal! # uint256
-  timestamp: BigInt!
+  timestamp: Int!
   emittedBy: Bytes! #address
   transaction: Transaction!
 }
@@ -177,7 +177,7 @@ type PayBorrowingFee @entity {
   token: Bytes! # address
   loanId: Loan! # bytes32
   amount: BigDecimal! # uint256
-  timestamp: BigInt!
+  timestamp: Int!
   emittedBy: Bytes! #address
   transaction: Transaction!
 }
@@ -190,7 +190,7 @@ type PayLendingFee @entity {
   payer: Bytes! # address
   token: Bytes! # address
   amount: BigDecimal! # uint256
-  timestamp: BigInt!
+  timestamp: Int!
   emittedBy: Bytes! #address
   transaction: Transaction!
 }
@@ -204,7 +204,7 @@ type PayTradingFee @entity {
   token: Bytes! # address
   loanId: Loan! # bytes32
   amount: BigDecimal! # uint256
-  timestamp: BigInt!
+  timestamp: Int!
   emittedBy: Bytes! #address
   transaction: Transaction!
 }
@@ -220,11 +220,11 @@ type Trade @entity {
   positionSize: BigDecimal! 
   borrowedAmount: BigDecimal! 
   interestRate: BigDecimal! 
-  settlementDate: BigInt! 
+  settlementDate: Int! 
   entryPrice: BigDecimal! 
   entryLeverage: BigDecimal! 
   currentLeverage: BigDecimal! 
-  timestamp: BigInt!
+  timestamp: Int!
   emittedBy: Bytes!
   transaction: Transaction!
 }

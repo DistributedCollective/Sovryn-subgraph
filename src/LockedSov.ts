@@ -25,7 +25,7 @@ export function handleTokenStaked(event: TokenStakedEvent): void {
   rewardsEarnedHistoryItem.action = RewardsEarnedAction.RewardSovStaked
   rewardsEarnedHistoryItem.user = event.params._initiator.toHexString()
   rewardsEarnedHistoryItem.amount = decimal.fromBigInt(event.params._amount, DEFAULT_DECIMALS)
-  rewardsEarnedHistoryItem.timestamp = event.block.timestamp
+  rewardsEarnedHistoryItem.timestamp = event.block.timestamp.toI32()
   rewardsEarnedHistoryItem.transaction = event.transaction.hash.toHexString()
   rewardsEarnedHistoryItem.save()
 }

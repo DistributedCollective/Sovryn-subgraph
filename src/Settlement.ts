@@ -6,7 +6,7 @@ import {
   OrderFilled as OrderFilledEvent,
   Withdrawal as WithdrawalEvent,
 } from '../generated/Settlement/Settlement'
-import { Deposit, MarginOrderCanceled, MarginOrderFilled, OrderCanceled, OrderFilled, Withdrawal, Trade, Swap } from '../generated/schema'
+import { MarginOrderCanceled, MarginOrderFilled, OrderCanceled, OrderFilled, Withdrawal, Swap, Deposit } from '../generated/schema'
 import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
 import { decimalize } from './utils/Token'
 

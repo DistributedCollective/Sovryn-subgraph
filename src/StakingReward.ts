@@ -31,7 +31,7 @@ export function handleRewardWithdrawn(event: RewardWithdrawnEvent): void {
   rewardsHistoryItem.action = RewardsEarnedAction.StakingRewardWithdrawn
   rewardsHistoryItem.user = event.params.receiver.toHexString()
   rewardsHistoryItem.amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
-  rewardsHistoryItem.timestamp = event.block.timestamp
+  rewardsHistoryItem.timestamp = event.block.timestamp.toI32()
   rewardsHistoryItem.transaction = event.transaction.hash.toHexString()
   rewardsHistoryItem.save()
 }

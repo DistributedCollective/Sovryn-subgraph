@@ -33,6 +33,6 @@ type RewardsEarnedHistoryItem @entity {
   user: UserRewardsEarnedHistory!
   token: Token
   amount: BigDecimal!
-  timestamp: BigInt!
+  timestamp: Int!
   transaction: Transaction!
 }

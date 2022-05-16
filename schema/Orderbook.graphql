@@ -13,13 +13,13 @@ type OrderCreated @entity {
   order_maker: User! # address
   order_fromToken: Bytes! # address
   order_toToken: Bytes! # address
-  order_amountIn: BigInt! # uint256
-  order_amountOutMin: BigInt! # uint256
+  order_amountIn: BigInt! # Keep as BigInt, do not convert to BigDecimal
+  order_amountOutMin: BigInt! # Keep as BigInt, do not convert to BigDecimal
   order_recipient: Bytes! # address
-  order_deadline: BigInt! # uint256
-  order_created: BigInt! # uint256
-  limitPrice: BigInt! # uint256
-  timestamp: BigInt!
+  order_deadline: BigInt! # Keep as BigInt, do not convert to BigDecimal
+  order_created: BigInt! # Keep as BigInt, do not convert to BigDecimal
+  limitPrice: BigInt! # Keep as BigInt, do not convert to BigDecimal
+  timestamp: Int!
   emittedBy: Bytes! #address
   transaction: Transaction!
 }
