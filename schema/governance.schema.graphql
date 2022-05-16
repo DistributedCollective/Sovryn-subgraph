@@ -5,7 +5,7 @@ type Proposal @entity {
   canceled: Transaction
   executed: Transaction
   queued: Transaction
-  votesFor: BigInt!
+  votesFor: BigInt! # No need to decimalize
   votesAgainst: BigInt!
   """
   Number of unique wallets that voted for this proposal
@@ -19,7 +19,7 @@ type Proposal @entity {
   proposalId: BigInt!
   proposer: Bytes! # address
   targets: [String!]! # address[]
-  values: [BigInt!]! # uint256[]
+  values: [BigInt!]! # uint256[] TODO: Remo
   signatures: [String!]! # string[]
   startBlock: BigInt! # uint256
   endBlock: BigInt! # uint256

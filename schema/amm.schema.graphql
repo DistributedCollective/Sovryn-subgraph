@@ -166,7 +166,10 @@ type LiquidityPool @entity {
   connectorTokens: [LiquidityPoolToken!]! @derivedFrom(field: "liquidityPool")
   poolTokens: [PoolToken!] @derivedFrom(field: "liquidityPool")
   owner: String
-  conversionFee: BigInt
+  """
+  Divide by maxConversionFee to get percentage
+  """
+  conversionFee: BigInt # This is in percent if you divide by maxConversionFee
   # weight: BigDecimal
   """
   Activated with be true when this pool is activated, and will change to false is the pool is deactivated

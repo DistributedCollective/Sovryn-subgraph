@@ -1,3 +1,6 @@
+# This is the orderbooks for testnet and mainnet. Both orderbooks are created on testnet. This event will never be emitted on mainnet.
+# This is suboptimal, we are thinking of a better solution
+
 enum Network {
   Mainnet
   Testnet
