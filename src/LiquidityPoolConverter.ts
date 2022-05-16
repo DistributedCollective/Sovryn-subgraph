@@ -27,7 +27,7 @@ import { liquidityPoolV1ChangeBlock } from './contracts/contracts'
 import { updateCandleSticks } from './utils/Candlesticks'
 import { LiquidityHistoryType } from './utils/types'
 import { updatePoolBalanceFromConversion, withdrawFeesFromPool } from './utils/LiquidityPool'
-import { updateLiquidityHistory } from './utils/UserLiqudityHistory'
+import { updateLiquidityHistory } from './utils/UserLiquidityHistory'
 import { decimal } from '@protofire/subgraph-toolkit'
 
 export function handleLiquidityAdded(event: LiquidityAddedEvent): void {

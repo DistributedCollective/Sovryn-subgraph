@@ -12,7 +12,7 @@ export class ConversionEventForSwap {
   toToken: Address
   fromAmount: BigDecimal
   toAmount: BigDecimal
-  timestamp: BigInt
+  timestamp: i32
   user: Address
   trader: Address
   lpFee: BigDecimal
@@ -23,7 +23,7 @@ export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
   let userEntity: User | null = null
   /** Check if the trader property on the swap is the same as the caller of the tx. If it is, this is a user-instigated swap */
   if (event.user.toHexString() == event.trader.toHexString()) {
-    userEntity = createAndReturnUser(event.user, event.timestamp)
+    userEntity = createAndReturnUser(event.user, BigInt.fromI32(event.timestamp))
   }
   let swapEntity = Swap.load(event.transactionHash)
 
@@ -43,7 +43,7 @@ export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
     swapEntity.isMarginTrade = false
     swapEntity.isBorrow = false
     swapEntity.isLimit = false
-    swapEntity.timestamp = event.timestamp.toI32()
+    swapEntity.timestamp = event.timestamp
     swapEntity.transaction = event.transactionHash
   } else {
     /** Swap already exists - this means it has multiple conversion events */
@@ -97,7 +97,7 @@ export function updatePricing(event: ConversionEventForSwap): void {
       BTCToken.prevPriceBtc = decimal.ONE
       BTCToken.lastPriceBtc = decimal.ONE
 
-      updateLastPriceUsdAll(event.timestamp)
+      updateLastPriceUsdAll()
     }
 
     if (token != null) {

@@ -142,7 +142,7 @@ type Conversion @entity {
   emittedBy: Bytes! #address
   transaction: Transaction!
   swapTransaction: Swap!
-  blockNumber: BigInt!
+  blockNumber: Int!
 }
 
 """
