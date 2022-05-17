@@ -26,7 +26,7 @@ import { updateVolumes } from './utils/Volumes'
 import { liquidityPoolV1ChangeBlock } from './contracts/contracts'
 import { updateCandleSticks } from './utils/Candlesticks'
 import { LiquidityHistoryType } from './utils/types'
-import { updatePoolBalanceFromConversion, withdrawFeesFromPool } from './utils/LiquidityPool'
+import { decrementPoolBalance, incrementPoolBalance, updatePoolBalanceFromConversion, withdrawFeesFromPool } from './utils/LiquidityPool'
 import { updateLiquidityHistory } from './utils/UserLiquidityHistory'
 import { decimal } from '@protofire/subgraph-toolkit'
 
@@ -235,7 +235,7 @@ function handleConversion(event: IConversionEvent): void {
   const toAmount = decimalize(event.toAmount, event.toToken)
   const conversionFee = decimalize(event.conversionFee, event.toToken)
   const protocolFee = decimalize(event.protocolFee, event.toToken)
-  const liquidityPool = LiquidityPool.load(event.liquidityPool.toHexString())
+  let liquidityPool = LiquidityPool.load(event.liquidityPool.toHexString())
 
   let entity = new Conversion(event.transaction.id + '-' + event.logIndex.toString())
   entity._fromToken = event.fromToken.toHexString()
@@ -269,15 +269,17 @@ function handleConversion(event: IConversionEvent): void {
   updateVolumes(parsedEvent, dataSource.address())
   updateCandleSticks(parsedEvent)
   if (liquidityPool !== null) {
-    updatePoolBalanceFromConversion(parsedEvent, liquidityPool)
+    // updatePoolBalanceFromConversion(parsedEvent, liquidityPool)
+    liquidityPool = incrementPoolBalance(liquidityPool, event.fromToken, fromAmount)
+    decrementPoolBalance(liquidityPool, event.toToken, toAmount)
   }
 }
 
 export function handleWithdrawFees(event: WithdrawFeesEvent): void {
-  let liquidityPool = LiquidityPool.load(event.address.toHexString())
-  let token = Token.load(event.params.token.toHexString())
-  if (liquidityPool !== null && token !== null) {
-    const feeAmount = decimal.fromBigInt(event.params.protocolFeeAmount, token.decimals)
-    withdrawFeesFromPool(liquidityPool, token, feeAmount)
-  }
+  // let liquidityPool = LiquidityPool.load(event.address.toHexString())
+  // let token = Token.load(event.params.token.toHexString())
+  // if (liquidityPool !== null && token !== null) {
+  //   const feeAmount = decimal.fromBigInt(event.params.protocolFeeAmount, token.decimals)
+  //   withdrawFeesFromPool(liquidityPool, token, feeAmount)
+  // }
 }

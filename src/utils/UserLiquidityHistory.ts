@@ -1,6 +1,6 @@
 import { BigInt, BigDecimal, dataSource, Address } from '@graphprotocol/graph-ts'
 import { UserLiquidityHistory, LiquidityHistoryItem, Conversion, LiquidityPool, LiquidityPoolToken, Token } from '../../generated/schema'
-import { replaceLiquidityPoolBalance } from './LiquidityPool'
+import { decrementPoolBalance, incrementPoolBalance, replaceLiquidityPoolBalance } from './LiquidityPool'
 import { decimalize } from './Token'
 import { LiquidityHistoryType } from './types'
 
@@ -38,7 +38,12 @@ export function updateLiquidityHistory(params: IUserLiquidityHistory): void {
   const amountRemoved = params.type == LiquidityHistoryType.Removed ? BigDecimal.zero() : params.amount
   updateUserLiquidityHistory(params.liquidityPool, userLiquidityHistory, params.token.toHexString(), amountAdded, amountRemoved)
   createLiquidityHistoryItem(params, userLiquidityHistoryId)
-  replaceLiquidityPoolBalance(params.liquidityPool, params.token.toHexString(), params.newBalance)
+  // replaceLiquidityPoolBalance(params.liquidityPool, params.token.toHexString(), params.newBalance)
+  if (params.type === LiquidityHistoryType.Added) {
+    incrementPoolBalance(params.liquidityPool, params.token, params.amount)
+  } else if (params.type === LiquidityHistoryType.Removed) {
+    decrementPoolBalance(params.liquidityPool, params.token, params.amount)
+  }
 }
 
 function createLiquidityHistoryItem(params: IUserLiquidityHistory, userLiquidityHistoryId: string): void {

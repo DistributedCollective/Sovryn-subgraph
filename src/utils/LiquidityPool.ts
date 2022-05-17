@@ -122,6 +122,26 @@ export function updatePoolBalanceFromConversion(params: ConversionEventForSwap, 
   liquidityPool.save()
 }
 
+export function incrementPoolBalance(liquidityPool: LiquidityPool, token: Address, amount: BigDecimal): LiquidityPool {
+  if (liquidityPool.token0 == token.toHexString()) {
+    liquidityPool.token0Balance = liquidityPool.token0Balance.plus(amount)
+  } else if (liquidityPool.token1 == token.toHexString()) {
+    liquidityPool.token1Balance = liquidityPool.token1Balance.plus(amount)
+  }
+  liquidityPool.save()
+  return liquidityPool
+}
+
+export function decrementPoolBalance(liquidityPool: LiquidityPool, token: Address, amount: BigDecimal): LiquidityPool {
+  if (liquidityPool.token0 == token.toHexString()) {
+    liquidityPool.token0Balance = liquidityPool.token0Balance.minus(amount)
+  } else if (liquidityPool.token1 == token.toHexString()) {
+    liquidityPool.token1Balance = liquidityPool.token1Balance.minus(amount)
+  }
+  liquidityPool.save()
+  return liquidityPool
+}
+
 /** Called on LiquidityAdded or LiquidityRemoved */
 export function replaceLiquidityPoolBalance(liquidityPool: LiquidityPool, token: string, newBalance: BigDecimal): void {
   if (liquidityPool.token0 == token) {
