@@ -276,10 +276,10 @@ function handleConversion(event: IConversionEvent): void {
 }
 
 export function handleWithdrawFees(event: WithdrawFeesEvent): void {
-  // let liquidityPool = LiquidityPool.load(event.address.toHexString())
-  // let token = Token.load(event.params.token.toHexString())
-  // if (liquidityPool !== null && token !== null) {
-  //   const feeAmount = decimal.fromBigInt(event.params.protocolFeeAmount, token.decimals)
-  //   withdrawFeesFromPool(liquidityPool, token, feeAmount)
-  // }
+  let liquidityPool = LiquidityPool.load(event.address.toHexString())
+  let token = Token.load(event.params.token.toHexString())
+  if (liquidityPool !== null && token !== null) {
+    const feeAmount = decimal.fromBigInt(event.params.protocolFeeAmount, token.decimals)
+    withdrawFeesFromPool(liquidityPool, token, feeAmount)
+  }
 }
