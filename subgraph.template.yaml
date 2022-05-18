@@ -54,7 +54,6 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - NewConverter
-        - OwnerUpdate
         - LiquidityPool
       abis:
         - name: ConverterFactory
@@ -686,7 +685,6 @@ templates:
         - Activation
         - Conversion
         - TokenRateUpdate
-        - OwnerUpdate
         - Token
         - SmartToken
         - PoolToken
@@ -729,7 +727,6 @@ templates:
       entities:
         - Activation
         - Conversion
-        - OwnerUpdate
         - Token
         - SmartToken
         - PoolToken
@@ -823,7 +820,6 @@ templates:
       language: wasm/assemblyscript
       entities:
         - Conversion
-        - OwnerUpdate
         - Token
         - SmartToken
         - PoolToken
