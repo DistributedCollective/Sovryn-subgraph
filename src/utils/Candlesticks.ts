@@ -57,6 +57,7 @@ export function updateCandleSticks(event: ConversionEventForSwap): void {
   } else {
     // TODO: handle a case where neither side of the conversion is WRBTC
     log.warning('Candlesticks unHandled Conversion - fromToken: {}, toToken {}', [event.fromToken.toHex(), event.toToken.toHex()])
+    return
   }
 
   oldPrice = baseToken.prevPriceBtc
