@@ -12,6 +12,7 @@ import { version2Block } from '../blockNumbers/blockNumbers'
 import { ConversionEventForSwap } from './Swap'
 import { decimalize } from './Token'
 import { decimal } from '@protofire/subgraph-toolkit'
+import {WRBTCAddress} from '../contracts/contracts'
 
 export class IGetLiquidityPool {
   liquidityPool: LiquidityPool
@@ -26,41 +27,47 @@ export function createAndReturnLiquidityPool(
 ): IGetLiquidityPool {
   let isNew = false
   let liquidityPool = LiquidityPool.load(converterAddress.toHex())
+  /** TODO: Testnet contracts are randomly deployed with new/old abis. To fix this, don't use the block deployed at number, try to call the protocolFeeTokensHeld method
+   * If it is reverted, use old abi
+   */
   if (liquidityPool === null) {
     liquidityPool = new LiquidityPool(converterAddress.toHex())
     const type = getPoolType(converterAddress)
     liquidityPool.activated = false
-    if (type === 1 && createdAtBlockNumber <= version2Block) {
-      LiquidityPoolV1ConverterTemplate.create(converterAddress)
-      liquidityPool.type = 1
-      let converterContract = LiquidityPoolV1ConverterContract.bind(converterAddress)
-      let converterOwnerResult = converterContract.try_owner()
-      if (!converterOwnerResult.reverted) {
-        liquidityPool.owner = converterOwnerResult.value.toHex()
-      }
-      let converterMaxConversionFeeResult = converterContract.try_maxConversionFee()
-      if (!converterMaxConversionFeeResult.reverted) {
-        liquidityPool.maxConversionFee = converterMaxConversionFeeResult.value
-      }
-      let conversionFee = converterContract.try_conversionFee()
-      if (!conversionFee.reverted) {
-        liquidityPool.conversionFee = conversionFee.value
-      }
-    } else if (type === 1 && createdAtBlockNumber > version2Block) {
-      LiquidityPoolV1ConverterTemplate_V2.create(converterAddress)
-      liquidityPool.type = 1
-      let converterContract = LiquidityPoolV1ConverterContract_V2.bind(converterAddress)
-      let converterOwnerResult = converterContract.try_owner()
-      if (!converterOwnerResult.reverted) {
-        liquidityPool.owner = converterOwnerResult.value.toHex()
-      }
-      let converterMaxConversionFeeResult = converterContract.try_maxConversionFee()
-      if (!converterMaxConversionFeeResult.reverted) {
-        liquidityPool.maxConversionFee = converterMaxConversionFeeResult.value
-      }
-      let conversionFee = converterContract.try_conversionFee()
-      if (!conversionFee.reverted) {
-        liquidityPool.conversionFee = conversionFee.value
+    if (type === 1) {
+      const isFeeSplit = isFeeSplitAbi(converterAddress)
+      if(!isFeeSplit) {
+        LiquidityPoolV1ConverterTemplate.create(converterAddress)
+        liquidityPool.type = 1
+        let converterContract = LiquidityPoolV1ConverterContract.bind(converterAddress)
+        let converterOwnerResult = converterContract.try_owner()
+        if (!converterOwnerResult.reverted) {
+          liquidityPool.owner = converterOwnerResult.value.toHex()
+        }
+        let converterMaxConversionFeeResult = converterContract.try_maxConversionFee()
+        if (!converterMaxConversionFeeResult.reverted) {
+          liquidityPool.maxConversionFee = converterMaxConversionFeeResult.value
+        }
+        let conversionFee = converterContract.try_conversionFee()
+        if (!conversionFee.reverted) {
+          liquidityPool.conversionFee = conversionFee.value
+        }
+      } else {
+        LiquidityPoolV1ConverterTemplate_V2.create(converterAddress)
+        liquidityPool.type = 1
+        let converterContract = LiquidityPoolV1ConverterContract_V2.bind(converterAddress)
+        let converterOwnerResult = converterContract.try_owner()
+        if (!converterOwnerResult.reverted) {
+          liquidityPool.owner = converterOwnerResult.value.toHex()
+        }
+        let converterMaxConversionFeeResult = converterContract.try_maxConversionFee()
+        if (!converterMaxConversionFeeResult.reverted) {
+          liquidityPool.maxConversionFee = converterMaxConversionFeeResult.value
+        }
+        let conversionFee = converterContract.try_conversionFee()
+        if (!conversionFee.reverted) {
+          liquidityPool.conversionFee = conversionFee.value
+        }
       }
     } else if (type === 2) {
       LiquidityPoolV2ConverterTemplate.create(converterAddress)
@@ -88,6 +95,16 @@ export function createAndReturnLiquidityPool(
     isNew = true
   }
   return { liquidityPool, isNew }
+}
+
+function isFeeSplitAbi(address: Address): boolean {
+  let converterContract = LiquidityPoolV1ConverterContract_V2.bind(address)
+  let protocolFeeTokensHeldResult = converterContract.try_protocolFeeTokensHeld(Address.fromString(WRBTCAddress))
+  if(protocolFeeTokensHeldResult.reverted) {
+    return false
+  } else {
+    return true
+  }
 }
 
 function getPoolType(address: Address): number {
