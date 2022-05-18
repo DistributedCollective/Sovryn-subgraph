@@ -84,6 +84,7 @@ export function updatePricing(event: ConversionEventForSwap): void {
       btcAmount = event.toAmount
     } else {
       /** TODO: Handle case where neither token is rBTC for when AMM pools with non-rBTC tokens are introduced */
+      return
     }
 
     /** IF SWAP IS BTC/USDT: Update lastPriceUsd on BTC */
