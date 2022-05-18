@@ -247,7 +247,7 @@ function handleConversion(event: IConversionEvent): void {
   entity._protocolFee = protocolFee
   entity.transaction = event.transaction.id
   entity.timestamp = event.transaction.timestamp
-  entity.emittedBy = event.liquidityPool
+  entity.emittedBy = event.liquidityPool.toHexString()
   entity.blockNumber = event.transaction.blockNumber
   entity.save()
 
