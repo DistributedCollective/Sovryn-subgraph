@@ -56,7 +56,7 @@ type LendingHistoryItem @entity {
   The underlying asset for this pool (eg USDT for the iUSDT pool)
   """
   asset: Token 
-  amount: BigDecimal! #TODO: Change to BigDecimal
+  amount: BigDecimal!
   loanTokenAmount: BigDecimal!
   transaction: Transaction!
   emittedBy: String!
