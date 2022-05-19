@@ -275,11 +275,12 @@ function handleConversion(event: IConversionEvent): void {
   }
 }
 
+/** For debugging: Emitted from SOV pool at 2425895 */
 export function handleWithdrawFees(event: WithdrawFeesEvent): void {
   let liquidityPool = LiquidityPool.load(event.address.toHexString())
   let token = Token.load(event.params.token.toHexString())
   if (liquidityPool !== null && token !== null) {
     const feeAmount = decimal.fromBigInt(event.params.protocolFeeAmount, token.decimals)
-    withdrawFeesFromPool(liquidityPool, token, feeAmount)
+    decrementPoolBalance(liquidityPool, event.params.token, feeAmount)
   }
 }
