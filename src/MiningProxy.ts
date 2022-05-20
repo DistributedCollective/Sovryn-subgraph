@@ -1,5 +1,5 @@
 import { PoolTokenAdded, PoolTokenUpdated, RewardClaimed as RewardClaimedEvent } from '../generated/MiningProxy/MiningProxy'
-import { UserRewardsEarnedHistory, RewardsEarnedHistoryItem, LiquidityMiningGlobal, LiquidityMiningAllocationPoint } from '../generated/schema'
+import { UserRewardsEarnedHistory, RewardsEarnedHistoryItem, LiquidityMiningGlobal, LiquidityMiningAllocationPoint, LendingPool, SmartToken } from '../generated/schema'
 import { MiningProxy } from '../generated/MiningProxy/MiningProxy'
 import { createAndReturnTransaction } from './utils/Transaction'
 import { createAndReturnUser } from './utils/User'
@@ -91,6 +91,15 @@ function createAndReturnLiquidityMiningAllocation(
     allocationEntity.poolTokenUpdatedBlock = blockNumber
     allocationEntity.poolTokenAddedTimestamp = timestamp
     allocationEntity.rewardPerBlock = calculateRewardPerBlock(global.totalRewardPerBlock, allocationPoint, global.totalAllocationPoint)
+    /** Check if the pool token is for a lending or amm pool */
+    let smartTokenEntity = SmartToken.load(token.toHexString())
+    let lendingPoolEntity = LendingPool.load(token.toHexString())
+    if(smartTokenEntity !== null) {
+      allocationEntity.ammPoolToken = token.toHexString()
+    }
+    if(lendingPoolEntity !== null) {
+      allocationEntity.lendingPoolToken = token.toHexString()
+    }
     allocationEntity.save()
     return allocationEntity
   }

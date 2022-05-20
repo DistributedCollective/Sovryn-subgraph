@@ -53,6 +53,8 @@ type LiquidityMiningAllocationPoint @entity {
   Calculated as (totalRewardPerBlock * allocationPoint) / totalAllocationPoint
   """
   rewardPerBlock: BigDecimal!
+  ammPoolToken: SmartToken
+  lendingPoolToken: LendingPool
   poolTokenAddedTimestamp: Int!
   poolTokenUpdatedTImestamp: Int!
   poolTokenAddedBlock: Int!
