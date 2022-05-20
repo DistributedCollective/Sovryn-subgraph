@@ -577,6 +577,10 @@ dataSources:
       eventHandlers:
         - event: RewardClaimed(indexed address,indexed address,uint256)
           handler: handleRewardClaimed
+        - event: PoolTokenAdded(indexed address,indexed address,uint256)
+          handler: handlePoolTokenAdded
+        - event: PoolTokenUpdated(indexed address,indexed address,uint256,uint256)
+          handler: handlePoolTokenUpdated
       file: ./src/MiningProxy.ts
 
   # Staking Reward

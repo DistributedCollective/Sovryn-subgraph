@@ -118,8 +118,6 @@ function getPoolType(address: Address): number {
   return type
 }
 
-/** TODO: Can we make these methods into one generic method for incrementing / decrementing balances? */
-
 /** Called on Conversion */
 export function updatePoolBalanceFromConversion(params: ConversionEventForSwap, liquidityPool: LiquidityPool): void {
   /** For from token, increment balance */
