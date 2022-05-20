@@ -23,10 +23,9 @@ import { BigInt, dataSource, Address } from '@graphprotocol/graph-ts'
 import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnPoolToken } from './utils/PoolToken'
 import { updateVolumes } from './utils/Volumes'
-import { liquidityPoolV1ChangeBlock } from './contracts/contracts'
 import { updateCandleSticks } from './utils/Candlesticks'
 import { LiquidityHistoryType } from './utils/types'
-import { decrementPoolBalance, incrementPoolBalance, updatePoolBalanceFromConversion, withdrawFeesFromPool } from './utils/LiquidityPool'
+import { decrementPoolBalance, incrementPoolBalance } from './utils/LiquidityPool'
 import { updateLiquidityHistory } from './utils/UserLiquidityHistory'
 import { decimal } from '@protofire/subgraph-toolkit'
 
@@ -98,39 +97,19 @@ export function handleActivation(event: ActivationEvent): void {
     }
 
     if (event.params._type == 1) {
-      /** The liquidityPoolV1ChangeBlock is where the abi changes to include the protocolFee */
-      if (event.block.number < BigInt.fromI32(liquidityPoolV1ChangeBlock)) {
-        const contract = LiquidityPoolV1Contract.bind(event.address)
-        let reserveTokenCountResult = contract.try_reserveTokenCount()
-        if (!reserveTokenCountResult.reverted) {
-          for (let i = 0; i < reserveTokenCountResult.value; i++) {
-            let reserveTokenResult = contract.try_reserveTokens(BigInt.fromI32(i))
-            if (!reserveTokenResult.reverted) {
-              createAndReturnToken(reserveTokenResult.value, event.address, event.params._anchor)
-              createAndReturnPoolToken(event.params._anchor, event.address, reserveTokenResult.value)
-            }
-            if (i == 0) {
-              liquidityPool.token0 = reserveTokenResult.value.toHexString()
-            } else if (i == 1) {
-              liquidityPool.token1 = reserveTokenResult.value.toHexString()
-            }
+      const contract = LiquidityPoolV1Contract.bind(event.address)
+      let reserveTokenCountResult = contract.try_reserveTokenCount()
+      if (!reserveTokenCountResult.reverted) {
+        for (let i = 0; i < reserveTokenCountResult.value; i++) {
+          let reserveTokenResult = contract.try_reserveTokens(BigInt.fromI32(i))
+          if (!reserveTokenResult.reverted) {
+            createAndReturnToken(reserveTokenResult.value, event.address, event.params._anchor)
+            createAndReturnPoolToken(event.params._anchor, event.address, reserveTokenResult.value)
           }
-        }
-      } else {
-        const contract = LiquidityPoolV1ConverterProtocolFeeContract.bind(event.address)
-        let reserveTokenCountResult = contract.try_reserveTokenCount()
-        if (!reserveTokenCountResult.reverted) {
-          for (let i = 0; i < reserveTokenCountResult.value; i++) {
-            let reserveTokenResult = contract.try_reserveTokens(BigInt.fromI32(i))
-            if (!reserveTokenResult.reverted) {
-              createAndReturnToken(reserveTokenResult.value, event.address, event.params._anchor)
-              createAndReturnPoolToken(event.params._anchor, event.address, reserveTokenResult.value)
-            }
-            if (i == 0) {
-              liquidityPool.token0 = reserveTokenResult.value.toHexString()
-            } else if (i == 1) {
-              liquidityPool.token1 = reserveTokenResult.value.toHexString()
-            }
+          if (i == 0) {
+            liquidityPool.token0 = reserveTokenResult.value.toHexString()
+          } else if (i == 1) {
+            liquidityPool.token1 = reserveTokenResult.value.toHexString()
           }
         }
       }

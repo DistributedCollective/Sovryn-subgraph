@@ -8,11 +8,10 @@ import {
   LiquidityPoolV2Converter as LiquidityPoolV2ConverterTemplate,
   LiquidityPoolV1ConverterProtocolFee as LiquidityPoolV1ConverterTemplate_V2,
 } from '../../generated/templates'
-import { version2Block } from '../blockNumbers/blockNumbers'
 import { ConversionEventForSwap } from './Swap'
 import { decimalize } from './Token'
 import { decimal } from '@protofire/subgraph-toolkit'
-import {WRBTCAddress} from '../contracts/contracts'
+import { WRBTCAddress } from '../contracts/contracts'
 
 export class IGetLiquidityPool {
   liquidityPool: LiquidityPool
@@ -27,7 +26,7 @@ export function createAndReturnLiquidityPool(
 ): IGetLiquidityPool {
   let isNew = false
   let liquidityPool = LiquidityPool.load(converterAddress.toHex())
-  /** TODO: Testnet contracts are randomly deployed with new/old abis. To fix this, don't use the block deployed at number, try to call the protocolFeeTokensHeld method
+  /** To see if a contract was deployed with the fee split abi, try to call the protocolFeeTokensHeld method
    * If it is reverted, use old abi
    */
   if (liquidityPool === null) {
@@ -36,7 +35,7 @@ export function createAndReturnLiquidityPool(
     liquidityPool.activated = false
     if (type === 1) {
       const isFeeSplit = isFeeSplitAbi(converterAddress)
-      if(!isFeeSplit) {
+      if (!isFeeSplit) {
         LiquidityPoolV1ConverterTemplate.create(converterAddress)
         liquidityPool.type = 1
         let converterContract = LiquidityPoolV1ConverterContract.bind(converterAddress)
@@ -100,7 +99,7 @@ export function createAndReturnLiquidityPool(
 function isFeeSplitAbi(address: Address): boolean {
   let converterContract = LiquidityPoolV1ConverterContract_V2.bind(address)
   let protocolFeeTokensHeldResult = converterContract.try_protocolFeeTokensHeld(Address.fromString(WRBTCAddress))
-  if(protocolFeeTokensHeldResult.reverted) {
+  if (protocolFeeTokensHeldResult.reverted) {
     return false
   } else {
     return true
@@ -116,25 +115,6 @@ function getPoolType(address: Address): number {
   }
 
   return type
-}
-
-/** Called on Conversion */
-export function updatePoolBalanceFromConversion(params: ConversionEventForSwap, liquidityPool: LiquidityPool): void {
-  /** For from token, increment balance */
-  if (liquidityPool.token0 == params.fromToken.toHexString()) {
-    liquidityPool.token0Balance = liquidityPool.token0Balance.plus(params.fromAmount)
-  } else if (liquidityPool.token1 == params.fromToken.toHexString()) {
-    liquidityPool.token1Balance = liquidityPool.token1Balance.plus(params.fromAmount)
-  }
-
-  /** For to token, decrement balance. LP Fees are removed in LiquidityRemoved events. TODO: handle when protocol fees are removed */
-  if (liquidityPool.token0 == params.toToken.toHexString()) {
-    liquidityPool.token0Balance = liquidityPool.token0Balance.minus(params.toAmount)
-  } else if (liquidityPool.token1 == params.toToken.toHexString()) {
-    liquidityPool.token1Balance = liquidityPool.token1Balance.minus(params.toAmount)
-  }
-
-  liquidityPool.save()
 }
 
 export function incrementPoolBalance(liquidityPool: LiquidityPool, token: Address, amount: BigDecimal): LiquidityPool {
@@ -155,24 +135,4 @@ export function decrementPoolBalance(liquidityPool: LiquidityPool, token: Addres
   }
   liquidityPool.save()
   return liquidityPool
-}
-
-/** Called on LiquidityAdded or LiquidityRemoved */
-export function replaceLiquidityPoolBalance(liquidityPool: LiquidityPool, token: string, newBalance: BigDecimal): void {
-  if (liquidityPool.token0 == token) {
-    liquidityPool.token0Balance = newBalance
-  } else if (liquidityPool.token1 == token) {
-    liquidityPool.token1Balance = newBalance
-  }
-  liquidityPool.save()
-}
-
-/** Called on WithdrawFees */
-export function withdrawFeesFromPool(liquidityPool: LiquidityPool, token: Token, feeAmount: BigDecimal): void {
-  if (liquidityPool.token0 == token.id) {
-    liquidityPool.token0Balance = liquidityPool.token0Balance.minus(feeAmount)
-  } else if (liquidityPool.token1 == token.id) {
-    liquidityPool.token1Balance = liquidityPool.token1Balance.minus(feeAmount)
-  }
-  liquidityPool.save()
 }

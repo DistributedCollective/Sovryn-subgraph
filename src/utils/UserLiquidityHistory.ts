@@ -1,7 +1,6 @@
-import { BigInt, BigDecimal, dataSource, Address } from '@graphprotocol/graph-ts'
-import { UserLiquidityHistory, LiquidityHistoryItem, Conversion, LiquidityPool, LiquidityPoolToken, Token } from '../../generated/schema'
-import { decrementPoolBalance, incrementPoolBalance, replaceLiquidityPoolBalance } from './LiquidityPool'
-import { decimalize } from './Token'
+import { BigInt, BigDecimal, Address } from '@graphprotocol/graph-ts'
+import { UserLiquidityHistory, LiquidityHistoryItem, LiquidityPool, LiquidityPoolToken } from '../../generated/schema'
+import { decrementPoolBalance, incrementPoolBalance } from './LiquidityPool'
 import { LiquidityHistoryType } from './types'
 
 class IUserLiquidityHistory {
