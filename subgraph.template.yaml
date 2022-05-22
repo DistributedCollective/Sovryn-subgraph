@@ -103,6 +103,8 @@ dataSources:
       eventHandlers:
         - event: SmartTokenAdded(indexed address)
           handler: handleSmartTokenAdded
+        - event: SmartTokenRemoved(indexed address)
+          handler: handleSmartTokenRemoved
       file: ./src/ConverterRegistry.ts
 
   # ISovryn
