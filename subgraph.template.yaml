@@ -673,7 +673,51 @@ dataSources:
         - event: OrderCreated(indexed bytes32,(address,address,address,uint256,uint256,address,uint256,uint256,uint8,bytes32,bytes32),uint256)
           handler: handleOrderCreated
       file: ./src/Orderbook.ts
-  
+
+  - kind: ethereum/contract
+    name: FastBTCBridge
+    network: {{network}}
+    source:
+      address: '{{FastBTCBridge.address}}'
+      abi: FastBTCBridge
+      startBlock: {{FastBTCBridge.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - BitcoinTransferBatchSending
+        - BitcoinTransferFeeChanged
+        - BitcoinTransferStatusUpdated
+        - Frozen
+        - NewBitcoinTransfer
+        - Paused
+        - Unfrozen
+        - Unpaused
+      abis:
+        - name: FastBTCBridge
+          file: ./abis/FastBTCBridge.json
+      eventHandlers:
+        
+        - event: BitcoinTransferBatchSending(bytes32,uint8)
+          handler: handleBitcoinTransferBatchSending
+        - event: BitcoinTransferFeeChanged(uint256,uint256)
+          handler: handleBitcoinTransferFeeChanged
+        - event: BitcoinTransferStatusUpdated(indexed bytes32,uint8)
+          handler: handleBitcoinTransferStatusUpdated
+        - event: Frozen(address)
+          handler: handleFrozen
+        - event: NewBitcoinTransfer(indexed bytes32,string,uint256,uint256,uint256,indexed address)
+          handler: handleNewBitcoinTransfer
+        - event: Paused(address)
+          handler: handlePaused
+        - event: Unfrozen(address)
+          handler: handleUnfrozen
+        - event: Unpaused(address)
+          handler: handleUnpaused
+      file: ./src/FastBTCBridge.ts
+
+
 templates:
   # LiquidityPoolV1Converter
   - kind: ethereum/contract
