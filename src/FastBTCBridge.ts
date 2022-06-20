@@ -18,6 +18,10 @@ import {
   Unfrozen,
   Unpaused,
 } from '../generated/schema'
+import { BitcoinTransferStatus, createBitcoinTransfer, loadBitcoinTransfer } from './utils/BitcoinTransfer'
+
+import { createAndReturnTransaction } from './utils/Transaction'
+
 export function handleBitcoinTransferBatchSending(event: BitcoinTransferBatchSendingEvent): void {
   let entity = new BitcoinTransferBatchSending(event.transaction.hash.toHex())
   entity.bitcoinTxHash = event.params.bitcoinTxHash
@@ -49,6 +53,13 @@ export function handleBitcoinTransferStatusUpdated(event: BitcoinTransferStatusU
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  let bitcoinTransferBatchSending = BitcoinTransferBatchSending.load(event.transaction.hash.toHex())
+  const bitcoinTransfer = loadBitcoinTransfer(event.params.transferId)
+  bitcoinTransfer.status = BitcoinTransferStatus.getStatus(event.params.newStatus)
+  bitcoinTransfer.bitcoinTxHash = bitcoinTransferBatchSending != null ? bitcoinTransferBatchSending.bitcoinTxHash : bitcoinTransfer.bitcoinTxHash
+  bitcoinTransfer.updatedAtTx = event.transaction.hash.toHex()
+  bitcoinTransfer.save()
 }
 
 export function handleFrozen(event: FrozenEvent): void {

@@ -70,3 +70,26 @@ type Unpaused @entity {
   transaction: Transaction!
 }
 
+enum BitcoinTransferStatus {
+  NOT_APPLICABLE # the transfer slot has not been initialized
+  NEW # the transfer was initiated
+  SENDING # the federators have approved this transfer as part of a transfer batch
+  MINED # the transfer was confirmedly mined in Bitcoin blockchain
+  REFUNDED # the transfer was refunded
+  RECLAIMED # the transfer was reclaimed by the user
+}
+
+type BitcoinTransfer @entity {
+  id: ID! # transferId
+  btcAddress: String!
+  nonce: Int!
+  amountSatoshi: BigInt!
+  feeSatoshi: BigInt!
+  totalAmountSatoshi: BigInt!
+  user: User! # user
+  status: BitcoinTransferStatus!
+  bitcoinTxHash: Bytes!
+  createdAtTx: Transaction!
+  updatedAtTx: Transaction!
+}
+
