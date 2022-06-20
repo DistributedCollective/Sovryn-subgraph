@@ -122,6 +122,6 @@
     "FastBTCBridge": {
         "network": "mainnet",
         "address": "0x0D5006330289336ebdF9d0AC9E0674f91b4851eA",
-        "startBlock": 2417524
+        "startBlock": 4029878
     }
 }
