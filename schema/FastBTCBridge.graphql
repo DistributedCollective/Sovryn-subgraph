@@ -83,13 +83,28 @@ type BitcoinTransfer @entity {
   id: ID! # transferId
   btcAddress: String!
   nonce: Int!
-  amountSatoshi: BigInt!
-  feeSatoshi: BigInt!
-  totalAmountSatoshi: BigInt!
+  amountBTC: BigDecimal!
+  feeBTC: BigDecimal!
+  totalAmountBTC: BigDecimal!
   user: User! # user
   status: BitcoinTransferStatus!
   bitcoinTxHash: Bytes!
+  createdAtTimestamp: Int!
+  createdAtBlockNumber: Int!
   createdAtTx: Transaction!
+  updatedAtTimestamp: Int!
+  updatedAtBlockNumber: Int!
   updatedAtTx: Transaction!
 }
 
+type BidirectionalBridgeStat @entity {
+  id: ID!
+  user: User
+  totalAmountBTCInitialized: BigDecimal!
+  totalAmountBTCSending: BigDecimal!
+  totalAmountBTCMined: BigDecimal!
+  totalFeesBTC: BigDecimal!
+  totalAmountBTCRefunded: BigDecimal!
+  createdAtTx: Transaction!
+  updatedAtTx: Transaction!
+}

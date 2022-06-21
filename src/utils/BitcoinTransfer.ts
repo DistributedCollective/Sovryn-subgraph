@@ -1,5 +1,5 @@
-import { Bytes } from '@graphprotocol/graph-ts'
-import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
+import { BigDecimal, Bytes, BigInt } from '@graphprotocol/graph-ts'
+import { decimal } from '@protofire/subgraph-toolkit'
 import { NewBitcoinTransfer as NewBitcoinTransferEvent } from '../../generated/FastBTCBridge/FastBTCBridge'
 import { BitcoinTransfer } from '../../generated/schema'
 import { createAndReturnTransaction } from './Transaction'
@@ -25,14 +25,17 @@ export const createBitcoinTransfer = (event: NewBitcoinTransferEvent): BitcoinTr
     bitcoinTransfer = new BitcoinTransfer(event.params.transferId.toHex())
     bitcoinTransfer.btcAddress = event.params.btcAddress
     bitcoinTransfer.nonce = event.params.nonce.toI32()
-    bitcoinTransfer.amountSatoshi = event.params.amountSatoshi
-    bitcoinTransfer.feeSatoshi = event.params.feeSatoshi
-    bitcoinTransfer.totalAmountSatoshi = event.params.amountSatoshi.plus(event.params.feeSatoshi)
+    bitcoinTransfer.amountBTC = satoshiToBTC(event.params.amountSatoshi)
+    bitcoinTransfer.feeBTC = satoshiToBTC(event.params.feeSatoshi)
+    bitcoinTransfer.totalAmountBTC = satoshiToBTC(event.params.amountSatoshi.plus(event.params.feeSatoshi))
     const user = createAndReturnUser(event.params.rskAddress, event.block.timestamp)
     bitcoinTransfer.user = event.params.rskAddress.toHex()
     bitcoinTransfer.status = BitcoinTransferStatus.getStatus(1)
-    // bitcoinTransfer.bitcoinTxHash = Bytes.fromByteArray(Bytes.fromHexString(ZERO_ADDRESS))
+    bitcoinTransfer.createdAtTimestamp = event.block.timestamp.toI32()
+    bitcoinTransfer.createdAtBlockNumber = event.block.number.toI32()
     bitcoinTransfer.createdAtTx = event.transaction.hash.toHex()
+    bitcoinTransfer.updatedAtTimestamp = event.block.timestamp.toI32()
+    bitcoinTransfer.updatedAtBlockNumber = event.block.number.toI32()
     bitcoinTransfer.updatedAtTx = event.transaction.hash.toHex()
   }
   bitcoinTransfer.save()
@@ -45,4 +48,8 @@ export const loadBitcoinTransfer = (transferId: Bytes): BitcoinTransfer => {
     bitcoinTransfer = new BitcoinTransfer(transferId.toHex())
   }
   return bitcoinTransfer
+}
+
+export function satoshiToBTC(satoshi: BigInt): BigDecimal {
+  return decimal.fromBigInt(satoshi, 8)
 }

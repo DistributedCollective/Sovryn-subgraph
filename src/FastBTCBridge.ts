@@ -18,6 +18,7 @@ import {
   Unfrozen,
   Unpaused,
 } from '../generated/schema'
+import { aggregateBidirectionalBridgeStat, createBidirectionalBridgeStat } from './utils/BidirectionalBridgeStats'
 import { BitcoinTransferStatus, createBitcoinTransfer, loadBitcoinTransfer } from './utils/BitcoinTransfer'
 
 import { createAndReturnTransaction } from './utils/Transaction'
@@ -55,11 +56,18 @@ export function handleBitcoinTransferStatusUpdated(event: BitcoinTransferStatusU
   entity.save()
 
   let bitcoinTransferBatchSending = BitcoinTransferBatchSending.load(event.transaction.hash.toHex())
+
   const bitcoinTransfer = loadBitcoinTransfer(event.params.transferId)
   bitcoinTransfer.status = BitcoinTransferStatus.getStatus(event.params.newStatus)
   bitcoinTransfer.bitcoinTxHash = bitcoinTransferBatchSending != null ? bitcoinTransferBatchSending.bitcoinTxHash : bitcoinTransfer.bitcoinTxHash
+
+  bitcoinTransfer.updatedAtBlockNumber = event.block.number.toI32()
+  bitcoinTransfer.updatedAtTimestamp = event.block.timestamp.toI32()
   bitcoinTransfer.updatedAtTx = event.transaction.hash.toHex()
   bitcoinTransfer.save()
+
+  aggregateBidirectionalBridgeStat('0', event.params.newStatus, bitcoinTransfer, transaction)
+  aggregateBidirectionalBridgeStat(bitcoinTransfer.user, event.params.newStatus, bitcoinTransfer, transaction)
 }
 
 export function handleFrozen(event: FrozenEvent): void {
@@ -86,6 +94,17 @@ export function handleNewBitcoinTransfer(event: NewBitcoinTransferEvent): void {
   entity.emittedBy = event.address
   entity.save()
 
+  const bitcoinTransfer = createBitcoinTransfer(event)
+
+  const bidirectionalBridgeStat = createBidirectionalBridgeStat('0', transaction)
+  bidirectionalBridgeStat.totalAmountBTCInitialized = bidirectionalBridgeStat.totalAmountBTCInitialized.plus(bitcoinTransfer.totalAmountBTC)
+  bidirectionalBridgeStat.updatedAtTx = transaction.id
+  bidirectionalBridgeStat.save()
+
+  const bidirectionalBridgeTraderStat = createBidirectionalBridgeStat(event.params.rskAddress.toHex(), transaction)
+  bidirectionalBridgeTraderStat.totalAmountBTCInitialized = bidirectionalBridgeTraderStat.totalAmountBTCInitialized.plus(bitcoinTransfer.totalAmountBTC)
+  bidirectionalBridgeTraderStat.updatedAtTx = transaction.id
+  bidirectionalBridgeTraderStat.save()
 }
 
 export function handlePaused(event: PausedEvent): void {
