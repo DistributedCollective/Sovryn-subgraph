@@ -5,6 +5,8 @@ import { BitcoinTransfer } from '../../generated/schema'
 import { createAndReturnTransaction } from './Transaction'
 import { createAndReturnUser } from './User'
 
+const BTC_DECIMAL = 8
+
 export class BitcoinTransferStatus {
   static NOT_APPLICABLE: string = 'NOT_APPLICABLE'
   static NEW: string = 'NEW'
@@ -51,5 +53,5 @@ export const loadBitcoinTransfer = (transferId: Bytes): BitcoinTransfer => {
 }
 
 export function satoshiToBTC(satoshi: BigInt): BigDecimal {
-  return decimal.fromBigInt(satoshi, 8)
+  return decimal.fromBigInt(satoshi, BTC_DECIMAL)
 }
