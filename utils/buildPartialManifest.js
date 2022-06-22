@@ -12,7 +12,8 @@ const manifestSections = {
     amm: ["ConverterRegistry", "ConverterFactory", "LiquidityPoolV1Converter", "LiquidityPoolV2Converter", "LiquidityPoolV1ConverterProtocolFee", "SmartToken"],
     governance: [],
     trading: [],
-    bridge: ["FastBTCBridge"]
+    bridge: ["FastBTCBridge"],
+    sovrynProtocol: [...amm, "ISovryn"]
 }
 
 const pruneManifest = (section) => {
