@@ -33,19 +33,6 @@ type Frozen @entity {
   transaction: Transaction!
 }
 
-type NewBitcoinTransfer @entity {
-  id: ID!
-  transferId: Bytes! # bytes32
-  btcAddress: String! # string
-  nonce: BigInt! # uint256
-  amountSatoshi: BigInt! # uint256
-  feeSatoshi: BigInt! # uint256
-  rskAddress: Bytes! # address
-  timestamp: Int!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
 enum BitcoinTransferStatus {
   NOT_APPLICABLE # the transfer slot has not been initialized
   NEW # the transfer was initiated

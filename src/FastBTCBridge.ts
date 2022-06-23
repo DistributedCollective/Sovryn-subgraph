@@ -4,7 +4,7 @@ import {
   BitcoinTransferStatusUpdated as BitcoinTransferStatusUpdatedEvent,
   NewBitcoinTransfer as NewBitcoinTransferEvent,
 } from '../generated/FastBTCBridge/FastBTCBridge'
-import { BitcoinTransferBatchSending, BitcoinTransferFeeChanged, BitcoinTransferStatusUpdated, NewBitcoinTransfer } from '../generated/schema'
+import { BitcoinTransferBatchSending, BitcoinTransferFeeChanged, BitcoinTransferStatusUpdated } from '../generated/schema'
 import { aggregateBidirectionalBridgeStat, createBidirectionalBridgeStat } from './utils/BidirectionalBridgeStats'
 import { BitcoinTransferStatus, createBitcoinTransfer, loadBitcoinTransfer } from './utils/BitcoinTransfer'
 
@@ -58,18 +58,7 @@ export function handleBitcoinTransferStatusUpdated(event: BitcoinTransferStatusU
 }
 
 export function handleNewBitcoinTransfer(event: NewBitcoinTransferEvent): void {
-  let entity = new NewBitcoinTransfer(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.transferId = event.params.transferId
-  entity.btcAddress = event.params.btcAddress
-  entity.nonce = event.params.nonce
-  entity.amountSatoshi = event.params.amountSatoshi
-  entity.feeSatoshi = event.params.feeSatoshi
-  entity.rskAddress = event.params.rskAddress
   let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
 
   const bitcoinTransfer = createBitcoinTransfer(event)
 
