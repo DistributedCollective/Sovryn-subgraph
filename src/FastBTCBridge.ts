@@ -2,22 +2,9 @@ import {
   BitcoinTransferBatchSending as BitcoinTransferBatchSendingEvent,
   BitcoinTransferFeeChanged as BitcoinTransferFeeChangedEvent,
   BitcoinTransferStatusUpdated as BitcoinTransferStatusUpdatedEvent,
-  Frozen as FrozenEvent,
   NewBitcoinTransfer as NewBitcoinTransferEvent,
-  Paused as PausedEvent,
-  Unfrozen as UnfrozenEvent,
-  Unpaused as UnpausedEvent,
 } from '../generated/FastBTCBridge/FastBTCBridge'
-import {
-  BitcoinTransferBatchSending,
-  BitcoinTransferFeeChanged,
-  BitcoinTransferStatusUpdated,
-  Frozen,
-  NewBitcoinTransfer,
-  Paused,
-  Unfrozen,
-  Unpaused,
-} from '../generated/schema'
+import { BitcoinTransferBatchSending, BitcoinTransferFeeChanged, BitcoinTransferStatusUpdated, NewBitcoinTransfer } from '../generated/schema'
 import { aggregateBidirectionalBridgeStat, createBidirectionalBridgeStat } from './utils/BidirectionalBridgeStats'
 import { BitcoinTransferStatus, createBitcoinTransfer, loadBitcoinTransfer } from './utils/BitcoinTransfer'
 
@@ -70,16 +57,6 @@ export function handleBitcoinTransferStatusUpdated(event: BitcoinTransferStatusU
   aggregateBidirectionalBridgeStat(bitcoinTransfer.user, event.params.newStatus, bitcoinTransfer, transaction)
 }
 
-export function handleFrozen(event: FrozenEvent): void {
-  let entity = new Frozen(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.account = event.params.account
-  let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-}
-
 export function handleNewBitcoinTransfer(event: NewBitcoinTransferEvent): void {
   let entity = new NewBitcoinTransfer(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   entity.transferId = event.params.transferId
@@ -105,34 +82,4 @@ export function handleNewBitcoinTransfer(event: NewBitcoinTransferEvent): void {
   bidirectionalBridgeTraderStat.totalAmountBTCInitialized = bidirectionalBridgeTraderStat.totalAmountBTCInitialized.plus(bitcoinTransfer.totalAmountBTC)
   bidirectionalBridgeTraderStat.updatedAtTx = transaction.id
   bidirectionalBridgeTraderStat.save()
-}
-
-export function handlePaused(event: PausedEvent): void {
-  let entity = new Paused(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.account = event.params.account
-  let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-}
-
-export function handleUnfrozen(event: UnfrozenEvent): void {
-  let entity = new Unfrozen(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.account = event.params.account
-  let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-}
-
-export function handleUnpaused(event: UnpausedEvent): void {
-  let entity = new Unpaused(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.account = event.params.account
-  let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
 }

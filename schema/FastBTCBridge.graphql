@@ -46,30 +46,6 @@ type NewBitcoinTransfer @entity {
   transaction: Transaction!
 }
 
-type Paused @entity {
-  id: ID!
-  account: Bytes! # address
-  timestamp: Int!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type Unfrozen @entity {
-  id: ID!
-  account: Bytes! # address
-  timestamp: Int!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
-type Unpaused @entity {
-  id: ID!
-  account: Bytes! # address
-  timestamp: Int!
-  emittedBy: Bytes! #address
-  transaction: Transaction!
-}
-
 enum BitcoinTransferStatus {
   NOT_APPLICABLE # the transfer slot has not been initialized
   NEW # the transfer was initiated

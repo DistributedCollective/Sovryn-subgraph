@@ -692,11 +692,7 @@ dataSources:
         - BitcoinTransferBatchSending
         - BitcoinTransferFeeChanged
         - BitcoinTransferStatusUpdated
-        - Frozen
         - NewBitcoinTransfer
-        - Paused
-        - Unfrozen
-        - Unpaused
       abis:
         - name: FastBTCBridge
           file: ./abis/FastBTCBridge.json
@@ -708,16 +704,8 @@ dataSources:
           handler: handleBitcoinTransferFeeChanged
         - event: BitcoinTransferStatusUpdated(indexed bytes32,uint8)
           handler: handleBitcoinTransferStatusUpdated
-        - event: Frozen(address)
-          handler: handleFrozen
         - event: NewBitcoinTransfer(indexed bytes32,string,uint256,uint256,uint256,indexed address)
           handler: handleNewBitcoinTransfer
-        - event: Paused(address)
-          handler: handlePaused
-        - event: Unfrozen(address)
-          handler: handleUnfrozen
-        - event: Unpaused(address)
-          handler: handleUnpaused
       file: ./src/FastBTCBridge.ts
 
 
