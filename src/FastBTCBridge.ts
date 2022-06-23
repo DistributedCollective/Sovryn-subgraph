@@ -4,7 +4,7 @@ import {
   BitcoinTransferStatusUpdated as BitcoinTransferStatusUpdatedEvent,
   NewBitcoinTransfer as NewBitcoinTransferEvent,
 } from '../generated/FastBTCBridge/FastBTCBridge'
-import { BitcoinTransferBatchSending, BitcoinTransferFeeChanged, BitcoinTransferStatusUpdated } from '../generated/schema'
+import { BitcoinTransferBatchSending } from '../generated/schema'
 import { aggregateBidirectionalBridgeStat, createBidirectionalBridgeStat } from './utils/BidirectionalBridgeStats'
 import { BitcoinTransferStatus, createBitcoinTransfer, loadBitcoinTransfer } from './utils/BitcoinTransfer'
 
@@ -21,26 +21,10 @@ export function handleBitcoinTransferBatchSending(event: BitcoinTransferBatchSen
   entity.save()
 }
 
-export function handleBitcoinTransferFeeChanged(event: BitcoinTransferFeeChangedEvent): void {
-  let entity = new BitcoinTransferFeeChanged(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.baseFeeSatoshi = event.params.baseFeeSatoshi
-  entity.dynamicFee = event.params.dynamicFee
-  let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-}
+export function handleBitcoinTransferFeeChanged(event: BitcoinTransferFeeChangedEvent): void {}
 
 export function handleBitcoinTransferStatusUpdated(event: BitcoinTransferStatusUpdatedEvent): void {
-  let entity = new BitcoinTransferStatusUpdated(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.transferId = event.params.transferId
-  entity.newStatus = event.params.newStatus
   let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
 
   let bitcoinTransferBatchSending = BitcoinTransferBatchSending.load(event.transaction.hash.toHex())
 

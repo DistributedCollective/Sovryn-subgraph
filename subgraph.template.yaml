@@ -690,9 +690,6 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - BitcoinTransferBatchSending
-        - BitcoinTransferFeeChanged
-        - BitcoinTransferStatusUpdated
-        - NewBitcoinTransfer
       abis:
         - name: FastBTCBridge
           file: ./abis/FastBTCBridge.json
@@ -700,8 +697,8 @@ dataSources:
         
         - event: BitcoinTransferBatchSending(bytes32,uint8)
           handler: handleBitcoinTransferBatchSending
-        - event: BitcoinTransferFeeChanged(uint256,uint256)
-          handler: handleBitcoinTransferFeeChanged
+        # - event: BitcoinTransferFeeChanged(uint256,uint256)
+        #   handler: handleBitcoinTransferFeeChanged
         - event: BitcoinTransferStatusUpdated(indexed bytes32,uint8)
           handler: handleBitcoinTransferStatusUpdated
         - event: NewBitcoinTransfer(indexed bytes32,string,uint256,uint256,uint256,indexed address)
