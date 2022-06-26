@@ -70,7 +70,7 @@ type BitcoinTransfer @entity {
   updatedAtTx: Transaction!
 }
 
-type BidirectionalBridgeStat @entity {
+type FastBTCBridgeStat @entity {
   id: ID!
   user: User
   totalAmountBTCInitialized: BigDecimal!

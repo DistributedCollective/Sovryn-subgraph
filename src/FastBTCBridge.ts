@@ -5,7 +5,7 @@ import {
   NewBitcoinTransfer as NewBitcoinTransferEvent,
 } from '../generated/FastBTCBridge/FastBTCBridge'
 import { BitcoinTransferBatchSending } from '../generated/schema'
-import { aggregateBidirectionalBridgeStat, createBidirectionalBridgeStat } from './utils/BidirectionalBridgeStats'
+import { aggregateFastBTCBridgeStat, createFastBTCBridgeStat } from './utils/FastBTCBridgeStats'
 import { BitcoinTransferStatus, createBitcoinTransfer, loadBitcoinTransfer } from './utils/BitcoinTransfer'
 
 import { createAndReturnTransaction } from './utils/Transaction'
@@ -37,8 +37,8 @@ export function handleBitcoinTransferStatusUpdated(event: BitcoinTransferStatusU
   bitcoinTransfer.updatedAtTx = event.transaction.hash.toHex()
   bitcoinTransfer.save()
 
-  aggregateBidirectionalBridgeStat('0', event.params.newStatus, bitcoinTransfer, transaction)
-  aggregateBidirectionalBridgeStat(bitcoinTransfer.user, event.params.newStatus, bitcoinTransfer, transaction)
+  aggregateFastBTCBridgeStat('0', event.params.newStatus, bitcoinTransfer, transaction)
+  aggregateFastBTCBridgeStat(bitcoinTransfer.user, event.params.newStatus, bitcoinTransfer, transaction)
 }
 
 export function handleNewBitcoinTransfer(event: NewBitcoinTransferEvent): void {
@@ -46,13 +46,13 @@ export function handleNewBitcoinTransfer(event: NewBitcoinTransferEvent): void {
 
   const bitcoinTransfer = createBitcoinTransfer(event)
 
-  const bidirectionalBridgeStat = createBidirectionalBridgeStat('0', transaction)
-  bidirectionalBridgeStat.totalAmountBTCInitialized = bidirectionalBridgeStat.totalAmountBTCInitialized.plus(bitcoinTransfer.totalAmountBTC)
-  bidirectionalBridgeStat.updatedAtTx = transaction.id
-  bidirectionalBridgeStat.save()
+  const FastBTCBridgeStat = createFastBTCBridgeStat('0', transaction)
+  FastBTCBridgeStat.totalAmountBTCInitialized = FastBTCBridgeStat.totalAmountBTCInitialized.plus(bitcoinTransfer.totalAmountBTC)
+  FastBTCBridgeStat.updatedAtTx = transaction.id
+  FastBTCBridgeStat.save()
 
-  const bidirectionalBridgeTraderStat = createBidirectionalBridgeStat(event.params.rskAddress.toHex(), transaction)
-  bidirectionalBridgeTraderStat.totalAmountBTCInitialized = bidirectionalBridgeTraderStat.totalAmountBTCInitialized.plus(bitcoinTransfer.totalAmountBTC)
-  bidirectionalBridgeTraderStat.updatedAtTx = transaction.id
-  bidirectionalBridgeTraderStat.save()
+  const FastBTCBridgeTraderStat = createFastBTCBridgeStat(event.params.rskAddress.toHex(), transaction)
+  FastBTCBridgeTraderStat.totalAmountBTCInitialized = FastBTCBridgeTraderStat.totalAmountBTCInitialized.plus(bitcoinTransfer.totalAmountBTC)
+  FastBTCBridgeTraderStat.updatedAtTx = transaction.id
+  FastBTCBridgeTraderStat.save()
 }

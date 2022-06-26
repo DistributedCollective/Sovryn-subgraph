@@ -66,7 +66,7 @@ type User @entity {
   FastBTCBridge transfers from BTC to RSK
   """
   bitcoinTransfers: [BitcoinTransfer!] @derivedFrom(field: "user")
-  bidirectionalBridgeStats: [BidirectionalBridgeStat!] @derivedFrom(field: "user")
+  fastBTCBridgeStats: [FastBTCBridgeStat!] @derivedFrom(field: "user")
   """
   Transactions initiated by this user
   """
