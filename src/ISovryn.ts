@@ -375,6 +375,8 @@ export function handlePayTradingFee(event: PayTradingFeeEvent): void {
   entity.emittedBy = event.address
   entity.save()
 
+  /** TODO: Update existing loan with positionSize */
+
   let protocolStatsEntity = createAndReturnProtocolStats()
   let userTotalsEntity = createAndReturnUserTotals(event.params.payer)
   let usdVolume = convertToUsd(event.params.token, event.params.amount)
