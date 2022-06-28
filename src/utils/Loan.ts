@@ -5,6 +5,7 @@
 import { BigDecimal, BigInt, Bytes } from '@graphprotocol/graph-ts'
 import { Loan } from '../../generated/schema'
 import { decimal } from '@protofire/subgraph-toolkit'
+import { LoanType } from './types'
 export class LoanStartState {
   loanId: Bytes
   user: Bytes
@@ -35,7 +36,6 @@ export enum LoanActionType {
   NEUTRAL,
 }
 
-/** This is currently very buggy. Convert everything to BigDecimal normal numbers to help with debugging? */
 export function createAndReturnLoan(startParams: LoanStartState): Loan {
   let loanEntity = Loan.load(startParams.loanId.toHexString())
   if (loanEntity == null) {
@@ -64,6 +64,19 @@ export function createAndReturnLoan(startParams: LoanStartState): Loan {
   return loanEntity
 }
 
+function checkTradeForTinyPosition(loan: Loan): Loan {
+  const minimumPositionSize = decimal.fromNumber(0.00025)
+  if (loan.isOpen == false) {
+    return loan
+  }
+
+  /** Check if position size or borrowed amount is less than tiny position */
+  if (loan.positionSize <= minimumPositionSize || loan.borrowedAmount == BigDecimal.zero()) {
+    loan.isOpen = false
+  }
+  return loan
+}
+
 export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
   let loanEntity = Loan.load(params.loanId)
   let eventPnL = BigDecimal.zero()
@@ -71,9 +84,15 @@ export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
     loanEntity.positionSize = loanEntity.positionSize.plus(params.positionSizeChange)
     loanEntity.borrowedAmount = loanEntity.borrowedAmount.plus(params.borrowedAmountChange)
     loanEntity.isOpen = params.isOpen
-    if (params.isOpen == false) {
+
+    if (loanEntity.type == LoanType.Trade) {
+      checkTradeForTinyPosition(loanEntity)
+    }
+
+    if (loanEntity.isOpen == false) {
       loanEntity.endTimestamp = params.timestamp.toI32()
     }
+
     if (loanEntity.positionSize.gt(loanEntity.maximumPositionSize)) {
       loanEntity.maximumPositionSize = loanEntity.positionSize
     }
@@ -94,14 +113,6 @@ export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
       const priceSoldAt = params.rate
       const differenceFromBuyPrice = loanEntity.averageBuyPrice.minus(priceSoldAt)
 
-      // log.debug('DEBUGGING PNL: \nSELL RATE: {} \nLOAN ID: {} \nAMOUNT SOLD: {} \nDIFFERENCE FROM BUY PRICE: {} \nNEW PNL: {}', [
-      //   params.rate.toString(),
-      //   params.loanId.toString(),
-      //   amountSold.toString(),
-      //   differenceFromBuyPrice.toString(),
-      //   newPnL.toString(),
-      // ])
-
       let oldWeightedPrice = loanEntity.totalSold.times(loanEntity.averageSellPrice) // If first time, this is 0
       let newWeightedPrice = amountSold.times(params.rate)
       const newTotalSold = loanEntity.totalSold.plus(amountSold)
@@ -120,7 +131,7 @@ export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
       }
     } else if (params.type == LoanActionType.NEUTRAL) {
       /**
-       * TODO: How does DepositCollateral affect PnL?
+       * TODO: How does DepositCollateral and Rollover affect PnL?
        */
     }
     loanEntity.save()

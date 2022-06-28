@@ -434,7 +434,7 @@ export function handleTrade(event: TradeEvent): void {
   entity.loanId = event.params.loanId.toHexString()
   entity.collateralToken = event.params.collateralToken.toHexString()
   entity.loanToken = event.params.loanToken.toHexString()
-  /** In Collteral tokens */
+  /** In Collateral tokens */
   entity.positionSize = positionSize
   /** In Loan tokens */
   entity.borrowedAmount = borrowedAmount
@@ -464,6 +464,8 @@ export function handleRollover(event: RolloverEvent): void {
   let loan = Loan.load(event.params.loanId.toHexString())
   if (loan != null) {
     loan.nextRollover = event.params.endTimestamp.toI32()
+    loan.positionSize = decimal.fromBigInt(event.params.collateral, DEFAULT_DECIMALS)
+    loan.borrowedAmount = decimal.fromBigInt(event.params.principal, DEFAULT_DECIMALS)
     loan.save()
   }
 
