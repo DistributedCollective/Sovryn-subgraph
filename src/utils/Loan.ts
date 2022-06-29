@@ -64,19 +64,6 @@ export function createAndReturnLoan(startParams: LoanStartState): Loan {
   return loanEntity
 }
 
-function checkTradeForTinyPosition(loan: Loan): Loan {
-  const minimumPositionSize = decimal.fromNumber(0.00025)
-  if (loan.isOpen == false) {
-    return loan
-  }
-
-  /** Check if position size or borrowed amount is less than tiny position */
-  if (loan.positionSize <= minimumPositionSize || loan.borrowedAmount == BigDecimal.zero()) {
-    loan.isOpen = false
-  }
-  return loan
-}
-
 export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
   let loanEntity = Loan.load(params.loanId)
   let eventPnL = BigDecimal.zero()
@@ -84,10 +71,6 @@ export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
     loanEntity.positionSize = loanEntity.positionSize.plus(params.positionSizeChange)
     loanEntity.borrowedAmount = loanEntity.borrowedAmount.plus(params.borrowedAmountChange)
     loanEntity.isOpen = params.isOpen
-
-    if (loanEntity.type == LoanType.Trade) {
-      checkTradeForTinyPosition(loanEntity)
-    }
 
     if (loanEntity.isOpen == false) {
       loanEntity.endTimestamp = params.timestamp.toI32()

@@ -42,6 +42,7 @@ import { convertToUsd } from './utils/Prices'
 import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
 import { createAndReturnLendingPool } from './utils/LendingPool'
 import { RewardsEarnedAction } from './utils/types'
+import { ISovryn as ISovrynContract } from '../generated/ISovryn/ISovryn'
 
 export function handleBorrow(event: BorrowEvent): void {
   createAndReturnTransaction(event)
@@ -170,7 +171,7 @@ export function handleCloseWithSwap(event: CloseWithSwapEvent): void {
     loanId: event.params.loanId.toHexString(),
     borrowedAmountChange: BigDecimal.zero().minus(loanCloseAmount),
     positionSizeChange: BigDecimal.zero().minus(positionCloseSize),
-    isOpen: event.params.currentLeverage.gt(BigInt.zero()) ? true : false,
+    isOpen: event.params.currentLeverage == BigInt.zero() ? false : true,
     rate: exitPrice,
     type: LoanActionType.SELL,
     timestamp: event.block.timestamp,
@@ -375,8 +376,6 @@ export function handlePayTradingFee(event: PayTradingFeeEvent): void {
   entity.emittedBy = event.address
   entity.save()
 
-  /** TODO: Update existing loan with positionSize */
-
   let protocolStatsEntity = createAndReturnProtocolStats()
   let userTotalsEntity = createAndReturnUserTotals(event.params.payer)
   let usdVolume = convertToUsd(event.params.token, event.params.amount)
@@ -388,8 +387,6 @@ export function handlePayTradingFee(event: PayTradingFeeEvent): void {
 
 export function handleSetLoanPool(event: SetLoanPoolEvent): void {
   /** This function creates a new lending pool */
-
-  /** Context not currently working, not sure why */
   let context = new DataSourceContext()
   context.setString('underlyingAsset', event.params.underlying.toHexString())
   LoanTokenTemplate.createWithContext(event.params.loanPool, context)
@@ -466,6 +463,10 @@ export function handleRollover(event: RolloverEvent): void {
     loan.nextRollover = event.params.endTimestamp.toI32()
     loan.positionSize = decimal.fromBigInt(event.params.collateral, DEFAULT_DECIMALS)
     loan.borrowedAmount = decimal.fromBigInt(event.params.principal, DEFAULT_DECIMALS)
+    if (loan.positionSize === BigDecimal.zero() || loan.borrowedAmount === BigDecimal.zero()) {
+      loan.isOpen = false
+      loan.endTimestamp = event.block.timestamp.toI32()
+    }
     loan.save()
   }
 
