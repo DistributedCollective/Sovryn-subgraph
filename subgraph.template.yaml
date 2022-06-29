@@ -148,7 +148,7 @@ dataSources:
           handler: handleCloseWithDeposit
         - event: CloseWithSwap(indexed address,indexed address,indexed bytes32,address,address,address,uint256,uint256,uint256,uint256)
           handler: handleCloseWithSwap
-        - event: DepositCollateral(bytes32,uint256,uint256)
+        - event: DepositCollateral(indexed bytes32,uint256,uint256)
           handler: handleDepositCollateral
         - event: EarnReward(indexed address,indexed address,indexed bytes32,uint256,uint256,uint256)
           handler: handleEarnReward
