@@ -171,7 +171,7 @@ export function handleCloseWithSwap(event: CloseWithSwapEvent): void {
     loanId: event.params.loanId.toHexString(),
     borrowedAmountChange: BigDecimal.zero().minus(loanCloseAmount),
     positionSizeChange: BigDecimal.zero().minus(positionCloseSize),
-    isOpen: event.params.currentLeverage == BigInt.zero() ? false : true,
+    isOpen: event.params.currentLeverage.gt(BigInt.zero()) ? true : false,
     rate: exitPrice,
     type: LoanActionType.SELL,
     timestamp: event.block.timestamp,
