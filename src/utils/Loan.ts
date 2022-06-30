@@ -38,7 +38,7 @@ export enum LoanActionType {
 
 export function createAndReturnLoan(startParams: LoanStartState): Loan {
   let loanEntity = Loan.load(startParams.loanId.toHexString())
-  if (loanEntity == null) {
+  if (loanEntity === null) {
     loanEntity = new Loan(startParams.loanId.toHexString())
     loanEntity.type = startParams.type
     loanEntity.isOpen = true
@@ -64,30 +64,28 @@ export function createAndReturnLoan(startParams: LoanStartState): Loan {
   return loanEntity
 }
 
-function checkCloseAndReturnLoan(loan: Loan, isOpenParam: boolean, timestamp: BigInt): Loan {
+function isLoanOpen(loan: Loan, isOpenParam: boolean): boolean {
   if (isOpenParam === false) {
-    loan.isOpen = false
-    loan.endTimestamp = timestamp.toI32()
-    return loan
+    return false
   }
 
   if (loan.positionSize === BigDecimal.zero()) {
-    loan.isOpen = false
-    loan.endTimestamp = timestamp.toI32()
-    return loan
+    return false
   }
 
-  return loan
+  return true
 }
 
 export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
   let loanEntity = Loan.load(params.loanId)
   let eventPnL = BigDecimal.zero()
-  if (loanEntity != null) {
+  if (loanEntity !== null) {
     loanEntity.positionSize = loanEntity.positionSize.plus(params.positionSizeChange)
     loanEntity.borrowedAmount = loanEntity.borrowedAmount.plus(params.borrowedAmountChange)
-
-    checkCloseAndReturnLoan(loanEntity, params.isOpen, params.timestamp)
+    loanEntity.isOpen = isLoanOpen(loanEntity, params.isOpen)
+    if (!loanEntity.isOpen) {
+      loanEntity.endTimestamp = params.timestamp.toI32()
+    }
 
     if (loanEntity.positionSize.gt(loanEntity.maximumPositionSize)) {
       loanEntity.maximumPositionSize = loanEntity.positionSize
@@ -96,7 +94,7 @@ export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
       loanEntity.maxBorrowedAmount = loanEntity.borrowedAmount
     }
 
-    if (params.type == LoanActionType.BUY) {
+    if (params.type === LoanActionType.BUY) {
       let oldWeightedPrice = loanEntity.totalBought.times(loanEntity.averageBuyPrice)
       let newWeightedPrice = params.positionSizeChange.times(params.rate)
       const newTotalBought = loanEntity.totalBought.plus(params.positionSizeChange)
@@ -104,7 +102,7 @@ export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
       if (newWeightedPrice.gt(decimal.ZERO) && newTotalBought.gt(decimal.ZERO)) {
         loanEntity.averageBuyPrice = oldWeightedPrice.plus(newWeightedPrice).div(newTotalBought)
       }
-    } else if (params.type == LoanActionType.SELL) {
+    } else if (params.type === LoanActionType.SELL) {
       const amountSold = BigDecimal.zero().minus(params.positionSizeChange)
       const priceSoldAt = params.rate
       const differenceFromBuyPrice = loanEntity.averageBuyPrice.minus(priceSoldAt)
@@ -125,7 +123,7 @@ export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
         loanEntity.realizedPnL = loanEntity.realizedPnL.plus(newPnL).truncate(18)
         loanEntity.realizedPnLPercent = loanEntity.realizedPnL.times(decimal.fromNumber(100)).div(loanEntity.maximumPositionSize).truncate(8)
       }
-    } else if (params.type == LoanActionType.NEUTRAL) {
+    } else if (params.type === LoanActionType.NEUTRAL) {
       /**
        * TODO: How does DepositCollateral and Rollover affect PnL?
        */
