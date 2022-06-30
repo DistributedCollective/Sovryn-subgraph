@@ -64,17 +64,30 @@ export function createAndReturnLoan(startParams: LoanStartState): Loan {
   return loanEntity
 }
 
+function checkCloseAndReturnLoan(loan: Loan, isOpenParam: boolean, timestamp: BigInt): Loan {
+  if (isOpenParam === false) {
+    loan.isOpen = false
+    loan.endTimestamp = timestamp.toI32()
+    return loan
+  }
+
+  if (loan.positionSize === BigDecimal.zero()) {
+    loan.isOpen = false
+    loan.endTimestamp = timestamp.toI32()
+    return loan
+  }
+
+  return loan
+}
+
 export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
   let loanEntity = Loan.load(params.loanId)
   let eventPnL = BigDecimal.zero()
   if (loanEntity != null) {
     loanEntity.positionSize = loanEntity.positionSize.plus(params.positionSizeChange)
     loanEntity.borrowedAmount = loanEntity.borrowedAmount.plus(params.borrowedAmountChange)
-    loanEntity.isOpen = params.isOpen
 
-    if (loanEntity.isOpen == false) {
-      loanEntity.endTimestamp = params.timestamp.toI32()
-    }
+    checkCloseAndReturnLoan(loanEntity, params.isOpen, params.timestamp)
 
     if (loanEntity.positionSize.gt(loanEntity.maximumPositionSize)) {
       loanEntity.maximumPositionSize = loanEntity.positionSize
