@@ -104,9 +104,8 @@ export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
       }
     } else if (params.type === LoanActionType.SELL) {
       const amountSold = BigDecimal.zero().minus(params.positionSizeChange)
-      const priceSoldAt = params.rate
+      const priceSoldAt = loanEntity.type === LoanType.Trade ? params.rate : decimal.ONE.div(params.rate)
       const differenceFromBuyPrice = loanEntity.averageBuyPrice.minus(priceSoldAt)
-
       let oldWeightedPrice = loanEntity.totalSold.times(loanEntity.averageSellPrice) // If first time, this is 0
       let newWeightedPrice = amountSold.times(params.rate)
       const newTotalSold = loanEntity.totalSold.plus(amountSold)
