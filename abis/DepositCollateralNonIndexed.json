@@ -3,7 +3,7 @@
         "anonymous": false,
         "inputs": [
             {
-                "indexed": true,
+                "indexed": false,
                 "internalType": "bytes32",
                 "name": "loanId",
                 "type": "bytes32"

@@ -214,7 +214,7 @@ dataSources:
         - name: DepositCollateralNonIndexed
           file: ./abis/DepositCollateralNonIndexed.json
       eventHandlers:
-        - event: DepositCollateral(indexed bytes32,uint256,uint256)
+        - event: DepositCollateral(bytes32,uint256,uint256)
           handler: handleDepositCollateralNonIndexed
       file: ./src/ISovryn.ts
 
