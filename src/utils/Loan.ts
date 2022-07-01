@@ -64,25 +64,13 @@ export function createAndReturnLoan(startParams: LoanStartState): Loan {
   return loanEntity
 }
 
-function isLoanOpen(loan: Loan, isOpenParam: boolean): boolean {
-  if (isOpenParam === false) {
-    return false
-  }
-
-  if (loan.positionSize === BigDecimal.zero()) {
-    return false
-  }
-
-  return true
-}
-
 export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
   let loanEntity = Loan.load(params.loanId)
   let eventPnL = BigDecimal.zero()
   if (loanEntity !== null) {
     loanEntity.positionSize = loanEntity.positionSize.plus(params.positionSizeChange)
     loanEntity.borrowedAmount = loanEntity.borrowedAmount.plus(params.borrowedAmountChange)
-    loanEntity.isOpen = isLoanOpen(loanEntity, params.isOpen)
+    loanEntity.isOpen = loanEntity.positionSize.gt(BigDecimal.zero())
     if (!loanEntity.isOpen) {
       loanEntity.endTimestamp = params.timestamp.toI32()
     }
@@ -104,7 +92,10 @@ export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
       }
     } else if (params.type === LoanActionType.SELL) {
       const amountSold = BigDecimal.zero().minus(params.positionSizeChange)
-      const priceSoldAt = loanEntity.type === LoanType.Trade ? params.rate : decimal.ONE.div(params.rate)
+      let priceSoldAt = params.rate
+      if (loanEntity.type == LoanType.Borrow) {
+        priceSoldAt = decimal.ONE.div(params.rate)
+      }
       const differenceFromBuyPrice = loanEntity.averageBuyPrice.minus(priceSoldAt)
       let oldWeightedPrice = loanEntity.totalSold.times(loanEntity.averageSellPrice) // If first time, this is 0
       let newWeightedPrice = amountSold.times(params.rate)

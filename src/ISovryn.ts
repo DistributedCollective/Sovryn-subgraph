@@ -125,7 +125,7 @@ export function handleCloseWithDeposit(event: CloseWithDepositEvent): void {
     borrowedAmountChange: BigDecimal.zero().minus(repayAmount),
     positionSizeChange: BigDecimal.zero().minus(collateralWithdrawAmount),
     isOpen: event.params.currentMargin.gt(BigInt.zero()) ? true : false,
-    rate: collateralToLoanRate,
+    rate: decimal.ONE.div(collateralToLoanRate),
     type: LoanActionType.SELL,
     timestamp: event.block.timestamp,
   }
