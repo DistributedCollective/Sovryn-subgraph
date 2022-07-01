@@ -31,9 +31,12 @@ export class ChangeLoanState {
 }
 
 export enum LoanActionType {
-  BUY,
-  SELL,
-  NEUTRAL,
+  LIQUIDATE,
+  CLOSE_WITH_SWAP,
+  CLOSE_WITH_DEPOSIT,
+  DEPOSIT_COLLATERAL,
+  DEPOSIT_COLLATERAL_LEGACY,
+  ROLLOVER,
 }
 
 export function createAndReturnLoan(startParams: LoanStartState): Loan {
@@ -67,6 +70,9 @@ export function createAndReturnLoan(startParams: LoanStartState): Loan {
 export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
   let loanEntity = Loan.load(params.loanId)
   let eventPnL = BigDecimal.zero()
+  const buyActions: LoanActionType[] = []
+  const sellActions: LoanActionType[] = [LoanActionType.CLOSE_WITH_DEPOSIT, LoanActionType.CLOSE_WITH_SWAP, LoanActionType.LIQUIDATE]
+  const neutralActions: LoanActionType[] = [LoanActionType.DEPOSIT_COLLATERAL_LEGACY, LoanActionType.DEPOSIT_COLLATERAL, LoanActionType.ROLLOVER]
   if (loanEntity !== null) {
     loanEntity.positionSize = loanEntity.positionSize.plus(params.positionSizeChange)
     loanEntity.borrowedAmount = loanEntity.borrowedAmount.plus(params.borrowedAmountChange)
@@ -82,7 +88,7 @@ export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
       loanEntity.maxBorrowedAmount = loanEntity.borrowedAmount
     }
 
-    if (params.type === LoanActionType.BUY) {
+    if (buyActions.includes(params.type)) {
       let oldWeightedPrice = loanEntity.totalBought.times(loanEntity.averageBuyPrice)
       let newWeightedPrice = params.positionSizeChange.times(params.rate)
       const newTotalBought = loanEntity.totalBought.plus(params.positionSizeChange)
@@ -90,15 +96,12 @@ export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
       if (newWeightedPrice.gt(decimal.ZERO) && newTotalBought.gt(decimal.ZERO)) {
         loanEntity.averageBuyPrice = oldWeightedPrice.plus(newWeightedPrice).div(newTotalBought)
       }
-    } else if (params.type === LoanActionType.SELL) {
+    } else if (sellActions.includes(params.type)) {
       const amountSold = BigDecimal.zero().minus(params.positionSizeChange)
-      let priceSoldAt = params.rate
-      if (loanEntity.type == LoanType.Borrow) {
-        priceSoldAt = decimal.ONE.div(params.rate)
-      }
+      const priceSoldAt = getSellPrice(params.type, loanEntity.type, params.rate)
       const differenceFromBuyPrice = loanEntity.averageBuyPrice.minus(priceSoldAt)
       let oldWeightedPrice = loanEntity.totalSold.times(loanEntity.averageSellPrice) // If first time, this is 0
-      let newWeightedPrice = amountSold.times(params.rate)
+      let newWeightedPrice = amountSold.times(priceSoldAt)
       const newTotalSold = loanEntity.totalSold.plus(amountSold)
       loanEntity.totalSold = newTotalSold
       const totalWeightedPrice = oldWeightedPrice.plus(newWeightedPrice)
@@ -113,7 +116,7 @@ export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
         loanEntity.realizedPnL = loanEntity.realizedPnL.plus(newPnL).truncate(18)
         loanEntity.realizedPnLPercent = loanEntity.realizedPnL.times(decimal.fromNumber(100)).div(loanEntity.maximumPositionSize).truncate(8)
       }
-    } else if (params.type === LoanActionType.NEUTRAL) {
+    } else if (neutralActions.includes(params.type)) {
       /**
        * TODO: How does DepositCollateral and Rollover affect PnL?
        */
@@ -121,4 +124,21 @@ export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
     loanEntity.save()
   }
   return eventPnL
+}
+
+/** Borrow loans use inverse price for CloseWithSwap,
+ * Trade loans use inverse price for liquidate
+ * TODO: Check DepositCollateral
+ * */
+function getSellPrice(actionType: LoanActionType, loanType: string, rate: BigDecimal): BigDecimal {
+  if (actionType == LoanActionType.CLOSE_WITH_SWAP && loanType == LoanType.Borrow) {
+    return decimal.ONE.div(rate)
+  }
+  if (actionType == LoanActionType.CLOSE_WITH_DEPOSIT && loanType == LoanType.Trade) {
+    return decimal.ONE.div(rate)
+  }
+  if (actionType == LoanActionType.LIQUIDATE && loanType == LoanType.Trade) {
+    return decimal.ONE.div(rate)
+  }
+  return rate
 }

@@ -125,8 +125,8 @@ export function handleCloseWithDeposit(event: CloseWithDepositEvent): void {
     borrowedAmountChange: BigDecimal.zero().minus(repayAmount),
     positionSizeChange: BigDecimal.zero().minus(collateralWithdrawAmount),
     isOpen: event.params.currentMargin.gt(BigInt.zero()) ? true : false,
-    rate: decimal.ONE.div(collateralToLoanRate),
-    type: LoanActionType.SELL,
+    rate: collateralToLoanRate,
+    type: LoanActionType.CLOSE_WITH_DEPOSIT,
     timestamp: event.block.timestamp,
   }
   updateLoanReturnPnL(changeParams)
@@ -173,7 +173,7 @@ export function handleCloseWithSwap(event: CloseWithSwapEvent): void {
     positionSizeChange: BigDecimal.zero().minus(positionCloseSize),
     isOpen: event.params.currentLeverage.gt(BigInt.zero()) ? true : false,
     rate: exitPrice,
-    type: LoanActionType.SELL,
+    type: LoanActionType.CLOSE_WITH_SWAP,
     timestamp: event.block.timestamp,
   }
   updateLoanReturnPnL(changeParams)
@@ -207,7 +207,7 @@ export function handleDepositCollateral(event: DepositCollateralEvent): void {
     positionSizeChange: depositAmount,
     isOpen: true,
     rate: rate,
-    type: LoanActionType.NEUTRAL,
+    type: LoanActionType.DEPOSIT_COLLATERAL,
     timestamp: event.block.timestamp,
   }
   updateLoanReturnPnL(changeParams)
@@ -231,7 +231,7 @@ export function handleDepositCollateralLegacy(event: DepositCollateralLegacyEven
     positionSizeChange: decimal.fromBigInt(event.params.depositAmount, DEFAULT_DECIMALS),
     isOpen: true,
     rate: decimal.ONE, //This is a placeholder, this value is not used for DepositCollateral events
-    type: LoanActionType.NEUTRAL,
+    type: LoanActionType.DEPOSIT_COLLATERAL_LEGACY,
     timestamp: event.block.timestamp,
   }
   updateLoanReturnPnL(changeParams)
@@ -304,8 +304,8 @@ export function handleLiquidate(event: LiquidateEvent): void {
     borrowedAmountChange: BigDecimal.zero().minus(repayAmount),
     positionSizeChange: BigDecimal.zero().minus(collateralWithdrawAmount),
     isOpen: event.params.currentMargin.gt(BigInt.zero()) ? true : false,
-    rate: decimal.ONE.div(collateralToLoanRate),
-    type: LoanActionType.SELL,
+    rate: collateralToLoanRate,
+    type: LoanActionType.LIQUIDATE,
     timestamp: event.block.timestamp,
   }
   updateLoanReturnPnL(changeParams)
@@ -463,7 +463,7 @@ export function handleRollover(event: RolloverEvent): void {
     loan.nextRollover = event.params.endTimestamp.toI32()
     loan.positionSize = decimal.fromBigInt(event.params.collateral, DEFAULT_DECIMALS)
     loan.borrowedAmount = decimal.fromBigInt(event.params.principal, DEFAULT_DECIMALS)
-    if (loan.positionSize === BigDecimal.zero() || loan.borrowedAmount === BigDecimal.zero()) {
+    if (loan.positionSize == BigDecimal.zero() || loan.borrowedAmount == BigDecimal.zero()) {
       loan.isOpen = false
       loan.endTimestamp = event.block.timestamp.toI32()
     }
