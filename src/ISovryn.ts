@@ -37,10 +37,10 @@ import {
 import { LoanTokenLogicStandard as LoanTokenTemplate } from '../generated/templates'
 import { createAndReturnTransaction } from './utils/Transaction'
 import { createAndReturnLoan, LoanStartState, updateLoanReturnPnL, ChangeLoanState, LoanActionType } from './utils/Loan'
-import { BigDecimal, BigInt, DataSourceContext } from '@graphprotocol/graph-ts'
+import { BigDecimal, bigInt, BigInt, Bytes, DataSourceContext, ethereum } from '@graphprotocol/graph-ts'
 import { createAndReturnProtocolStats, createAndReturnUserTotals } from './utils/ProtocolStats'
 import { convertToUsd } from './utils/Prices'
-import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
+import { decimal, DEFAULT_DECIMALS, integer } from '@protofire/subgraph-toolkit'
 import { createAndReturnLendingPool } from './utils/LendingPool'
 import { RewardsEarnedAction } from './utils/types'
 import { ISovryn as ISovrynContract } from '../generated/ISovryn/ISovryn'
@@ -188,84 +188,64 @@ export function handleCloseWithSwap(event: CloseWithSwapEvent): void {
   userTotalsEntity.save()
 }
 
-export function handleDepositCollateralNonIndexed(event: DepositCollateralNonIndexedEvent): void {
-  const depositAmount = decimal.fromBigInt(event.params.depositAmount, DEFAULT_DECIMALS)
-  const rate = decimal.fromBigInt(event.params.rate, DEFAULT_DECIMALS)
+class UnifiedDepositCollateral {
+  loanId: Bytes
+  depositAmount: BigInt
+  rate: BigInt
+  event: ethereum.Event
+}
 
-  let entity = new DepositCollateral(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.loanId = event.params.loanId.toHexString()
+function handleAllDepositCollateralVersions(params: UnifiedDepositCollateral): void {
+  const depositAmount = decimal.fromBigInt(params.depositAmount, DEFAULT_DECIMALS)
+  const rate = decimal.fromBigInt(params.rate, DEFAULT_DECIMALS)
+
+  let entity = new DepositCollateral(params.event.transaction.hash.toHex() + '-' + params.event.logIndex.toString())
+  entity.loanId = params.loanId.toHexString()
   entity.depositAmount = depositAmount
   entity.rate = rate
-  let transaction = createAndReturnTransaction(event)
+  let transaction = createAndReturnTransaction(params.event)
   entity.transaction = transaction.id
   entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
+  entity.emittedBy = params.event.address
   entity.save()
 
   let changeParams: ChangeLoanState = {
-    loanId: event.params.loanId.toHexString(),
+    loanId: params.loanId.toHexString(),
     borrowedAmountChange: BigDecimal.zero(),
     positionSizeChange: depositAmount,
     isOpen: true,
     rate: rate,
     type: LoanActionType.DEPOSIT_COLLATERAL,
-    timestamp: event.block.timestamp,
+    timestamp: params.event.block.timestamp,
   }
   updateLoanReturnPnL(changeParams)
+}
 
-  /** TODO: Update protocolStats. Need to return collateralToken from updateLoanReturnPnL */
+export function handleDepositCollateralNonIndexed(event: DepositCollateralNonIndexedEvent): void {
+  handleAllDepositCollateralVersions({
+    loanId: event.params.loanId,
+    depositAmount: event.params.depositAmount,
+    rate: event.params.rate,
+    event: event,
+  })
 }
 
 export function handleDepositCollateral(event: DepositCollateralEvent): void {
-  const depositAmount = decimal.fromBigInt(event.params.depositAmount, DEFAULT_DECIMALS)
-  const rate = decimal.fromBigInt(event.params.rate, DEFAULT_DECIMALS)
-
-  let entity = new DepositCollateral(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.loanId = event.params.loanId.toHexString()
-  entity.depositAmount = depositAmount
-  entity.rate = rate
-  let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-
-  let changeParams: ChangeLoanState = {
-    loanId: event.params.loanId.toHexString(),
-    borrowedAmountChange: BigDecimal.zero(),
-    positionSizeChange: depositAmount,
-    isOpen: true,
-    rate: rate,
-    type: LoanActionType.DEPOSIT_COLLATERAL,
-    timestamp: event.block.timestamp,
-  }
-  updateLoanReturnPnL(changeParams)
-
-  /** TODO: Update protocolStats. Need to return collateralToken from updateLoanReturnPnL */
+  handleAllDepositCollateralVersions({
+    loanId: event.params.loanId,
+    depositAmount: event.params.depositAmount,
+    rate: event.params.rate,
+    event: event,
+  })
 }
 
 export function handleDepositCollateralLegacy(event: DepositCollateralLegacyEvent): void {
-  let entity = new DepositCollateral(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.loanId = event.params.loanId.toHexString()
-  entity.depositAmount = decimal.fromBigInt(event.params.depositAmount, DEFAULT_DECIMALS)
-  let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-
-  let changeParams: ChangeLoanState = {
-    loanId: event.params.loanId.toHexString(),
-    borrowedAmountChange: BigDecimal.zero(),
-    positionSizeChange: decimal.fromBigInt(event.params.depositAmount, DEFAULT_DECIMALS),
-    isOpen: true,
-    rate: decimal.ONE, //This is a placeholder, this value is not used for DepositCollateral events
-    type: LoanActionType.DEPOSIT_COLLATERAL_LEGACY,
-    timestamp: event.block.timestamp,
-  }
-  updateLoanReturnPnL(changeParams)
-
-  /** TODO: Update protocolStats. Need to return collateralToken from updateLoanReturnPnL */
+  handleAllDepositCollateralVersions({
+    loanId: event.params.loanId,
+    depositAmount: event.params.depositAmount,
+    rate: integer.ZERO, //Placeholder, the legacy version of this event does not include rate
+    event: event,
+  })
 }
 
 export function handleEarnReward(event: EarnRewardEvent): void {
