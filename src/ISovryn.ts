@@ -1,3 +1,8 @@
+/**
+ * The ISovryn contract handles everything related to Loans.
+ * This includes Margin Trades, Borrow loans, and all loan lifecycle events
+ */
+
 import {
   Borrow as BorrowEvent, // User event
   CloseWithDeposit as CloseWithDepositEvent, // User event
@@ -43,7 +48,6 @@ import { convertToUsd } from './utils/Prices'
 import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
 import { createAndReturnLendingPool } from './utils/LendingPool'
 import { RewardsEarnedAction } from './utils/types'
-import { ISovryn as ISovrynContract } from '../generated/ISovryn/ISovryn'
 
 export function handleBorrow(event: BorrowEvent): void {
   createAndReturnTransaction(event)
@@ -268,6 +272,9 @@ export function handleDepositCollateralLegacy(event: DepositCollateralLegacyEven
   /** TODO: Update protocolStats. Need to return collateralToken from updateLoanReturnPnL */
 }
 
+/**
+ * EarnReward is emitted when a user margin trades and earns a % of the trading fee as a reward in SOV
+ */
 export function handleEarnReward(event: EarnRewardEvent): void {
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
 
