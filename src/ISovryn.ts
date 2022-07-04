@@ -43,7 +43,6 @@ import { convertToUsd } from './utils/Prices'
 import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
 import { createAndReturnLendingPool } from './utils/LendingPool'
 import { RewardsEarnedAction } from './utils/types'
-import { ISovryn as ISovrynContract } from '../generated/ISovryn/ISovryn'
 
 export function handleBorrow(event: BorrowEvent): void {
   createAndReturnTransaction(event)
