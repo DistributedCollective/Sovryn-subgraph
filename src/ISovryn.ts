@@ -274,13 +274,13 @@ export function handleEarnReward(event: EarnRewardEvent): void {
   createAndReturnTransaction(event)
   let userRewardsEarnedHistory = UserRewardsEarnedHistory.load(event.params.receiver.toHexString())
   if (userRewardsEarnedHistory != null) {
-    userRewardsEarnedHistory.availableRewardSov = userRewardsEarnedHistory.availableRewardSov.plus(amount)
+    userRewardsEarnedHistory.totalTradingRewards = userRewardsEarnedHistory.totalTradingRewards.plus(amount)
     userRewardsEarnedHistory.availableTradingRewards = userRewardsEarnedHistory.availableTradingRewards.plus(amount)
     userRewardsEarnedHistory.totalFeesAndRewardsEarned = userRewardsEarnedHistory.totalFeesAndRewardsEarned.plus(amount)
     userRewardsEarnedHistory.save()
   } else {
     userRewardsEarnedHistory = new UserRewardsEarnedHistory(event.params.receiver.toHexString())
-    userRewardsEarnedHistory.availableRewardSov = amount
+    userRewardsEarnedHistory.totalTradingRewards = amount
     userRewardsEarnedHistory.availableTradingRewards = amount
     userRewardsEarnedHistory.totalFeesAndRewardsEarned = amount
     userRewardsEarnedHistory.user = event.params.receiver.toHexString()
