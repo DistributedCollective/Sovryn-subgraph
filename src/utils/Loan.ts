@@ -76,7 +76,7 @@ export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
   if (loanEntity !== null) {
     loanEntity.positionSize = loanEntity.positionSize.plus(params.positionSizeChange)
     loanEntity.borrowedAmount = loanEntity.borrowedAmount.plus(params.borrowedAmountChange)
-    loanEntity.isOpen = loanEntity.positionSize.gt(BigDecimal.zero())
+    loanEntity.isOpen = loanEntity.positionSize.gt(BigDecimal.zero()) && loanEntity.borrowedAmount.gt(BigDecimal.zero())
     if (!loanEntity.isOpen) {
       loanEntity.endTimestamp = params.timestamp.toI32()
     }
@@ -105,13 +105,15 @@ export function updateLoanReturnPnL(params: ChangeLoanState): BigDecimal {
       const newTotalSold = loanEntity.totalSold.plus(amountSold)
       loanEntity.totalSold = newTotalSold
       const totalWeightedPrice = oldWeightedPrice.plus(newWeightedPrice)
+
+      /** If statement to avoid division by 0 */
       if (totalWeightedPrice.gt(decimal.ZERO) && newTotalSold.gt(decimal.ZERO)) {
         loanEntity.averageSellPrice = totalWeightedPrice.div(newTotalSold)
       }
 
+      /**If statement to avoid division by 0 */
       if (differenceFromBuyPrice != decimal.ZERO && amountSold != decimal.ZERO && loanEntity.averageSellPrice != decimal.ZERO) {
         const newPnL = amountSold.div(loanEntity.averageSellPrice.div(differenceFromBuyPrice))
-
         eventPnL = newPnL
         loanEntity.realizedPnL = loanEntity.realizedPnL.plus(newPnL).truncate(18)
         loanEntity.realizedPnLPercent = loanEntity.realizedPnL.times(decimal.fromNumber(100)).div(loanEntity.maximumPositionSize).truncate(8)
