@@ -37,6 +37,8 @@ export class VestingContractType {
   static FishTeam: string = 'FishTeam'
   static Team: string = 'Team'
   static Rewards: string = 'Rewards'
+  static FourYearVesting: string = 'FourYearVesting'
+  static Strategic: string = 'Strategic'
 }
 
 export class VestingHistoryActionItem {
