@@ -1,0 +1,155 @@
+type AcceptedCrossTransfer @entity {
+  id: ID!
+  _tokenAddress: Bytes! # address
+  _to: Bytes! # address
+  _amount: BigInt! # uint256
+  _decimals: Int! # uint8
+  _granularity: BigInt! # uint256
+  _formattedAmount: BigInt! # uint256
+  _calculatedDecimals: Int! # uint8
+  _calculatedGranularity: BigInt! # uint256
+  _userData: Bytes! # bytes
+  timestamp: Int!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
+type AllowTokenChanged @entity {
+  id: ID!
+  _newAllowToken: Bytes! # address
+  timestamp: Int!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
+type BridgeReceiverStatusChanged @entity {
+  id: ID!
+  bridgeReceiver: Bytes! # address
+  newStatus: Boolean! # bool
+  timestamp: Int!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
+type Cross @entity {
+  id: ID!
+  _tokenAddress: Bytes! # address
+  _to: Bytes! # address
+  _amount: BigInt! # uint256
+  _symbol: String! # string
+  _userData: Bytes! # bytes
+  _decimals: Int! # uint8
+  _granularity: BigInt! # uint256
+  timestamp: Int!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
+type ErrorTokenReceiver @entity {
+  id: ID!
+  _errorData: Bytes! # bytes
+  timestamp: Int!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
+type FederationChanged @entity {
+  id: ID!
+  _newFederation: Bytes! # address
+  timestamp: Int!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
+type NewSideToken @entity {
+  id: ID!
+  _newSideTokenAddress: Bytes! # address
+  _originalTokenAddress: Bytes! # address
+  _newSymbol: String! # string
+  _granularity: BigInt! # uint256
+  timestamp: Int!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
+type OwnershipTransferred @entity {
+  id: ID!
+  previousOwner: Bytes! # address
+  newOwner: Bytes! # address
+  timestamp: Int!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
+type Paused @entity {
+  id: ID!
+  account: Bytes! # address
+  timestamp: Int!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
+type PauserAdded @entity {
+  id: ID!
+  account: Bytes! # address
+  timestamp: Int!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
+type PauserRemoved @entity {
+  id: ID!
+  account: Bytes! # address
+  timestamp: Int!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
+type PrefixUpdated @entity {
+  id: ID!
+  _isSuffix: Boolean! # bool
+  _prefix: String! # string
+  timestamp: Int!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
+type RevokeTx @entity {
+  id: ID!
+  tx_revoked: Bytes! # bytes32
+  timestamp: Int!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
+type SideTokenFactoryChanged @entity {
+  id: ID!
+  _newSideTokenFactory: Bytes! # address
+  timestamp: Int!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
+type Unpaused @entity {
+  id: ID!
+  account: Bytes! # address
+  timestamp: Int!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
+type Upgrading @entity {
+  id: ID!
+  isUpgrading: Boolean! # bool
+  timestamp: Int!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}
+
+type erc777ConverterSet @entity {
+  id: ID!
+  erc777ConverterAddress: Bytes! # address
+  timestamp: Int!
+  emittedBy: Bytes! #address
+  transaction: Transaction!
+}

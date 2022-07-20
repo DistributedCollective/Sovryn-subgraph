@@ -123,5 +123,10 @@
         "network": "mainnet",
         "address": "0x0D5006330289336ebdF9d0AC9E0674f91b4851eA",
         "startBlock": 4029878
+    },
+    "Bridge": {
+        "network": "mainnet",
+        "address": "0x971b97c8cc82e7d27bc467c2dc3f219c6ee2e350",
+        "startBlock": 3398643
     }
 }
