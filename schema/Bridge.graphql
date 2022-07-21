@@ -153,3 +153,22 @@ type erc777ConverterSet @entity {
   emittedBy: Bytes! #address
   transaction: Transaction!
 }
+
+enum BridgeType {
+  RSK_BSC
+  RSK_ETH
+}
+
+type Bridge @entity {
+  id: ID! # Bridge address
+  type: BridgeType! # BridgeType
+  federations: [Federation!] @derivedFrom(field: "bridge")
+  isUpgrading: Boolean! # boolean
+  isPaused: Boolean! # boolean
+  totalFundsSent: BigInt! # uint256
+  totalFundsReceived: BigInt! # uint256
+  feesCollected: BigInt! # uint256
+  pausers: [Bytes!]!
+  createdAtTx: Transaction! # Transaction
+  updatedAtTx: Transaction! # Transaction
+}

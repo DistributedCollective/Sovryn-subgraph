@@ -737,6 +737,8 @@ dataSources:
       abis:
         - name: Bridge
           file: ./abis/Bridge.json
+        - name: Federation
+          file: ./abis/Federation.json
       eventHandlers:
         
         - event: AcceptedCrossTransfer(indexed address,indexed address,uint256,uint8,uint256,uint256,uint8,uint256,bytes)

@@ -37,6 +37,9 @@ import {
   erc777ConverterSet,
 } from '../generated/schema'
 
+import { Federation as FederationTemplate } from '../generated/templates'
+import { createAndReturnBridge, createAndReturnFederation } from './utils/CrossChainBridge'
+
 import { createAndReturnTransaction } from './utils/Transaction'
 
 export function handleAcceptedCrossTransfer(event: AcceptedCrossTransferEvent): void {
@@ -112,6 +115,17 @@ export function handleFederationChanged(event: FederationChangedEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  FederationTemplate.create(event.params._newFederation)
+
+  const bridge = createAndReturnBridge(event.address, event)
+  bridge.updatedAtTx = transaction.id
+  bridge.save()
+
+  const federation = createAndReturnFederation(event.params._newFederation, event)
+  federation.bridge = bridge.id
+  federation.updatedAtTx = transaction.id
+  federation.save()
 }
 
 export function handleNewSideToken(event: NewSideTokenEvent): void {

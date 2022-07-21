@@ -72,3 +72,13 @@ type Voted @entity {
   emittedBy: Bytes! #address
   transaction: Transaction!
 }
+
+type Federation @entity {
+  id: ID! # Bridge address
+  # type: BridgeType! # BridgeType
+  bridge: Bridge!
+  totalVotes: Int!
+  totalExecuted: Int!
+  createdAtTx: Transaction! # Transaction
+  updatedAtTx: Transaction! # Transaction
+}
