@@ -160,6 +160,11 @@ export function handlePaused(event: PausedEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  const bridge = createAndReturnBridge(event.address, event)
+  bridge.isPaused = true
+  bridge.updatedAtTx = transaction.id
+  bridge.save()
 }
 
 export function handlePauserAdded(event: PauserAddedEvent): void {
@@ -170,6 +175,13 @@ export function handlePauserAdded(event: PauserAddedEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  const bridge = createAndReturnBridge(event.address, event)
+  const pausers = bridge.pausers
+  pausers.push(event.params.account)
+  bridge.pausers = pausers
+  bridge.updatedAtTx = transaction.id
+  bridge.save()
 }
 
 export function handlePauserRemoved(event: PauserRemovedEvent): void {
@@ -221,6 +233,11 @@ export function handleUnpaused(event: UnpausedEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  const bridge = createAndReturnBridge(event.address, event)
+  bridge.isPaused = false
+  bridge.updatedAtTx = transaction.id
+  bridge.save()
 }
 
 export function handleUpgrading(event: UpgradingEvent): void {
@@ -231,6 +248,11 @@ export function handleUpgrading(event: UpgradingEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  const bridge = createAndReturnBridge(event.address, event)
+  bridge.isUpgrading = event.params.isUpgrading
+  bridge.updatedAtTx = transaction.id
+  bridge.save()
 }
 
 export function handleerc777ConverterSet(event: erc777ConverterSetEvent): void {
