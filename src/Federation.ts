@@ -1,3 +1,4 @@
+import { log } from '@graphprotocol/graph-ts'
 import {
   BridgeChanged as BridgeChangedEvent,
   Executed as ExecutedEvent,
@@ -22,6 +23,7 @@ import {
 } from '../generated/schema'
 
 import { createAndReturnTransaction } from './utils/Transaction'
+import { createAndReturnFederation } from './utils/CrossChainBridge'
 
 export function handleBridgeChanged(event: BridgeChangedEvent): void {
   let entity = new BridgeChanged(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
@@ -31,6 +33,12 @@ export function handleBridgeChanged(event: BridgeChangedEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  log.debug('src/Federation.ts ~ Federation.ts ~ 36 ~ info event.address: {}', [event.address.toHex()])
+  const federation = createAndReturnFederation(event.address, event)
+  federation.bridge = event.params.bridge.toHex()
+  federation.updatedAtTx = transaction.id
+  federation.save()
 }
 
 export function handleExecuted(event: ExecutedEvent): void {
@@ -41,6 +49,12 @@ export function handleExecuted(event: ExecutedEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  log.debug('src/Federation.ts ~ Federation.ts ~ 53 ~  event.address: {}', [event.address.toHex()])
+  const federation = createAndReturnFederation(event.address, event)
+  federation.totalExecuted = federation.totalExecuted + 1
+  federation.updatedAtTx = transaction.id
+  federation.save()
 }
 
 export function handleMemberAddition(event: MemberAdditionEvent): void {
@@ -92,6 +106,12 @@ export function handleRevokeTxAndVote(event: RevokeTxAndVoteEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  log.debug('src/Federation.ts ~ Federation.ts ~ 110 ~  event.address: {}', [event.address.toHex()])
+  const federation = createAndReturnFederation(event.address, event)
+  federation.totalVotes = federation.totalVotes + 1
+  federation.updatedAtTx = transaction.id
+  federation.save()
 }
 
 export function handleStoreFormerFederationExecutedTx(event: StoreFormerFederationExecutedTxEvent): void {
@@ -123,4 +143,10 @@ export function handleVoted(event: VotedEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  log.info('src/Federation.ts ~ Federation.ts ~ 143 ~  event.address: {}', [event.address.toHex()])
+  const federation = createAndReturnFederation(event.address, event)
+  federation.totalVotes = federation.totalVotes + 1
+  federation.updatedAtTx = transaction.id
+  federation.save()
 }
