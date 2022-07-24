@@ -44,3 +44,13 @@ export class VestingHistoryActionItem {
   static TeamTokensRevoked: string = 'TeamTokensRevoked'
   static TokensWithdrawn: string = 'TokensWithdrawn'
 }
+
+export class CrossDirection {
+  static Incoming: string = 'Incoming'
+  static Outgoing: string = 'Outgoing'
+}
+
+export class CrossStatus {
+  static Voting: string = 'Voting'
+  static Executed: string = 'Executed'
+}

@@ -1,6 +1,38 @@
-import { BigInt, Address, ethereum } from '@graphprotocol/graph-ts'
-import { Federation, Bridge } from '../../generated/schema'
+import { BigInt, Address, ethereum, Bytes, crypto, ByteArray } from '@graphprotocol/graph-ts'
+import { decimal } from '@protofire/subgraph-toolkit'
+import { Federation, Bridge, CrossTransfer, Token } from '../../generated/schema'
 import { createAndReturnTransaction } from './Transaction'
+import { AcceptedCrossTransfer as AcceptedCrossTransferEvent, Cross as CrossEvent } from '../../generated/Bridge/Bridge'
+import { CrossDirection, CrossStatus } from './types'
+import { createAndReturnToken } from './Token'
+
+export const getTransactionId = (
+  tokenAddress: Address,
+  receiver: Address,
+  amount: BigInt,
+  // symbol: string,
+  decimals: i32,
+  granularity: BigInt,
+  userData: Bytes,
+): ByteArray => {
+  return crypto.keccak256(
+    Bytes.fromUTF8(
+      tokenAddress.toHex() +
+        '-' +
+        receiver.toHex() +
+        '-' +
+        amount.toHex() +
+        '-' +
+        // symbol +
+        // '-' +
+        decimals.toString() +
+        '-' +
+        granularity.toHex() +
+        '-' +
+        userData.toHex(),
+    ),
+  )
+}
 
 export const createAndReturnBridge = (bridgeAddress: Address, event: ethereum.Event): Bridge => {
   let bridge = Bridge.load(bridgeAddress.toHex())
@@ -31,4 +63,65 @@ export const createAndReturnFederation = (federationAddress: Address, event: eth
     federation.save()
   }
   return federation
+}
+
+export const createAndReturnCrossTransferFromCrossEvent = (event: CrossEvent): CrossTransfer => {
+  const transactionId = getTransactionId(
+    event.params._tokenAddress,
+    event.params._to,
+    event.params._amount,
+    // event.params._symbol,
+    event.params._decimals,
+    event.params._granularity,
+    event.params._userData,
+  )
+  const token = Token.load(event.params._tokenAddress.toHex())
+
+  let crossTransfer = CrossTransfer.load(transactionId.toHex())
+  if (crossTransfer == null) {
+    crossTransfer = new CrossTransfer(transactionId.toHex())
+    crossTransfer.direction = CrossDirection.Outgoing
+    crossTransfer.votes = 0
+    crossTransfer.status = CrossStatus.Voting
+    crossTransfer.tokenAddress = event.params._tokenAddress
+    crossTransfer.token = token != null ? token.id : null
+    crossTransfer.to = event.params._to.toHex()
+    crossTransfer.amount = decimal.fromBigInt(event.params._amount, event.params._decimals)
+    crossTransfer.symbol = event.params._symbol
+    crossTransfer.createdAtTx = event.transaction.hash.toHex()
+    crossTransfer.updatedAtTx = event.transaction.hash.toHex()
+    crossTransfer.save()
+  }
+
+  return crossTransfer
+}
+
+export const createAndReturnCrossTransferFromAcceptedCrossTransfer = (event: AcceptedCrossTransferEvent): CrossTransfer => {
+  const transactionId = getTransactionId(
+    event.params._tokenAddress,
+    event.params._to,
+    event.params._amount,
+    /* event.params._symbol,*/
+    event.params._decimals,
+    event.params._granularity,
+    event.params._userData,
+  )
+  let crossTransfer = CrossTransfer.load(transactionId.toHex())
+  if (crossTransfer == null) {
+    const token = Token.load(event.params._tokenAddress.toHex())
+    crossTransfer = new CrossTransfer(transactionId.toHex())
+    crossTransfer.direction = CrossDirection.Incoming
+    // TODO: better status for incoming transfers
+    crossTransfer.status = CrossStatus.Executed
+    crossTransfer.tokenAddress = event.params._tokenAddress
+    crossTransfer.token = token != null ? token.id : null
+    // TODO: create user from to address
+    crossTransfer.to = event.params._to.toHex()
+    crossTransfer.amount = decimal.fromBigInt(event.params._amount, event.params._decimals)
+    crossTransfer.symbol = token != null ? token.symbol : null
+    crossTransfer.updatedAtTx = event.transaction.hash.toHex()
+    crossTransfer.createdAtTx = event.transaction.hash.toHex()
+    crossTransfer.save()
+  }
+  return crossTransfer
 }

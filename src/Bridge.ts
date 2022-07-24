@@ -1,3 +1,4 @@
+import { log } from '@graphprotocol/graph-ts'
 import {
   AcceptedCrossTransfer as AcceptedCrossTransferEvent,
   AllowTokenChanged as AllowTokenChangedEvent,
@@ -38,7 +39,12 @@ import {
 } from '../generated/schema'
 
 import { Federation as FederationTemplate } from '../generated/templates'
-import { createAndReturnBridge, createAndReturnFederation } from './utils/CrossChainBridge'
+import {
+  createAndReturnBridge,
+  createAndReturnCrossTransferFromAcceptedCrossTransfer,
+  createAndReturnCrossTransferFromCrossEvent,
+  createAndReturnFederation,
+} from './utils/CrossChainBridge'
 
 import { createAndReturnTransaction } from './utils/Transaction'
 
@@ -58,6 +64,8 @@ export function handleAcceptedCrossTransfer(event: AcceptedCrossTransferEvent): 
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  createAndReturnCrossTransferFromAcceptedCrossTransfer(event)
 }
 
 export function handleAllowTokenChanged(event: AllowTokenChangedEvent): void {
@@ -95,6 +103,8 @@ export function handleCross(event: CrossEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  createAndReturnCrossTransferFromCrossEvent(event)
 }
 
 export function handleErrorTokenReceiver(event: ErrorTokenReceiverEvent): void {

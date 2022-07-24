@@ -168,7 +168,42 @@ type Bridge @entity {
   totalFundsSent: BigInt! # uint256
   totalFundsReceived: BigInt! # uint256
   feesCollected: BigInt! # uint256
-  pausers: [Bytes!]!
+  pausers: [Bytes!]! # address[]
+  createdAtTx: Transaction! # Transaction
+  updatedAtTx: Transaction! # Transaction
+}
+
+enum CrossDirection {
+  Incoming
+  Outgoing
+}
+
+enum CrossStatus {
+  Voting
+  Executed
+  # FAILED
+}
+
+type CrossTransfer @entity {
+  id: ID! # TransactionIdU
+  direction: CrossDirection! # CrossDirection
+  votes: Int # uint8
+  status: CrossStatus! # CrossStatus
+  originalTokenAddress: Bytes
+  tokenAddress: Bytes! # address
+  token: Token
+  to: User! # address
+  amount: BigDecimal!
+  symbol: String # string
+  sourceChainBlockHash: Bytes # bytes
+  sourceChainTransactionHash: Bytes # bytes
+  # userData: Bytes! # bytes
+  # decimals: Int! # uint8
+  # granularity: BigInt! # uint256
+  # formattedAmount: BigInt! # uint256
+  # calculatedDecimals: Int! # uint8
+  # calculatedGranularity: BigInt! # uint256
+
   createdAtTx: Transaction! # Transaction
   updatedAtTx: Transaction! # Transaction
 }
