@@ -4,7 +4,7 @@ import { Federation, Bridge, CrossTransfer, Token } from '../../generated/schema
 import { createAndReturnTransaction } from './Transaction'
 import { AcceptedCrossTransfer as AcceptedCrossTransferEvent, Cross as CrossEvent } from '../../generated/Bridge/Bridge'
 import { CrossDirection, CrossStatus } from './types'
-import { createAndReturnToken } from './Token'
+import { createAndReturnUser } from './User'
 
 export const getTransactionId = (
   tokenAddress: Address,
@@ -75,17 +75,19 @@ export const createAndReturnCrossTransferFromCrossEvent = (event: CrossEvent): C
     event.params._granularity,
     event.params._userData,
   )
-  const token = Token.load(event.params._tokenAddress.toHex())
 
   let crossTransfer = CrossTransfer.load(transactionId.toHex())
   if (crossTransfer == null) {
+    const token = Token.load(event.params._tokenAddress.toHex())
+
     crossTransfer = new CrossTransfer(transactionId.toHex())
     crossTransfer.direction = CrossDirection.Outgoing
     crossTransfer.votes = 0
     crossTransfer.status = CrossStatus.Voting
     crossTransfer.tokenAddress = event.params._tokenAddress
     crossTransfer.token = token != null ? token.id : null
-    crossTransfer.to = event.params._to.toHex()
+    const user = createAndReturnUser(event.params._to, event.block.timestamp)
+    crossTransfer.to = user.id
     crossTransfer.amount = decimal.fromBigInt(event.params._amount, event.params._decimals)
     crossTransfer.symbol = event.params._symbol
     crossTransfer.createdAtTx = event.transaction.hash.toHex()
@@ -115,8 +117,8 @@ export const createAndReturnCrossTransferFromAcceptedCrossTransfer = (event: Acc
     crossTransfer.status = CrossStatus.Executed
     crossTransfer.tokenAddress = event.params._tokenAddress
     crossTransfer.token = token != null ? token.id : null
-    // TODO: create user from to address
-    crossTransfer.to = event.params._to.toHex()
+    const user = createAndReturnUser(event.params._to, event.block.timestamp)
+    crossTransfer.to = user.id
     crossTransfer.amount = decimal.fromBigInt(event.params._amount, event.params._decimals)
     crossTransfer.symbol = token != null ? token.symbol : null
     crossTransfer.updatedAtTx = event.transaction.hash.toHex()
