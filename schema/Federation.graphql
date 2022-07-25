@@ -79,6 +79,7 @@ type Federation @entity {
   bridge: Bridge!
   totalVotes: Int!
   totalExecuted: Int!
+  members: [Bytes!]!
   createdAtTx: Transaction! # Transaction
   updatedAtTx: Transaction! # Transaction
 }

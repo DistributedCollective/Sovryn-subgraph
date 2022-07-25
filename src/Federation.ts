@@ -65,6 +65,13 @@ export function handleMemberAddition(event: MemberAdditionEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  const federation = createAndReturnFederation(event.address, event)
+  const members = federation.members
+  members.push(event.params.member)
+  federation.members = members
+  federation.updatedAtTx = transaction.id
+  federation.save()
 }
 
 export function handleMemberRemoval(event: MemberRemovalEvent): void {
@@ -75,17 +82,13 @@ export function handleMemberRemoval(event: MemberRemovalEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
-}
 
-export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {
-  let entity = new OwnershipTransferred(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.previousOwner = event.params.previousOwner
-  entity.newOwner = event.params.newOwner
-  let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
+  const federation = createAndReturnFederation(event.address, event)
+  const members = federation.members
+  members.splice(members.indexOf(event.params.member), 1)
+  federation.members = members
+  federation.updatedAtTx = transaction.id
+  federation.save()
 }
 
 export function handleRequirementChange(event: RequirementChangeEvent): void {
