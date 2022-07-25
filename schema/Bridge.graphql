@@ -162,6 +162,8 @@ enum BridgeType {
 type Bridge @entity {
   id: ID! # Bridge address
   type: BridgeType! # BridgeType
+  prefix: String
+  isSuffix: Boolean
   federations: [Federation!] @derivedFrom(field: "bridge")
   isUpgrading: Boolean! # boolean
   isPaused: Boolean! # boolean

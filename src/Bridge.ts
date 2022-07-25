@@ -213,6 +213,13 @@ export function handlePrefixUpdated(event: PrefixUpdatedEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  // TODO: check if this event is ever fired, if not remove this logic and these fields from the bridge
+  const bridge = createAndReturnBridge(event.address, event)
+  bridge.prefix = event.params._prefix
+  bridge.isSuffix = event.params._isSuffix
+  bridge.updatedAtTx = transaction.id
+  bridge.save()
 }
 
 export function handleRevokeTx(event: RevokeTxEvent): void {
