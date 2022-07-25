@@ -14,7 +14,7 @@ const manifestSections = {
     trading: [],
     bridge: ["FastBTCBridge"],
     // sovrynProtocol: [...amm, "ISovryn"],
-    vestingStaking: ["FourYearVesting", "Staking"]
+    vestingStaking: ["FourYearVesting", "Staking", "VestingRegistryProxy", "VestingRegistry1", "VestingRegistry2", "VestingRegistry3", "VestingRegistryFish"]
 }
 
 const pruneManifest = (section) => {
