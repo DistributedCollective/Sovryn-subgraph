@@ -54,3 +54,9 @@ export class CrossStatus {
   static Voting: string = 'Voting'
   static Executed: string = 'Executed'
 }
+
+export class BridgeChain {
+  static RSK: string = 'RSK'
+  static ETH: string = 'ETH'
+  static BSC: string = 'BSC'
+}

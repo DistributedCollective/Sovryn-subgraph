@@ -6,30 +6,36 @@ import { AcceptedCrossTransfer as AcceptedCrossTransferEvent, Cross as CrossEven
 import { CrossDirection, CrossStatus } from './types'
 import { createAndReturnUser } from './User'
 
-export const getTransactionId = (
-  tokenAddress: Address,
-  receiver: Address,
-  amount: BigInt,
-  // symbol: string,
-  decimals: i32,
-  granularity: BigInt,
-  userData: Bytes,
-): ByteArray => {
+export class CrossTransferEvent {
+  receiver: Address
+  tokenAddress: Address
+  amount: BigInt
+  // symbol?: string
+  decimals: i32
+  granularity: BigInt
+  userData: Bytes
+  status: string
+  direction: string
+  timestamp: BigInt
+  transactionId: string
+}
+
+export const getCrossTransferId = (crossTransferEvent: CrossTransferEvent): ByteArray => {
   return crypto.keccak256(
     Bytes.fromUTF8(
-      tokenAddress.toHex() +
+      crossTransferEvent.tokenAddress.toHex() +
         '-' +
-        receiver.toHex() +
+        crossTransferEvent.receiver.toHex() +
         '-' +
-        amount.toHex() +
+        crossTransferEvent.amount.toHex() +
         '-' +
         // symbol +
         // '-' +
-        decimals.toString() +
+        crossTransferEvent.decimals.toString() +
         '-' +
-        granularity.toHex() +
+        crossTransferEvent.granularity.toHex() +
         '-' +
-        userData.toHex(),
+        crossTransferEvent.userData.toHex(),
     ),
   )
 }
@@ -65,64 +71,21 @@ export const createAndReturnFederation = (federationAddress: Address, event: eth
   return federation
 }
 
-export const createAndReturnCrossTransferFromCrossEvent = (event: CrossEvent): CrossTransfer => {
-  const transactionId = getTransactionId(
-    event.params._tokenAddress,
-    event.params._to,
-    event.params._amount,
-    // event.params._symbol,
-    event.params._decimals,
-    event.params._granularity,
-    event.params._userData,
-  )
-
-  let crossTransfer = CrossTransfer.load(transactionId.toHex())
+export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEvent): CrossTransfer => {
+  const id = getCrossTransferId(crossTransferEvent)
+  let crossTransfer = CrossTransfer.load(id.toHex())
   if (crossTransfer == null) {
-    const token = Token.load(event.params._tokenAddress.toHex())
-
-    crossTransfer = new CrossTransfer(transactionId.toHex())
-    crossTransfer.direction = CrossDirection.Outgoing
-    crossTransfer.votes = 0
-    crossTransfer.status = CrossStatus.Voting
-    crossTransfer.tokenAddress = event.params._tokenAddress
+    crossTransfer = new CrossTransfer(id.toHex())
+    crossTransfer.direction = crossTransferEvent.direction.toString()
+    crossTransfer.status = crossTransferEvent.status.toString()
+    const user = createAndReturnUser(crossTransferEvent.receiver, crossTransferEvent.timestamp)
+    crossTransfer.receiver = user.id
+    crossTransfer.tokenAddress = crossTransferEvent.tokenAddress
+    // TODO: get side token
+    const token = Token.load(crossTransferEvent.tokenAddress.toHex())
     crossTransfer.token = token != null ? token.id : null
-    const user = createAndReturnUser(event.params._to, event.block.timestamp)
-    crossTransfer.to = user.id
-    crossTransfer.amount = decimal.fromBigInt(event.params._amount, event.params._decimals)
-    crossTransfer.symbol = event.params._symbol
-    crossTransfer.createdAtTx = event.transaction.hash.toHex()
-    crossTransfer.updatedAtTx = event.transaction.hash.toHex()
-    crossTransfer.save()
-  }
-
-  return crossTransfer
-}
-
-export const createAndReturnCrossTransferFromAcceptedCrossTransfer = (event: AcceptedCrossTransferEvent): CrossTransfer => {
-  const transactionId = getTransactionId(
-    event.params._tokenAddress,
-    event.params._to,
-    event.params._amount,
-    /* event.params._symbol,*/
-    event.params._decimals,
-    event.params._granularity,
-    event.params._userData,
-  )
-  let crossTransfer = CrossTransfer.load(transactionId.toHex())
-  if (crossTransfer == null) {
-    const token = Token.load(event.params._tokenAddress.toHex())
-    crossTransfer = new CrossTransfer(transactionId.toHex())
-    crossTransfer.direction = CrossDirection.Incoming
-    // TODO: better status for incoming transfers
-    crossTransfer.status = CrossStatus.Executed
-    crossTransfer.tokenAddress = event.params._tokenAddress
-    crossTransfer.token = token != null ? token.id : null
-    const user = createAndReturnUser(event.params._to, event.block.timestamp)
-    crossTransfer.to = user.id
-    crossTransfer.amount = decimal.fromBigInt(event.params._amount, event.params._decimals)
-    crossTransfer.symbol = token != null ? token.symbol : null
-    crossTransfer.updatedAtTx = event.transaction.hash.toHex()
-    crossTransfer.createdAtTx = event.transaction.hash.toHex()
+    crossTransfer.amount = decimal.fromBigInt(crossTransferEvent.amount, crossTransferEvent.decimals)
+    crossTransfer.createdAtTx = crossTransferEvent.transactionId
     crossTransfer.save()
   }
   return crossTransfer

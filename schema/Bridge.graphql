@@ -186,15 +186,24 @@ enum CrossStatus {
   # FAILED
 }
 
+enum BridgeChain {
+  RSK
+  ETH
+  BSC
+}
+
 type CrossTransfer @entity {
   id: ID! # TransactionIdU
   direction: CrossDirection! # CrossDirection
+  sourceChain: BridgeChain!
+  destinationChain: BridgeChain!
   votes: Int # uint8
   status: CrossStatus! # CrossStatus
   originalTokenAddress: Bytes
   tokenAddress: Bytes! # address
   token: Token
-  to: User! # address
+  receiver: User # address
+  sender: User
   amount: BigDecimal!
   symbol: String # string
   sourceChainBlockHash: Bytes # bytes

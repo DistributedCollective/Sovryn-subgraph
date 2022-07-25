@@ -39,14 +39,10 @@ import {
 } from '../generated/schema'
 
 import { Federation as FederationTemplate } from '../generated/templates'
-import {
-  createAndReturnBridge,
-  createAndReturnCrossTransferFromAcceptedCrossTransfer,
-  createAndReturnCrossTransferFromCrossEvent,
-  createAndReturnFederation,
-} from './utils/CrossChainBridge'
+import { createAndReturnBridge, createAndReturnCrossTransfer, createAndReturnFederation, CrossTransferEvent } from './utils/CrossChainBridge'
 
 import { createAndReturnTransaction } from './utils/Transaction'
+import { BridgeChain, CrossDirection, CrossStatus } from './utils/types'
 
 export function handleAcceptedCrossTransfer(event: AcceptedCrossTransferEvent): void {
   let entity = new AcceptedCrossTransfer(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
@@ -65,7 +61,25 @@ export function handleAcceptedCrossTransfer(event: AcceptedCrossTransferEvent): 
   entity.emittedBy = event.address
   entity.save()
 
-  createAndReturnCrossTransferFromAcceptedCrossTransfer(event)
+  const crossTransferEvent: CrossTransferEvent = {
+    receiver: event.params._to,
+    tokenAddress: event.params._tokenAddress,
+    amount: event.params._amount,
+    decimals: event.params._decimals,
+    granularity: event.params._granularity,
+    userData: event.params._userData,
+    status: CrossStatus.Executed,
+    direction: CrossDirection.Incoming,
+    timestamp: event.block.timestamp,
+    transactionId: transaction.id,
+  }
+  const crossTransfer = createAndReturnCrossTransfer(crossTransferEvent)
+  // TODO: find a way to tell if it is rsk bsc bridge or rsk ETH bridge
+  crossTransfer.sourceChain = BridgeChain.BSC
+  crossTransfer.destinationChain = BridgeChain.RSK
+  crossTransfer.updatedAtTx = transaction.id
+  crossTransfer.save()
+  // createAndReturnCrossTransferFromAcceptedCrossTransfer(event)
 }
 
 export function handleAllowTokenChanged(event: AllowTokenChangedEvent): void {
@@ -104,7 +118,26 @@ export function handleCross(event: CrossEvent): void {
   entity.emittedBy = event.address
   entity.save()
 
-  createAndReturnCrossTransferFromCrossEvent(event)
+  const crossTransferEvent: CrossTransferEvent = {
+    receiver: event.params._to,
+    tokenAddress: event.params._tokenAddress,
+    amount: event.params._amount,
+    decimals: event.params._decimals,
+    granularity: event.params._granularity,
+    userData: event.params._userData,
+    status: CrossStatus.Executed,
+    direction: CrossDirection.Outgoing,
+    timestamp: event.block.timestamp,
+    transactionId: transaction.id,
+  }
+
+  const crossTransfer = createAndReturnCrossTransfer(crossTransferEvent)
+  crossTransfer.symbol = event.params._symbol
+  crossTransfer.sourceChain = BridgeChain.RSK
+  // TODO: find a way to tell if it is rsk bsc bridge or rsk ETH bridge
+  crossTransfer.destinationChain = BridgeChain.BSC
+  crossTransfer.updatedAtTx = transaction.id
+  crossTransfer.save()
 }
 
 export function handleErrorTokenReceiver(event: ErrorTokenReceiverEvent): void {
@@ -127,7 +160,7 @@ export function handleFederationChanged(event: FederationChangedEvent): void {
   entity.save()
 
   FederationTemplate.create(event.params._newFederation)
-
+  log.debug('Federation created: {}', [event.params._newFederation.toHex()])
   const bridge = createAndReturnBridge(event.address, event)
   bridge.updatedAtTx = transaction.id
   bridge.save()
@@ -139,6 +172,7 @@ export function handleFederationChanged(event: FederationChangedEvent): void {
 }
 
 export function handleNewSideToken(event: NewSideTokenEvent): void {
+  // TODO: create side token entity, if cross transfer is of side token how to store it to CrossTransfer entity?
   let entity = new NewSideToken(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   entity._newSideTokenAddress = event.params._newSideTokenAddress
   entity._originalTokenAddress = event.params._originalTokenAddress
@@ -151,16 +185,21 @@ export function handleNewSideToken(event: NewSideTokenEvent): void {
   entity.save()
 }
 
-export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {
-  let entity = new OwnershipTransferred(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.previousOwner = event.params.previousOwner
-  entity.newOwner = event.params.newOwner
-  let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-}
+// export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {
+//   let entity = new OwnershipTransferred(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
+//   entity.previousOwner = event.params.previousOwner
+//   entity.newOwner = event.params.newOwner
+//   let transaction = createAndReturnTransaction(event)
+//   entity.transaction = transaction.id
+//   entity.timestamp = transaction.timestamp
+//   entity.emittedBy = event.address
+//   entity.save()
+
+//   const bridge = createAndReturnBridge(event.address, event)
+//   bridge.owner = event.params.newOwner
+//   bridge.updatedAtTx = transaction.id
+//   bridge.save()
+// }
 
 export function handlePaused(event: PausedEvent): void {
   let entity = new Paused(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
@@ -202,6 +241,13 @@ export function handlePauserRemoved(event: PauserRemovedEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  const bridge = createAndReturnBridge(event.address, event)
+  const pausers = bridge.pausers
+  pausers.splice(pausers.indexOf(event.params.account), 1)
+  bridge.pausers = pausers
+  bridge.updatedAtTx = transaction.id
+  bridge.save()
 }
 
 export function handlePrefixUpdated(event: PrefixUpdatedEvent): void {
@@ -232,15 +278,15 @@ export function handleRevokeTx(event: RevokeTxEvent): void {
   entity.save()
 }
 
-export function handleSideTokenFactoryChanged(event: SideTokenFactoryChangedEvent): void {
-  let entity = new SideTokenFactoryChanged(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity._newSideTokenFactory = event.params._newSideTokenFactory
-  let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
-}
+// export function handleSideTokenFactoryChanged(event: SideTokenFactoryChangedEvent): void {
+//   let entity = new SideTokenFactoryChanged(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
+//   entity._newSideTokenFactory = event.params._newSideTokenFactory
+//   let transaction = createAndReturnTransaction(event)
+//   entity.transaction = transaction.id
+//   entity.timestamp = transaction.timestamp
+//   entity.emittedBy = event.address
+//   entity.save()
+// }
 
 export function handleUnpaused(event: UnpausedEvent): void {
   let entity = new Unpaused(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
