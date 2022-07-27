@@ -313,15 +313,15 @@ export function handleRevokeTx(event: RevokeTxEvent): void {
   entity.save()
 }
 
-// export function handleSideTokenFactoryChanged(event: SideTokenFactoryChangedEvent): void {
-//   let entity = new SideTokenFactoryChanged(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-//   entity._newSideTokenFactory = event.params._newSideTokenFactory
-//   let transaction = createAndReturnTransaction(event)
-//   entity.transaction = transaction.id
-//   entity.timestamp = transaction.timestamp
-//   entity.emittedBy = event.address
-//   entity.save()
-// }
+export function handleSideTokenFactoryChanged(event: SideTokenFactoryChangedEvent): void {
+  // let entity = new SideTokenFactoryChanged(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
+  // entity._newSideTokenFactory = event.params._newSideTokenFactory
+  // let transaction = createAndReturnTransaction(event)
+  // entity.transaction = transaction.id
+  // entity.timestamp = transaction.timestamp
+  // entity.emittedBy = event.address
+  // entity.save()
+}
 
 export function handleUnpaused(event: UnpausedEvent): void {
   let entity = new Unpaused(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
@@ -354,11 +354,11 @@ export function handleUpgrading(event: UpgradingEvent): void {
 }
 
 export function handleerc777ConverterSet(event: erc777ConverterSetEvent): void {
-  let entity = new erc777ConverterSet(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity.erc777ConverterAddress = event.params.erc777ConverterAddress
-  let transaction = createAndReturnTransaction(event)
-  entity.transaction = transaction.id
-  entity.timestamp = transaction.timestamp
-  entity.emittedBy = event.address
-  entity.save()
+  //   let entity = new erc777ConverterSet(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
+  //   entity.erc777ConverterAddress = event.params.erc777ConverterAddress
+  //   let transaction = createAndReturnTransaction(event)
+  //   entity.transaction = transaction.id
+  //   entity.timestamp = transaction.timestamp
+  //   entity.emittedBy = event.address
+  //   entity.save()
 }
