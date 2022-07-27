@@ -153,3 +153,57 @@ export function handleVoted(event: VotedEvent): void {
   federation.updatedAtTx = transaction.id
   federation.save()
 }
+
+export function handleVotedV0(event: VotedEvent): void {
+  let entity = new Voted(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
+  entity.sender = event.params.sender
+  entity.transactionId = event.params.transactionId
+  // entity.originalTokenAddress = event.params.originalTokenAddress
+  // entity.receiver = event.params.receiver
+  // entity.amount = event.params.amount
+  // entity.symbol = event.params.symbol
+  // entity.blockHash = event.params.blockHash
+  // entity.transactionHash = event.params.transactionHash
+  // entity.logIndex = event.params.logIndex
+  // entity.decimals = event.params.decimals
+  // entity.granularity = event.params.granularity
+  // entity.userData = event.params.userData
+  let transaction = createAndReturnTransaction(event)
+  entity.transaction = transaction.id
+  entity.timestamp = transaction.timestamp
+  entity.emittedBy = event.address
+  entity.save()
+
+  log.info('src/Federation.ts ~ Federation.ts ~ 143 ~  event.address: {}', [event.address.toHex()])
+  const federation = createAndReturnFederation(event.address, event)
+  federation.totalVotes = federation.totalVotes + 1
+  federation.updatedAtTx = transaction.id
+  federation.save()
+}
+
+export function handleVotedV1(event: VotedEvent): void {
+  let entity = new Voted(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
+  entity.sender = event.params.sender
+  entity.transactionId = event.params.transactionId
+  entity.originalTokenAddress = event.params.originalTokenAddress
+  entity.receiver = event.params.receiver
+  entity.amount = event.params.amount
+  entity.symbol = event.params.symbol
+  entity.blockHash = event.params.blockHash
+  entity.transactionHash = event.params.transactionHash
+  entity.logIndex = event.params.logIndex
+  entity.decimals = event.params.decimals
+  entity.granularity = event.params.granularity
+  // entity.userData = event.params.userData
+  let transaction = createAndReturnTransaction(event)
+  entity.transaction = transaction.id
+  entity.timestamp = transaction.timestamp
+  entity.emittedBy = event.address
+  entity.save()
+
+  log.info('src/Federation.ts ~ Federation.ts ~ 143 ~  event.address: {}', [event.address.toHex()])
+  const federation = createAndReturnFederation(event.address, event)
+  federation.totalVotes = federation.totalVotes + 1
+  federation.updatedAtTx = transaction.id
+  federation.save()
+}
