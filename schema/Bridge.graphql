@@ -162,6 +162,7 @@ enum BridgeType {
 type Bridge @entity {
   id: ID! # Bridge address
   type: BridgeType! # BridgeType
+  # owner: Bytes
   prefix: String
   isSuffix: Boolean
   federations: [Federation!] @derivedFrom(field: "bridge")
