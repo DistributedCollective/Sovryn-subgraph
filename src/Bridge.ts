@@ -1,4 +1,5 @@
-import { log } from '@graphprotocol/graph-ts'
+import { Address, log } from '@graphprotocol/graph-ts'
+import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
 import {
   AcceptedCrossTransfer as AcceptedCrossTransferEvent,
   AllowTokenChanged as AllowTokenChangedEvent,
@@ -164,6 +165,14 @@ export function handleFederationChanged(event: FederationChangedEvent): void {
   FederationTemplate.create(event.params._newFederation)
   log.debug('Federation created: {}', [event.params._newFederation.toHex()])
   const bridge = createAndReturnBridge(event.address, event)
+  const oldFederationAddress = bridge.federation
+  if (oldFederationAddress != ZERO_ADDRESS) {
+    const oldFederation = createAndReturnFederation(Address.fromString(oldFederationAddress), event)
+    oldFederation.isActive = false
+    oldFederation.updatedAtTx = transaction.id
+    oldFederation.save()
+  }
+  bridge.federation = event.params._newFederation.toHex()
   bridge.updatedAtTx = transaction.id
   bridge.save()
 

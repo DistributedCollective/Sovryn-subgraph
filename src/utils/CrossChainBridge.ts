@@ -1,5 +1,5 @@
 import { BigInt, Address, ethereum, Bytes, crypto, ByteArray } from '@graphprotocol/graph-ts'
-import { decimal } from '@protofire/subgraph-toolkit'
+import { decimal, ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
 import { Federation, Bridge, CrossTransfer, Token, SideToken, Transaction } from '../../generated/schema'
 import { createAndReturnTransaction } from './Transaction'
 import { AcceptedCrossTransfer as AcceptedCrossTransferEvent, Cross as CrossEvent } from '../../generated/Bridge/Bridge'
@@ -51,6 +51,7 @@ export const createAndReturnBridge = (bridgeAddress: Address, event: ethereum.Ev
     bridge.totalFundsReceived = BigInt.zero()
     bridge.totalFundsReceived = BigInt.zero()
     bridge.feesCollected = BigInt.zero()
+    bridge.federation = ZERO_ADDRESS
     const tx = createAndReturnTransaction(event)
     bridge.createdAtTx = tx.id
     bridge.save()
@@ -64,6 +65,7 @@ export const createAndReturnFederation = (federationAddress: Address, event: eth
     federation = new Federation(federationAddress.toHex())
     federation.totalExecuted = 0
     federation.totalVotes = 0
+    federation.isActive = true
     const tx = createAndReturnTransaction(event)
     federation.createdAtTx = tx.id
     federation.save()
@@ -77,6 +79,7 @@ export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEv
   if (crossTransfer == null) {
     crossTransfer = new CrossTransfer(id.toHex())
     crossTransfer.direction = crossTransferEvent.direction.toString()
+    crossTransfer.votes = 0
     crossTransfer.status = crossTransferEvent.status.toString()
     const user = createAndReturnUser(crossTransferEvent.receiver, crossTransferEvent.timestamp)
     crossTransfer.receiver = user.id

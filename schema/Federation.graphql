@@ -75,7 +75,7 @@ type Voted @entity {
 
 type Federation @entity {
   id: ID! # Bridge address
-  # type: BridgeType! # BridgeType
+  isActive: Boolean! # Is active
   bridge: Bridge!
   totalVotes: Int!
   totalExecuted: Int!

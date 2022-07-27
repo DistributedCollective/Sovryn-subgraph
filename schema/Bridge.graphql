@@ -165,7 +165,7 @@ type Bridge @entity {
   # owner: Bytes
   prefix: String
   isSuffix: Boolean
-  federations: [Federation!] @derivedFrom(field: "bridge")
+  federation: Federation!
   isUpgrading: Boolean! # boolean
   isPaused: Boolean! # boolean
   totalFundsSent: BigInt! # uint256
