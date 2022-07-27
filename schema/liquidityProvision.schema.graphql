@@ -1,8 +1,12 @@
 """
-This entity stores one Users history of adding and removing liquidity from one AMM pool
+This entity stores one User's history of adding and removing liquidity from one AMM pool
 """
 type UserLiquidityHistory @entity {
-  id: ID! # user + '-' + smartToken
+  """
+  The ID is userAddress + '-' + smartToken
+  Liquidity Pool address is not used here because when a liquidity pool is updated the address changes, but the smart token address remains the same.
+  """
+  id: ID!
   user: User!
   poolToken: PoolToken!
   totalAsset0LiquidityAdded: BigDecimal!
