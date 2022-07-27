@@ -71,13 +71,14 @@ export function handleAcceptedCrossTransfer(event: AcceptedCrossTransferEvent): 
     status: CrossStatus.Executed,
     direction: CrossDirection.Incoming,
     timestamp: event.block.timestamp,
-    transactionId: transaction.id,
+    transaction,
   }
   const crossTransfer = createAndReturnCrossTransfer(crossTransferEvent)
   // TODO: find a way to tell if it is rsk bsc bridge or rsk ETH bridge
   crossTransfer.sourceChain = BridgeChain.BSC
   crossTransfer.destinationChain = BridgeChain.RSK
   crossTransfer.updatedAtTx = transaction.id
+  crossTransfer.updatedAtTimestamp = transaction.timestamp
   crossTransfer.save()
   // createAndReturnCrossTransferFromAcceptedCrossTransfer(event)
 }
@@ -128,7 +129,7 @@ export function handleCross(event: CrossEvent): void {
     status: CrossStatus.Executed,
     direction: CrossDirection.Outgoing,
     timestamp: event.block.timestamp,
-    transactionId: transaction.id,
+    transaction,
   }
 
   const crossTransfer = createAndReturnCrossTransfer(crossTransferEvent)
@@ -137,6 +138,7 @@ export function handleCross(event: CrossEvent): void {
   // TODO: find a way to tell if it is rsk bsc bridge or rsk ETH bridge
   crossTransfer.destinationChain = BridgeChain.BSC
   crossTransfer.updatedAtTx = transaction.id
+  crossTransfer.updatedAtTimestamp = transaction.timestamp
   crossTransfer.save()
 }
 

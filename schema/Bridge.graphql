@@ -216,5 +216,11 @@ type CrossTransfer @entity {
   # calculatedGranularity: BigInt! # uint256
 
   createdAtTx: Transaction! # Transaction
+  createdAtTimestamp: Int!
+  updatedAtTx: Transaction! # Transaction
+  updatedAtTimestamp: Int!
+}
+
+  createdAtTx: Transaction! # Transaction
   updatedAtTx: Transaction! # Transaction
 }

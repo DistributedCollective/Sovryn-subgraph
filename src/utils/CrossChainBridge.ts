@@ -1,6 +1,6 @@
 import { BigInt, Address, ethereum, Bytes, crypto, ByteArray } from '@graphprotocol/graph-ts'
 import { decimal } from '@protofire/subgraph-toolkit'
-import { Federation, Bridge, CrossTransfer, Token } from '../../generated/schema'
+import { Federation, Bridge, CrossTransfer, Token, SideToken, Transaction } from '../../generated/schema'
 import { createAndReturnTransaction } from './Transaction'
 import { AcceptedCrossTransfer as AcceptedCrossTransferEvent, Cross as CrossEvent } from '../../generated/Bridge/Bridge'
 import { CrossDirection, CrossStatus } from './types'
@@ -17,7 +17,7 @@ export class CrossTransferEvent {
   status: string
   direction: string
   timestamp: BigInt
-  transactionId: string
+  transaction: Transaction
 }
 
 export const getCrossTransferId = (crossTransferEvent: CrossTransferEvent): ByteArray => {
@@ -85,7 +85,8 @@ export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEv
     const token = Token.load(crossTransferEvent.tokenAddress.toHex())
     crossTransfer.token = token != null ? token.id : null
     crossTransfer.amount = decimal.fromBigInt(crossTransferEvent.amount, crossTransferEvent.decimals)
-    crossTransfer.createdAtTx = crossTransferEvent.transactionId
+    crossTransfer.createdAtTx = crossTransferEvent.transaction.id
+    crossTransfer.createdAtTimestamp = crossTransferEvent.transaction.timestamp
     crossTransfer.save()
   }
   return crossTransfer
