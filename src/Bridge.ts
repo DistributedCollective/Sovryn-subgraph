@@ -37,6 +37,7 @@ import {
   Unpaused,
   Upgrading,
   erc777ConverterSet,
+  SideToken,
 } from '../generated/schema'
 
 import { Federation as FederationTemplate } from '../generated/templates'
@@ -194,6 +195,29 @@ export function handleNewSideToken(event: NewSideTokenEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
+
+  let sideToken0 = SideToken.load(event.params._newSideTokenAddress.toHex())
+  if (sideToken0 == null) {
+    sideToken0 = new SideToken(event.params._newSideTokenAddress.toHex())
+    sideToken0.originalTokenAddress = event.params._originalTokenAddress
+    sideToken0.sideTokenAddress = event.params._newSideTokenAddress
+    sideToken0.newSymbol = event.params._newSymbol
+    sideToken0.granularity = event.params._granularity.toI32()
+    sideToken0.createdAtTx = transaction.id
+    sideToken0.updatedAtTx = transaction.id
+    sideToken0.save()
+  }
+  let sideToken1 = SideToken.load(event.params._originalTokenAddress.toHex())
+  if (sideToken1 == null) {
+    sideToken1 = new SideToken(event.params._originalTokenAddress.toHex())
+    sideToken1.originalTokenAddress = event.params._originalTokenAddress
+    sideToken1.sideTokenAddress = event.params._newSideTokenAddress
+    sideToken1.newSymbol = event.params._newSymbol
+    sideToken1.granularity = event.params._granularity.toI32()
+    sideToken1.createdAtTx = transaction.id
+    sideToken1.updatedAtTx = transaction.id
+    sideToken1.save()
+  }
 }
 
 // export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {

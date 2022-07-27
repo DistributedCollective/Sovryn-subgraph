@@ -203,6 +203,7 @@ type CrossTransfer @entity {
   originalTokenAddress: Bytes
   tokenAddress: Bytes! # address
   token: Token
+  sideToken: SideToken # SideToken
   receiver: User # address
   sender: User
   amount: BigDecimal!
@@ -222,6 +223,12 @@ type CrossTransfer @entity {
   updatedAtTimestamp: Int!
 }
 
+type SideToken @entity {
+  id: ID!
+  originalTokenAddress: Bytes!
+  sideTokenAddress: Bytes!
+  newSymbol: String!
+  granularity: Int!
   createdAtTx: Transaction! # Transaction
   updatedAtTx: Transaction! # Transaction
 }

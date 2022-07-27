@@ -85,8 +85,10 @@ export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEv
     crossTransfer.receiver = user.id
     crossTransfer.tokenAddress = crossTransferEvent.tokenAddress
     // TODO: get side token
-    const token = Token.load(crossTransferEvent.tokenAddress.toHex())
-    crossTransfer.token = token != null ? token.id : null
+    // const token = Token.load(crossTransferEvent.tokenAddress.toHex())
+    crossTransfer.token = crossTransferEvent.tokenAddress.toHex()
+    // const sideToken = SideToken.load(crossTransferEvent.tokenAddress.toHex())
+    crossTransfer.sideToken = crossTransferEvent.tokenAddress.toHex()
     crossTransfer.amount = decimal.fromBigInt(crossTransferEvent.amount, crossTransferEvent.decimals)
     crossTransfer.createdAtTx = crossTransferEvent.transaction.id
     crossTransfer.createdAtTimestamp = crossTransferEvent.transaction.timestamp
