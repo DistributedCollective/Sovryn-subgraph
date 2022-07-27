@@ -1,5 +1,5 @@
 import { SmartTokenAdded as SmartTokenAddedEvent, SmartTokenRemoved as SmartTokenRemovedEvent } from '../generated/ConverterRegistry/ConverterRegistry'
-import { SmartTokenAdded, LiquidityPool, ConverterRegistry, SmartToken } from '../generated/schema'
+import { LiquidityPool, ConverterRegistry, SmartToken } from '../generated/schema'
 import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnConverterRegistry } from './utils/ConverterRegistry'
 
@@ -26,10 +26,6 @@ export function handleSmartTokenAdded(event: SmartTokenAddedEvent): void {
       registry.save()
     }
   }
-
-  let entity = new SmartTokenAdded(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  entity._smartToken = event.params._smartToken
-  entity.save()
 }
 
 export function handleSmartTokenRemoved(event: SmartTokenRemovedEvent): void {
