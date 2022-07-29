@@ -50,7 +50,7 @@ enum RewardsEarnedAction {
 }
 
 type RewardsEarnedHistoryItem @entity {
-  id: ID! # transaction hash
+  id: ID! # transaction hash + RewardEarnedAction
   action: RewardsEarnedAction!
   user: UserRewardsEarnedHistory!
   token: Token

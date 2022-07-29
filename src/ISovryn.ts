@@ -35,7 +35,6 @@ import {
   Trade,
   Swap,
   UserRewardsEarnedHistory,
-  RewardsEarnedHistoryItem,
   Loan,
   Rollover,
 } from '../generated/schema'
@@ -48,6 +47,7 @@ import { convertToUsd } from './utils/Prices'
 import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
 import { createAndReturnLendingPool } from './utils/LendingPool'
 import { RewardsEarnedAction } from './utils/types'
+import { createOrIncrementRewardItem } from './utils/RewardsEarnedHistoryItem'
 
 export function handleBorrow(event: BorrowEvent): void {
   createAndReturnTransaction(event)
@@ -294,13 +294,13 @@ export function handleEarnReward(event: EarnRewardEvent): void {
     userRewardsEarnedHistory.save()
   }
 
-  let rewardsEarnedHistoryItem = new RewardsEarnedHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  rewardsEarnedHistoryItem.action = RewardsEarnedAction.EarnReward
-  rewardsEarnedHistoryItem.user = event.params.receiver.toHexString()
-  rewardsEarnedHistoryItem.amount = amount
-  rewardsEarnedHistoryItem.timestamp = event.block.timestamp.toI32()
-  rewardsEarnedHistoryItem.transaction = event.transaction.hash.toHexString()
-  rewardsEarnedHistoryItem.save()
+  createOrIncrementRewardItem({
+    action: RewardsEarnedAction.EarnReward,
+    user: event.params.receiver,
+    amount: amount,
+    timestamp: event.block.timestamp,
+    transactionHash: event.transaction.hash,
+  })
 }
 
 export function handleExternalSwap(event: ExternalSwapEvent): void {

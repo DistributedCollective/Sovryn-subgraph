@@ -1,18 +1,12 @@
 import { PoolTokenAdded, PoolTokenUpdated, RewardClaimed as RewardClaimedEvent } from '../generated/MiningProxy/MiningProxy'
-import {
-  UserRewardsEarnedHistory,
-  RewardsEarnedHistoryItem,
-  LiquidityMiningGlobal,
-  LiquidityMiningAllocationPoint,
-  LendingPool,
-  SmartToken,
-} from '../generated/schema'
+import { UserRewardsEarnedHistory, LiquidityMiningGlobal, LiquidityMiningAllocationPoint, LendingPool, SmartToken } from '../generated/schema'
 import { MiningProxy } from '../generated/MiningProxy/MiningProxy'
 import { createAndReturnTransaction } from './utils/Transaction'
 import { createAndReturnUser } from './utils/User'
 import { BigDecimal, Address, BigInt } from '@graphprotocol/graph-ts'
 import { RewardsEarnedAction } from './utils/types'
 import { DEFAULT_DECIMALS, decimal } from '@protofire/subgraph-toolkit'
+import { createOrIncrementRewardItem } from './utils/RewardsEarnedHistoryItem'
 
 export function handleRewardClaimed(event: RewardClaimedEvent): void {
   createAndReturnTransaction(event)
@@ -33,13 +27,13 @@ export function handleRewardClaimed(event: RewardClaimedEvent): void {
     userRewardsEarnedHistory.save()
   }
 
-  let rewardsEarnedHistoryItem = new RewardsEarnedHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  rewardsEarnedHistoryItem.action = RewardsEarnedAction.RewardClaimed
-  rewardsEarnedHistoryItem.user = event.params.user.toHexString()
-  rewardsEarnedHistoryItem.amount = amount
-  rewardsEarnedHistoryItem.timestamp = event.block.timestamp.toI32()
-  rewardsEarnedHistoryItem.transaction = event.transaction.hash.toHexString()
-  rewardsEarnedHistoryItem.save()
+  createOrIncrementRewardItem({
+    action: RewardsEarnedAction.RewardClaimed,
+    user: event.params.user,
+    amount: amount,
+    timestamp: event.block.timestamp,
+    transactionHash: event.transaction.hash,
+  })
 }
 
 export function handlePoolTokenAdded(event: PoolTokenAdded): void {
