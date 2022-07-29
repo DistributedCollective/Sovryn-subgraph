@@ -553,7 +553,7 @@ dataSources:
           handler: handleTokensWithdrawn
         - event: StakingWithdrawn(indexed address,uint256,uint256,indexed address,bool)
           handler: handleStakingWithdrawn
-      file: ./src/Staking.ts
+      file: ./src/StakingFish.ts
    
   #  FeeSharingProxy contract
   - kind: ethereum/contract

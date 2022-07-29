@@ -55,6 +55,9 @@ export function handleTeamVestingCreated(event: TeamVestingCreatedEvent): void {
   }
 }
 
+/** This event has a different event signature than TeamVestingCreated, but for our purposes the logic is the same.
+ * TODO: Dry up this code
+ */
 export function handleTeamVestingCreatedProxy(event: TeamVestingCreatedProxyEvent): void {
   let existingContract = VestingContract.load(event.params.vesting.toHexString())
   if (existingContract == null) {

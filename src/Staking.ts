@@ -19,14 +19,6 @@ import { createAndReturnProtocolStats } from './utils/ProtocolStats'
 import { adminContracts, stakingFish } from './contracts/contracts'
 import { StakeHistoryAction, VestingHistoryActionItem, VestingContractType } from './utils/types'
 
-function isFishStaking(contract: Address): boolean {
-  if (contract.toHexString() == stakingFish) {
-    return true
-  } else {
-    return false
-  }
-}
-
 export function handleDelegateChanged(event: DelegateChangedEvent): void {
   let user = User.load(event.params.delegator.toHexString())
   if (event.params.fromDelegate.toHexString() != ZERO_ADDRESS && user != null) {
@@ -98,44 +90,39 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     /** Tokens were staked by user. We need to check that tokens staked were not from the FISH staking contract
      * We do not need to check for this on the vesting contracts, as these are already segmented by SOV/FISH
      */
-    if (event.address.toHexString() != stakingFish.toLowerCase()) {
-      createAndReturnUser(event.params.staker, event.block.timestamp)
 
-      let userStakeHistory = createAndReturnUserStakeHistory(event.params.staker)
-      userStakeHistory.totalStaked = userStakeHistory.totalStaked.plus(amount)
-      userStakeHistory.totalRemaining = userStakeHistory.totalRemaining.plus(amount)
-      userStakeHistory.save()
+    createAndReturnUser(event.params.staker, event.block.timestamp)
 
-      entity.isUserStaked = true
-      entity.user = event.params.staker.toHexString()
-      let stakeHistoryItem = new StakeHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-      stakeHistoryItem.user = event.params.staker.toHexString()
-      stakeHistoryItem.action = event.params.amount < event.params.totalStaked ? StakeHistoryAction.IncreaseStake : StakeHistoryAction.Stake
-      stakeHistoryItem.timestamp = event.block.timestamp.toI32()
-      stakeHistoryItem.transaction = transaction.id
-      stakeHistoryItem.amount = amount
-      stakeHistoryItem.lockedUntil = event.params.lockedUntil.toI32()
-      stakeHistoryItem.save()
+    let userStakeHistory = createAndReturnUserStakeHistory(event.params.staker)
+    userStakeHistory.totalStaked = userStakeHistory.totalStaked.plus(amount)
+    userStakeHistory.totalRemaining = userStakeHistory.totalRemaining.plus(amount)
+    userStakeHistory.save()
 
-      if (!isFishStaking(event.address)) {
-        let protocolStatsEntity = createAndReturnProtocolStats()
-        protocolStatsEntity.currentVoluntarilyStakedSov = protocolStatsEntity.currentVoluntarilyStakedSov.plus(
-          decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS),
-        )
-        protocolStatsEntity.save()
-      }
-    }
+    entity.isUserStaked = true
+    entity.user = event.params.staker.toHexString()
+    let stakeHistoryItem = new StakeHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
+    stakeHistoryItem.user = event.params.staker.toHexString()
+    stakeHistoryItem.action = event.params.amount < event.params.totalStaked ? StakeHistoryAction.IncreaseStake : StakeHistoryAction.Stake
+    stakeHistoryItem.timestamp = event.block.timestamp.toI32()
+    stakeHistoryItem.transaction = transaction.id
+    stakeHistoryItem.amount = amount
+    stakeHistoryItem.lockedUntil = event.params.lockedUntil.toI32()
+    stakeHistoryItem.save()
+
+    let protocolStatsEntity = createAndReturnProtocolStats()
+    protocolStatsEntity.currentVoluntarilyStakedSov = protocolStatsEntity.currentVoluntarilyStakedSov.plus(
+      decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS),
+    )
+    protocolStatsEntity.save()
   } else {
     vestingContract.currentBalance = vestingContract.currentBalance.plus(amount)
     vestingContract.save()
 
-    if (!isFishStaking(event.address)) {
-      let protocolStatsEntity = createAndReturnProtocolStats()
-      protocolStatsEntity.currentStakedByVestingSov = protocolStatsEntity.currentStakedByVestingSov.plus(
-        decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS),
-      )
-      protocolStatsEntity.save()
-    }
+    let protocolStatsEntity = createAndReturnProtocolStats()
+    protocolStatsEntity.currentStakedByVestingSov = protocolStatsEntity.currentStakedByVestingSov.plus(
+      decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS),
+    )
+    protocolStatsEntity.save()
 
     createVestingTokensStaked(event)
   }
@@ -222,11 +209,9 @@ function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams): void {
     }
     userStakeHistory.save()
 
-    if (!isFishStaking(params.stakingContract)) {
-      let protocolStatsEntity = createAndReturnProtocolStats()
-      protocolStatsEntity.currentVoluntarilyStakedSov = protocolStatsEntity.currentVoluntarilyStakedSov.minus(params.amount)
-      protocolStatsEntity.save()
-    }
+    let protocolStatsEntity = createAndReturnProtocolStats()
+    protocolStatsEntity.currentVoluntarilyStakedSov = protocolStatsEntity.currentVoluntarilyStakedSov.minus(params.amount)
+    protocolStatsEntity.save()
   } else if (vesting != null) {
     let vestingHistoryItem = new VestingHistoryItem(params.id)
     if (adminContracts.includes(params.receiver.toHexString().toLowerCase()) && vesting.type == VestingContractType.Team) {
@@ -246,11 +231,9 @@ function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams): void {
     vesting.currentBalance = vesting.currentBalance.minus(params.amount)
     vesting.save()
 
-    if (!isFishStaking(params.stakingContract)) {
-      let protocolStatsEntity = createAndReturnProtocolStats()
-      protocolStatsEntity.currentStakedByVestingSov = protocolStatsEntity.currentStakedByVestingSov.minus(params.amount)
-      protocolStatsEntity.save()
-    }
+    let protocolStatsEntity = createAndReturnProtocolStats()
+    protocolStatsEntity.currentStakedByVestingSov = protocolStatsEntity.currentStakedByVestingSov.minus(params.amount)
+    protocolStatsEntity.save()
   }
 }
 
