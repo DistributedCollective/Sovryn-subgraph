@@ -15,7 +15,7 @@ export function createOrIncrementRewardItem(params: CreateOrIncrementRewardParam
   let rewardsEarnedHistoryItem = RewardsEarnedHistoryItem.load(params.transactionHash.toHexString() + '-' + params.action)
   if (rewardsEarnedHistoryItem == null) {
     rewardsEarnedHistoryItem = new RewardsEarnedHistoryItem(params.transactionHash.toHexString() + '-' + params.action)
-    rewardsEarnedHistoryItem.action = RewardsEarnedAction.UserFeeWithdrawn
+    rewardsEarnedHistoryItem.action = params.action
     rewardsEarnedHistoryItem.user = params.user.toHexString()
     rewardsEarnedHistoryItem.amount = params.amount
     rewardsEarnedHistoryItem.timestamp = params.timestamp.toI32()
