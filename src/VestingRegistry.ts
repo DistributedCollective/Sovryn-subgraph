@@ -118,7 +118,7 @@ function getVestingContractType(address: string, cliff: BigInt, duration: BigInt
   /** To determine if a vesting contract from vesting registries 1 and 2 is from Origins or from a Strategic investment round, check if the cliff is equal to the duration
    * We could maybe also check the timestamp as added redundancy, but this adds testnet/mainnet complexity that I want to avoid
    */
-  const originsOrStragetic = (cliff: BigInt, duration: BigInt): string => {
+  const originsOrStrategic = (cliff: BigInt, duration: BigInt): string => {
     if (cliff == duration) {
       return VestingContractType.Origins
     } else {
@@ -128,7 +128,8 @@ function getVestingContractType(address: string, cliff: BigInt, duration: BigInt
 
   if (address == vestingRegistry3.toLowerCase()) return VestingContractType.Rewards
   if (address == vestingRegistryFish.toLowerCase()) return VestingContractType.Fish
-  if (address == vestingRegistry1.toLowerCase() || address == vestingRegistry2.toLowerCase()) return originsOrStragetic(cliff, duration)
+  if (address == vestingRegistry1.toLowerCase() || address == vestingRegistry2.toLowerCase()) return originsOrStrategic(cliff, duration)
 
+  /** Rewards is the default type. We could consider having type Undefined or Other */
   return VestingContractType.Rewards
 }

@@ -27,13 +27,26 @@ type UserRewardsEarnedHistory @entity {
 
 enum RewardsEarnedAction {
   """
-  This event is emitted when a user withdraws the SOV they have earned through voluntarily staking SOV
-
+  When a SOV Staker withdraws their liquid SOV reward for staking
   """
   StakingRewardWithdrawn
+  """
+  SOV reward earned when a user margin trades or one of their trades is rolled over.
+  The reward is a percentage of the trading fee, paid in SOV.
+  """
   EarnReward
+  """
+  When a user claims a liquidity mining reward
+  """
   RewardClaimed
+  """
+  When SOV is staked by a Rewards vesting contract (eg after it has been claimed by the user)
+  """
   RewardSovStaked
+  """
+  When an SOV Staker withdraws their share of the fees earned by the Protocol
+  """
+  UserFeeWithdrawn
 }
 
 type RewardsEarnedHistoryItem @entity {
