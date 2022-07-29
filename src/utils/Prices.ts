@@ -23,8 +23,8 @@ export function updateLastPriceUsdAll(): void {
         tokenEntity.prevPriceUsd = tokenEntity.lastPriceUsd
         tokenEntity.lastPriceUsd = tokenEntity.lastPriceBtc.times(btcUsdPrice).truncate(18)
         tokenEntity.save()
-      } else if (tokenEntity != null && tokenEntity.hasStablecoinPool == true) {
-        /**TODO: Update btc price/candlesticks with btc/usd price */
+      } else {
+        /**TODO: Handle non-BTC pairs */
       }
     }
   }

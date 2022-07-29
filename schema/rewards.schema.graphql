@@ -19,10 +19,17 @@ type UserRewardsEarnedHistory @entity {
   Incremented by EarnReward events
   """
   totalTradingRewards: BigDecimal!
+  """
+  Granular events for transaction where a reward is earned
+  """
   rewardsEarnedHistory: [RewardsEarnedHistoryItem!] @derivedFrom(field: "user")
 }
 
 enum RewardsEarnedAction {
+  """
+  This event is emitted when a user withdraws the SOV they have earned through voluntarily staking SOV
+
+  """
   StakingRewardWithdrawn
   EarnReward
   RewardClaimed
