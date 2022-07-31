@@ -2,18 +2,19 @@ import { BigInt, Address, ethereum, Bytes, crypto, ByteArray } from '@graphproto
 import { decimal, ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
 import { Federation, Bridge, CrossTransfer, Token, SideToken, Transaction } from '../../generated/schema'
 import { createAndReturnTransaction } from './Transaction'
-import { AcceptedCrossTransfer as AcceptedCrossTransferEvent, Cross as CrossEvent } from '../../generated/Bridge/Bridge'
+import { AcceptedCrossTransfer as AcceptedCrossTransferEvent, Cross as CrossEvent, NewSideToken as NewSideTokenEvent } from '../../generated/Bridge/Bridge'
 import { CrossDirection, CrossStatus } from './types'
 import { createAndReturnUser } from './User'
 
 export class CrossTransferEvent {
+  id: string = ''
   receiver: Address
-  tokenAddress: Address
+  originalTokenAddress: Address
   amount: BigInt
   // symbol?: string
   decimals: i32
   granularity: BigInt
-  userData: Bytes
+  // userData: Bytes
   status: string
   direction: string
   timestamp: BigInt
@@ -23,7 +24,7 @@ export class CrossTransferEvent {
 export const getCrossTransferId = (crossTransferEvent: CrossTransferEvent): ByteArray => {
   return crypto.keccak256(
     Bytes.fromUTF8(
-      crossTransferEvent.tokenAddress.toHex() +
+      crossTransferEvent.originalTokenAddress.toHex() +
         '-' +
         crossTransferEvent.receiver.toHex() +
         '-' +
@@ -33,9 +34,9 @@ export const getCrossTransferId = (crossTransferEvent: CrossTransferEvent): Byte
         // '-' +
         crossTransferEvent.decimals.toString() +
         '-' +
-        crossTransferEvent.granularity.toHex() +
-        '-' +
-        crossTransferEvent.userData.toHex(),
+        crossTransferEvent.granularity.toHex(),
+      // '-' +
+      // crossTransferEvent.userData.toHex(),
     ),
   )
 }
@@ -74,25 +75,47 @@ export const createAndReturnFederation = (federationAddress: Address, event: eth
 }
 
 export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEvent): CrossTransfer => {
-  const id = getCrossTransferId(crossTransferEvent)
-  let crossTransfer = CrossTransfer.load(id.toHex())
+  const id = crossTransferEvent.id != null ? crossTransferEvent.id : getCrossTransferId(crossTransferEvent).toHex()
+  // let id: string
+  // if (crossTransferEvent.id != null) {
+  //   id = crossTransferEvent.id
+  // } else {
+  //   // if id is null, then we need to generate it from the event
+  //   id = crossTransferEvent.transaction.id + '-' + crossTransferEvent.logIndex.toString()
+  // }
+  let crossTransfer = CrossTransfer.load(id)
   if (crossTransfer == null) {
-    crossTransfer = new CrossTransfer(id.toHex())
+    crossTransfer = new CrossTransfer(id)
     crossTransfer.direction = crossTransferEvent.direction.toString()
     crossTransfer.votes = 0
     crossTransfer.status = crossTransferEvent.status.toString()
     const user = createAndReturnUser(crossTransferEvent.receiver, crossTransferEvent.timestamp)
     crossTransfer.receiver = user.id
-    crossTransfer.tokenAddress = crossTransferEvent.tokenAddress
+    crossTransfer.originalTokenAddress = crossTransferEvent.originalTokenAddress
     // TODO: get side token
     // const token = Token.load(crossTransferEvent.tokenAddress.toHex())
-    crossTransfer.token = crossTransferEvent.tokenAddress.toHex()
+    crossTransfer.token = crossTransferEvent.originalTokenAddress.toHex()
     // const sideToken = SideToken.load(crossTransferEvent.tokenAddress.toHex())
-    crossTransfer.sideToken = crossTransferEvent.tokenAddress.toHex()
+    crossTransfer.sideToken = crossTransferEvent.originalTokenAddress.toHex()
     crossTransfer.amount = decimal.fromBigInt(crossTransferEvent.amount, crossTransferEvent.decimals)
     crossTransfer.createdAtTx = crossTransferEvent.transaction.id
     crossTransfer.createdAtTimestamp = crossTransferEvent.transaction.timestamp
     crossTransfer.save()
   }
   return crossTransfer
+}
+
+export const createAndReturnSideToken = (sideTokenAddress: Address, event: NewSideTokenEvent, transaction: Transaction): SideToken => {
+  let sideToken = SideToken.load(sideTokenAddress.toHex())
+  if (sideToken == null) {
+    sideToken = new SideToken(sideTokenAddress.toHex())
+    sideToken.originalTokenAddress = event.params._originalTokenAddress
+    sideToken.sideTokenAddress = event.params._newSideTokenAddress
+    sideToken.newSymbol = event.params._newSymbol
+    sideToken.granularity = event.params._granularity
+    sideToken.createdAtTx = transaction.id
+    sideToken.updatedAtTx = transaction.id
+    sideToken.save()
+  }
+  return sideToken
 }

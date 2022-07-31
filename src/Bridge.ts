@@ -41,7 +41,13 @@ import {
 } from '../generated/schema'
 
 import { Federation as FederationTemplate } from '../generated/templates'
-import { createAndReturnBridge, createAndReturnCrossTransfer, createAndReturnFederation, CrossTransferEvent } from './utils/CrossChainBridge'
+import {
+  createAndReturnBridge,
+  createAndReturnCrossTransfer,
+  createAndReturnFederation,
+  createAndReturnSideToken,
+  CrossTransferEvent,
+} from './utils/CrossChainBridge'
 
 import { createAndReturnTransaction } from './utils/Transaction'
 import { BridgeChain, CrossDirection, CrossStatus } from './utils/types'
@@ -62,26 +68,26 @@ export function handleAcceptedCrossTransfer(event: AcceptedCrossTransferEvent): 
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
-
-  const crossTransferEvent: CrossTransferEvent = {
-    receiver: event.params._to,
-    tokenAddress: event.params._tokenAddress,
-    amount: event.params._amount,
-    decimals: event.params._decimals,
-    granularity: event.params._granularity,
-    userData: event.params._userData,
-    status: CrossStatus.Executed,
-    direction: CrossDirection.Incoming,
-    timestamp: event.block.timestamp,
-    transaction,
-  }
-  const crossTransfer = createAndReturnCrossTransfer(crossTransferEvent)
-  // TODO: find a way to tell if it is rsk bsc bridge or rsk ETH bridge
-  crossTransfer.sourceChain = BridgeChain.BSC
-  crossTransfer.destinationChain = BridgeChain.RSK
-  crossTransfer.updatedAtTx = transaction.id
-  crossTransfer.updatedAtTimestamp = transaction.timestamp
-  crossTransfer.save()
+  // const crossTransferEvent: CrossTransferEvent = {
+  //   receiver: event.params._to,
+  //   originalTokenAddress: event.params._tokenAddress,
+  //   amount: event.params._amount,
+  //   decimals: event.params._decimals,
+  //   granularity: event.params._granularity,
+  //   // userData: event.params._userData,
+  //   status: CrossStatus.Executed,
+  //   direction: CrossDirection.Incoming,
+  //   timestamp: event.block.timestamp,
+  //   transaction,
+  //   // logIndex: event.logIndex,
+  // }
+  // const crossTransfer = createAndReturnCrossTransfer(crossTransferEvent)
+  // // TODO: find a way to tell if it is rsk bsc bridge or rsk ETH bridge
+  // crossTransfer.sourceChain = BridgeChain.BSC
+  // crossTransfer.destinationChain = BridgeChain.RSK
+  // crossTransfer.updatedAtTx = transaction.id
+  // crossTransfer.updatedAtTimestamp = transaction.timestamp
+  // crossTransfer.save()
   // createAndReturnCrossTransferFromAcceptedCrossTransfer(event)
 }
 
@@ -123,11 +129,11 @@ export function handleCross(event: CrossEvent): void {
 
   const crossTransferEvent: CrossTransferEvent = {
     receiver: event.params._to,
-    tokenAddress: event.params._tokenAddress,
+    originalTokenAddress: event.params._tokenAddress,
     amount: event.params._amount,
     decimals: event.params._decimals,
     granularity: event.params._granularity,
-    userData: event.params._userData,
+    // userData: event.params._userData,
     status: CrossStatus.Executed,
     direction: CrossDirection.Outgoing,
     timestamp: event.block.timestamp,
@@ -184,7 +190,6 @@ export function handleFederationChanged(event: FederationChangedEvent): void {
 }
 
 export function handleNewSideToken(event: NewSideTokenEvent): void {
-  // TODO: create side token entity, if cross transfer is of side token how to store it to CrossTransfer entity?
   let entity = new NewSideToken(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   entity._newSideTokenAddress = event.params._newSideTokenAddress
   entity._originalTokenAddress = event.params._originalTokenAddress
@@ -196,28 +201,9 @@ export function handleNewSideToken(event: NewSideTokenEvent): void {
   entity.emittedBy = event.address
   entity.save()
 
-  let sideToken0 = SideToken.load(event.params._newSideTokenAddress.toHex())
-  if (sideToken0 == null) {
-    sideToken0 = new SideToken(event.params._newSideTokenAddress.toHex())
-    sideToken0.originalTokenAddress = event.params._originalTokenAddress
-    sideToken0.sideTokenAddress = event.params._newSideTokenAddress
-    sideToken0.newSymbol = event.params._newSymbol
-    sideToken0.granularity = event.params._granularity.toI32()
-    sideToken0.createdAtTx = transaction.id
-    sideToken0.updatedAtTx = transaction.id
-    sideToken0.save()
-  }
-  let sideToken1 = SideToken.load(event.params._originalTokenAddress.toHex())
-  if (sideToken1 == null) {
-    sideToken1 = new SideToken(event.params._originalTokenAddress.toHex())
-    sideToken1.originalTokenAddress = event.params._originalTokenAddress
-    sideToken1.sideTokenAddress = event.params._newSideTokenAddress
-    sideToken1.newSymbol = event.params._newSymbol
-    sideToken1.granularity = event.params._granularity.toI32()
-    sideToken1.createdAtTx = transaction.id
-    sideToken1.updatedAtTx = transaction.id
-    sideToken1.save()
-  }
+  // store sideToken with both address as ID so we can fetch it later by either one
+  createAndReturnSideToken(event.params._newSideTokenAddress, event, transaction)
+  createAndReturnSideToken(event.params._originalTokenAddress, event, transaction)
 }
 
 // export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {

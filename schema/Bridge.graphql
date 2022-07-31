@@ -200,8 +200,8 @@ type CrossTransfer @entity {
   destinationChain: BridgeChain!
   votes: Int # uint8
   status: CrossStatus! # CrossStatus
-  originalTokenAddress: Bytes
-  tokenAddress: Bytes! # address
+  originalTokenAddress: Bytes!
+  tokenAddress: Bytes # address
   token: Token
   sideToken: SideToken # SideToken
   receiver: User # address
@@ -228,7 +228,7 @@ type SideToken @entity {
   originalTokenAddress: Bytes!
   sideTokenAddress: Bytes!
   newSymbol: String!
-  granularity: Int!
+  granularity: BigInt!
   createdAtTx: Transaction! # Transaction
   updatedAtTx: Transaction! # Transaction
 }

@@ -704,14 +704,87 @@ dataSources:
         - event: NewBitcoinTransfer(indexed bytes32,string,uint256,uint256,uint256,indexed address)
           handler: handleNewBitcoinTransfer
       file: ./src/FastBTCBridge.ts
-
+  
+  # Bridge
   - kind: ethereum/contract
-    name: Bridge
+    name: BridgeBSC
     network: {{network}}
     source:
-      address: '{{Bridge.address}}'
+      address: '{{BridgeBSC.address}}'
       abi: Bridge
-      startBlock: {{Bridge.startBlock}}
+      startBlock: {{BridgeBSC.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - AcceptedCrossTransfer
+        - AllowTokenChanged
+        - BridgeReceiverStatusChanged
+        - Cross
+        - ErrorTokenReceiver
+        - FederationChanged
+        - NewSideToken
+        - OwnershipTransferred
+        - Paused
+        - PauserAdded
+        - PauserRemoved
+        - PrefixUpdated
+        - RevokeTx
+        - SideTokenFactoryChanged
+        - Unpaused
+        - Upgrading
+        - erc777ConverterSet
+      abis:
+        - name: Bridge
+          file: ./abis/Bridge.json
+        - name: Federation
+          file: ./abis/Federation.json
+      eventHandlers:
+        
+        - event: AcceptedCrossTransfer(indexed address,indexed address,uint256,uint8,uint256,uint256,uint8,uint256,bytes)
+          handler: handleAcceptedCrossTransfer
+        - event: AllowTokenChanged(address)
+          handler: handleAllowTokenChanged
+        - event: BridgeReceiverStatusChanged(address,bool)
+          handler: handleBridgeReceiverStatusChanged
+        - event: Cross(indexed address,indexed address,uint256,string,bytes,uint8,uint256)
+          handler: handleCross
+        - event: ErrorTokenReceiver(bytes)
+          handler: handleErrorTokenReceiver
+        - event: FederationChanged(address)
+          handler: handleFederationChanged
+        - event: NewSideToken(indexed address,indexed address,string,uint256)
+          handler: handleNewSideToken
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: Paused(address)
+          handler: handlePaused
+        - event: PauserAdded(indexed address)
+          handler: handlePauserAdded
+        - event: PauserRemoved(indexed address)
+          handler: handlePauserRemoved
+        - event: PrefixUpdated(bool,string)
+          handler: handlePrefixUpdated
+        - event: RevokeTx(bytes32)
+          handler: handleRevokeTx
+        - event: SideTokenFactoryChanged(address)
+          handler: handleSideTokenFactoryChanged
+        - event: Unpaused(address)
+          handler: handleUnpaused
+        - event: Upgrading(bool)
+          handler: handleUpgrading
+        - event: erc777ConverterSet(address)
+          handler: handleerc777ConverterSet
+      file: ./src/Bridge.ts
+
+  - kind: ethereum/contract
+    name: BridgeETH
+    network: {{network}}
+    source:
+      address: '{{BridgeETH.address}}'
+      abi: Bridge
+      startBlock: {{BridgeETH.startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
