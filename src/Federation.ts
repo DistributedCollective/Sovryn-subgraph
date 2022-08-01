@@ -25,7 +25,7 @@ import {
 } from '../generated/schema'
 
 import { createAndReturnTransaction } from './utils/Transaction'
-import { createAndReturnCrossTransfer, createAndReturnFederation, CrossTransferEvent, isETHBridge } from './utils/CrossChainBridge'
+import { createAndReturnCrossTransfer, createAndReturnFederation, CrossTransferEvent, handleFederatorVoted, isETHBridge } from './utils/CrossChainBridge'
 import { BridgeChain, CrossDirection, CrossStatus } from './utils/types'
 import { createAndReturnUser } from './utils/User'
 
@@ -159,31 +159,7 @@ export function handleVoted(event: VotedEvent): void {
   entity.emittedBy = event.address
   entity.save()
 
-  log.info('src/Federation.ts ~ Federation.ts ~ 143 ~  event.address: {}', [event.address.toHex()])
-  const federation = createAndReturnFederation(event.address, event)
-  federation.totalVotes = federation.totalVotes + 1
-  federation.updatedAtTx = transaction.id
-  federation.save()
-
-  // const sideToken = SideToken.load(event.params.originalTokenAddress.toHex())
-  // if (sideToken == null) {
-  //   log.error('src/Federation.ts ~ Federation.ts ~ 161 ~  event.params.originalTokenAddress: {}', [event.params.originalTokenAddress.toHex()])
-  //   return
-  // }
-  const crossTransferEvent: CrossTransferEvent = {
-    id: event.params.transactionId.toHex(),
-    receiver: event.params.receiver,
-    originalTokenAddress: event.params.originalTokenAddress,
-    amount: event.params.amount,
-    decimals: event.params.decimals,
-    granularity: event.params.granularity,
-    // userData: event.params.userData,
-    status: CrossStatus.Voting,
-    direction: CrossDirection.Incoming,
-    timestamp: event.block.timestamp,
-    transaction,
-  }
-  const crossTransfer = createAndReturnCrossTransfer(crossTransferEvent)
+  handleFederatorVoted(event, transaction)
 }
 
 export function handleVotedV0(event: VotedEvent): void {
@@ -222,44 +198,5 @@ export function handleVotedV1(event: VotedEvent): void {
   entity.emittedBy = event.address
   entity.save()
 
-  log.info('src/Federation.ts ~ Federation.ts ~ 143 ~  event.address: {}', [event.address.toHex()])
-  const federation = createAndReturnFederation(event.address, event)
-  federation.totalVotes = federation.totalVotes + 1
-  federation.updatedAtTx = transaction.id
-  federation.save()
-
-  const sideToken = SideToken.load(event.params.originalTokenAddress.toHex())
-  if (sideToken != null) {
-    const crossTransferEvent: CrossTransferEvent = {
-      id: event.params.transactionId.toHex(),
-      receiver: event.params.receiver,
-      originalTokenAddress: event.params.originalTokenAddress,
-      amount: event.params.amount,
-      decimals: event.params.decimals,
-      granularity: event.params.granularity,
-      // userData: event.params.userData,
-      status: CrossStatus.Voting,
-      direction: CrossDirection.Incoming,
-      timestamp: event.block.timestamp,
-      transaction,
-    }
-    const crossTransfer = createAndReturnCrossTransfer(crossTransferEvent)
-    crossTransfer.sourceChainTransactionHash = event.params.transactionHash
-    crossTransfer.sourceChainBlockHash = event.params.blockHash
-    // TODO: tokenAddress might not be a side token but rather a token that is "native" to RSK (WRBTC, SOV etc.) need to check
-    crossTransfer.tokenAddress = sideToken.sideTokenAddress
-    // TODO: if token is native to RSK, then symbol should be from token entity and not side token
-    crossTransfer.symbol = sideToken.newSymbol
-    createAndReturnUser(event.params.sender, event.block.timestamp) // making sure sender is created as a user in the graph
-    crossTransfer.sender = event.params.sender.toHex()
-    crossTransfer.votes = crossTransfer.votes + 1
-
-    const bridgeAddress = federation.bridge
-    crossTransfer.destinationChain = BridgeChain.RSK
-    crossTransfer.sourceChain = isETHBridge(bridgeAddress) ? BridgeChain.ETH : BridgeChain.BSC
-    crossTransfer.updatedAtTx = transaction.id
-    crossTransfer.updatedAtTimestamp = transaction.timestamp
-    crossTransfer.save()
-  }
-  log.debug('src/Federation.ts ~ Federation.ts ~ 262 ~  event.params.originalTokenAddress: {}', [event.params.originalTokenAddress.toHex()])
+  handleFederatorVoted(event, transaction)
 }

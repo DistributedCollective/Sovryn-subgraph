@@ -3,7 +3,8 @@ import { decimal, ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
 import { Federation, Bridge, CrossTransfer, Token, SideToken, Transaction } from '../../generated/schema'
 import { createAndReturnTransaction } from './Transaction'
 import { NewSideToken as NewSideTokenEvent } from '../../generated/Bridge/Bridge'
-import { BridgeType } from './types'
+import { Voted as VotedEvent } from '../../generated/templates/Federation/Federation'
+import { BridgeChain, BridgeType, CrossDirection, CrossStatus } from './types'
 import { createAndReturnUser } from './User'
 
 export class CrossTransferEvent {
@@ -117,6 +118,48 @@ export const createAndReturnSideToken = (sideTokenAddress: Address, event: NewSi
     sideToken.save()
   }
   return sideToken
+}
+
+export const handleFederatorVoted = (event: VotedEvent, transaction: Transaction): void => {
+  log.info('src/Federation.ts ~ Federation.ts ~ 999 ~  event.params.transactionId: {}', [event.params.transactionId.toHex()])
+  const federation = createAndReturnFederation(event.address, event)
+  federation.totalVotes = federation.totalVotes + 1
+  federation.updatedAtTx = transaction.id
+  federation.save()
+
+  const crossTransferEvent: CrossTransferEvent = {
+    id: event.params.transactionId.toHex(),
+    receiver: event.params.receiver,
+    originalTokenAddress: event.params.originalTokenAddress,
+    amount: event.params.amount,
+    decimals: event.params.decimals,
+    granularity: event.params.granularity,
+    // userData: event.params.userData,
+    status: CrossStatus.Voting,
+    direction: CrossDirection.Incoming,
+    timestamp: event.block.timestamp,
+    transaction,
+  }
+  const crossTransfer = createAndReturnCrossTransfer(crossTransferEvent)
+  crossTransfer.sourceChainTransactionHash = event.params.transactionHash
+  crossTransfer.sourceChainBlockHash = event.params.blockHash
+  // TODO: tokenAddress might not be a side token but rather a token that is "native" to RSK (WRBTC, SOV etc.) need to check
+  const sideToken = SideToken.load(event.params.originalTokenAddress.toHex())
+  if (sideToken != null) {
+    crossTransfer.tokenAddress = sideToken.sideTokenAddress
+  }
+  // TODO: if token is native to RSK, then symbol should be from token entity and not side token
+  crossTransfer.symbol = event.params.symbol
+  createAndReturnUser(event.params.sender, event.block.timestamp) // making sure sender is created as a user in the graph
+  crossTransfer.sender = event.params.sender.toHex()
+  crossTransfer.votes = crossTransfer.votes + 1
+
+  const bridgeAddress = federation.bridge
+  crossTransfer.destinationChain = BridgeChain.RSK
+  crossTransfer.sourceChain = isETHBridge(bridgeAddress) ? BridgeChain.ETH : BridgeChain.BSC
+  crossTransfer.updatedAtTx = transaction.id
+  crossTransfer.updatedAtTimestamp = transaction.timestamp
+  crossTransfer.save()
 }
 
 export function isETHBridge(address: string): boolean {
