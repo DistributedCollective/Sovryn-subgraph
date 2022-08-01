@@ -47,6 +47,7 @@ import {
   createAndReturnFederation,
   createAndReturnSideToken,
   CrossTransferEvent,
+  isETHBridge,
 } from './utils/CrossChainBridge'
 
 import { createAndReturnTransaction } from './utils/Transaction'
@@ -143,8 +144,8 @@ export function handleCross(event: CrossEvent): void {
   const crossTransfer = createAndReturnCrossTransfer(crossTransferEvent)
   crossTransfer.symbol = event.params._symbol
   crossTransfer.sourceChain = BridgeChain.RSK
-  // TODO: find a way to tell if it is rsk bsc bridge or rsk ETH bridge
-  crossTransfer.destinationChain = BridgeChain.BSC
+  const destinationChain = isETHBridge(event.address.toHex()) ? BridgeChain.ETH : BridgeChain.BSC
+  crossTransfer.destinationChain = destinationChain
   crossTransfer.updatedAtTx = transaction.id
   crossTransfer.updatedAtTimestamp = transaction.timestamp
   crossTransfer.save()

@@ -25,7 +25,7 @@ import {
 } from '../generated/schema'
 
 import { createAndReturnTransaction } from './utils/Transaction'
-import { createAndReturnCrossTransfer, createAndReturnFederation, CrossTransferEvent } from './utils/CrossChainBridge'
+import { createAndReturnCrossTransfer, createAndReturnFederation, CrossTransferEvent, isETHBridge } from './utils/CrossChainBridge'
 import { BridgeChain, CrossDirection, CrossStatus } from './utils/types'
 import { createAndReturnUser } from './utils/User'
 
@@ -253,8 +253,10 @@ export function handleVotedV1(event: VotedEvent): void {
     createAndReturnUser(event.params.sender, event.block.timestamp) // making sure sender is created as a user in the graph
     crossTransfer.sender = event.params.sender.toHex()
     crossTransfer.votes = crossTransfer.votes + 1
+
+    const bridgeAddress = federation.bridge
     crossTransfer.destinationChain = BridgeChain.RSK
-    crossTransfer.sourceChain = BridgeChain.BSC
+    crossTransfer.sourceChain = isETHBridge(bridgeAddress) ? BridgeChain.ETH : BridgeChain.BSC
     crossTransfer.updatedAtTx = transaction.id
     crossTransfer.updatedAtTimestamp = transaction.timestamp
     crossTransfer.save()

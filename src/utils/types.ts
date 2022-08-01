@@ -60,3 +60,8 @@ export class BridgeChain {
   static ETH: string = 'ETH'
   static BSC: string = 'BSC'
 }
+
+export class BridgeType {
+  static RSK_BSC: string = 'RSK_BSC'
+  static RSK_ETH: string = 'RSK_ETH'
+}

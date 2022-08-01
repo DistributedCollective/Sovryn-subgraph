@@ -45,8 +45,13 @@ export const createAndReturnBridge = (bridgeAddress: Address, event: ethereum.Ev
   let bridge = Bridge.load(bridgeAddress.toHex())
   if (bridge == null) {
     bridge = new Bridge(bridgeAddress.toHex())
-    // TODO: get bridge type dynamically
-    bridge.type = 'RSK_BSC'
+    if (isETHBridge(bridgeAddress.toHex())) {
+      bridge.type = BridgeType.RSK_ETH
+    } else if (isBSCBridge(bridgeAddress.toHex())) {
+      bridge.type = BridgeType.RSK_BSC
+    } else {
+      log.warning('Unknown bridge type for bridgeAddress: {}', [bridgeAddress.toHex()])
+    }
     bridge.isUpgrading = false
     bridge.isPaused = false
     bridge.totalFundsReceived = BigInt.zero()
@@ -118,4 +123,14 @@ export const createAndReturnSideToken = (sideTokenAddress: Address, event: NewSi
     sideToken.save()
   }
   return sideToken
+}
+
+export function isETHBridge(address: string): boolean {
+  // TODO: this is mainnet value only, find a way to test for testnet as well
+  return address == '0x1ccad820b6d031b41c54f1f3da11c0d48b399581'
+}
+
+export function isBSCBridge(address: string): boolean {
+  // TODO: this is mainnet value only, find a way to test for testnet as well
+  return address == '0x971b97c8cc82e7d27bc467c2dc3f219c6ee2e350'
 }
