@@ -1037,9 +1037,7 @@ templates:
     name: Federation
     network: {{network}}
     source:
-      # address: '{{Federation.address}}'
       abi: Federation
-      # startBlock: {{Federation.startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
