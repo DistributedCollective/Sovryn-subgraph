@@ -6,6 +6,7 @@ import { NewSideToken as NewSideTokenEvent } from '../../generated/Bridge/Bridge
 import { Voted as VotedEvent } from '../../generated/templates/Federation/Federation'
 import { BridgeChain, BridgeType, CrossDirection, CrossStatus } from './types'
 import { createAndReturnUser } from './User'
+import { bridgeBSC, bridgeETH } from '../contracts/contracts'
 
 export class CrossTransferEvent {
   id: string = ''
@@ -163,11 +164,9 @@ export const handleFederatorVoted = (event: VotedEvent, transaction: Transaction
 }
 
 export function isETHBridge(address: string): boolean {
-  // TODO: this is mainnet value only, find a way to test for testnet as well
-  return address == '0x1ccad820b6d031b41c54f1f3da11c0d48b399581'
+  return address.toLowerCase() == bridgeETH.toLowerCase()
 }
 
 export function isBSCBridge(address: string): boolean {
-  // TODO: this is mainnet value only, find a way to test for testnet as well
-  return address == '0x971b97c8cc82e7d27bc467c2dc3f219c6ee2e350'
+  return address.toLowerCase() == bridgeBSC.toLowerCase()
 }
