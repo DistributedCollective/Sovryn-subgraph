@@ -705,7 +705,7 @@ dataSources:
           handler: handleNewBitcoinTransfer
       file: ./src/FastBTCBridge.ts
   
-  # Bridge
+  # Bridge BSC
   - kind: ethereum/contract
     name: BridgeBSC
     network: {{network}}
@@ -725,7 +725,7 @@ dataSources:
         - ErrorTokenReceiver
         - FederationChanged
         - NewSideToken
-        - OwnershipTransferred
+        # - OwnershipTransferred
         - Paused
         - PauserAdded
         - PauserRemoved
@@ -756,8 +756,8 @@ dataSources:
           handler: handleFederationChanged
         - event: NewSideToken(indexed address,indexed address,string,uint256)
           handler: handleNewSideToken
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
+        # - event: OwnershipTransferred(indexed address,indexed address)
+        #   handler: handleOwnershipTransferred
         - event: Paused(address)
           handler: handlePaused
         - event: PauserAdded(indexed address)
@@ -778,6 +778,7 @@ dataSources:
           handler: handleerc777ConverterSet
       file: ./src/Bridge.ts
 
+  # Bridge ETH
   - kind: ethereum/contract
     name: BridgeETH
     network: {{network}}
@@ -797,7 +798,7 @@ dataSources:
         - ErrorTokenReceiver
         - FederationChanged
         - NewSideToken
-        - OwnershipTransferred
+        # - OwnershipTransferred
         - Paused
         - PauserAdded
         - PauserRemoved
@@ -828,8 +829,8 @@ dataSources:
           handler: handleFederationChanged
         - event: NewSideToken(indexed address,indexed address,string,uint256)
           handler: handleNewSideToken
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
+        # - event: OwnershipTransferred(indexed address,indexed address)
+        #   handler: handleOwnershipTransferred
         - event: Paused(address)
           handler: handlePaused
         - event: PauserAdded(indexed address)
@@ -1031,6 +1032,7 @@ templates:
           handler: handleWithdrawFees
       file: ./src/LiquidityPoolConverter.ts
 
+  # Federation
   - kind: ethereum/contract
     name: Federation
     network: {{network}}
@@ -1047,7 +1049,7 @@ templates:
         - Executed
         - MemberAddition
         - MemberRemoval
-        - OwnershipTransferred
+        # - OwnershipTransferred
         - RequirementChange
         - RevokeTxAndVote
         - StoreFormerFederationExecutedTx
@@ -1065,8 +1067,8 @@ templates:
           handler: handleMemberAddition
         - event: MemberRemoval(indexed address)
           handler: handleMemberRemoval
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
+        # - event: OwnershipTransferred(indexed address,indexed address)
+        #   handler: handleOwnershipTransferred
         - event: RequirementChange(uint256)
           handler: handleRequirementChange
         - event: RevokeTxAndVote(bytes32)
