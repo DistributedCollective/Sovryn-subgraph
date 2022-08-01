@@ -19,15 +19,13 @@ import {
   // OwnershipTransferred,
   RequirementChange,
   RevokeTxAndVote,
-  SideToken,
   StoreFormerFederationExecutedTx,
   Voted,
 } from '../generated/schema'
 
 import { createAndReturnTransaction } from './utils/Transaction'
-import { createAndReturnCrossTransfer, createAndReturnFederation, CrossTransferEvent, handleFederatorVoted, isETHBridge } from './utils/CrossChainBridge'
-import { BridgeChain, CrossDirection, CrossStatus } from './utils/types'
-import { createAndReturnUser } from './utils/User'
+import { createAndReturnFederation, handleFederatorVoted } from './utils/CrossChainBridge'
+import { CrossStatus } from './utils/types'
 
 export function handleBridgeChanged(event: BridgeChangedEvent): void {
   let entity = new BridgeChanged(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
@@ -162,6 +160,7 @@ export function handleVoted(event: VotedEvent): void {
   handleFederatorVoted(event, transaction)
 }
 
+// this is an old event with a lot of missing data so it is not processed and not suppose to happen
 export function handleVotedV0(event: VotedEvent): void {
   let entity = new Voted(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   entity.sender = event.params.sender

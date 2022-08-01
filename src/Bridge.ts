@@ -33,11 +33,10 @@ import {
   PauserRemoved,
   PrefixUpdated,
   RevokeTx,
-  SideTokenFactoryChanged,
+  // SideTokenFactoryChanged,
   Unpaused,
   Upgrading,
-  erc777ConverterSet,
-  SideToken,
+  // erc777ConverterSet,
 } from '../generated/schema'
 
 import { Federation as FederationTemplate } from '../generated/templates'
@@ -54,6 +53,7 @@ import { createAndReturnTransaction } from './utils/Transaction'
 import { BridgeChain, CrossDirection, CrossStatus } from './utils/types'
 
 export function handleAcceptedCrossTransfer(event: AcceptedCrossTransferEvent): void {
+  // crossTransfer events are created and updated from voted/executed events so this event is not in use
   let entity = new AcceptedCrossTransfer(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   entity._tokenAddress = event.params._tokenAddress
   entity._to = event.params._to
@@ -69,27 +69,6 @@ export function handleAcceptedCrossTransfer(event: AcceptedCrossTransferEvent): 
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
-  // const crossTransferEvent: CrossTransferEvent = {
-  //   receiver: event.params._to,
-  //   originalTokenAddress: event.params._tokenAddress,
-  //   amount: event.params._amount,
-  //   decimals: event.params._decimals,
-  //   granularity: event.params._granularity,
-  //   // userData: event.params._userData,
-  //   status: CrossStatus.Executed,
-  //   direction: CrossDirection.Incoming,
-  //   timestamp: event.block.timestamp,
-  //   transaction,
-  //   // logIndex: event.logIndex,
-  // }
-  // const crossTransfer = createAndReturnCrossTransfer(crossTransferEvent)
-  // // TODO: find a way to tell if it is rsk bsc bridge or rsk ETH bridge
-  // crossTransfer.sourceChain = BridgeChain.BSC
-  // crossTransfer.destinationChain = BridgeChain.RSK
-  // crossTransfer.updatedAtTx = transaction.id
-  // crossTransfer.updatedAtTimestamp = transaction.timestamp
-  // crossTransfer.save()
-  // createAndReturnCrossTransferFromAcceptedCrossTransfer(event)
 }
 
 export function handleAllowTokenChanged(event: AllowTokenChangedEvent): void {
