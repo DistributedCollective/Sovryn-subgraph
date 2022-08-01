@@ -1,9 +1,9 @@
-import { BigInt, Address, ethereum, Bytes, crypto, ByteArray } from '@graphprotocol/graph-ts'
+import { BigInt, Address, ethereum, crypto, ByteArray, log } from '@graphprotocol/graph-ts'
 import { decimal, ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
 import { Federation, Bridge, CrossTransfer, Token, SideToken, Transaction } from '../../generated/schema'
 import { createAndReturnTransaction } from './Transaction'
-import { AcceptedCrossTransfer as AcceptedCrossTransferEvent, Cross as CrossEvent, NewSideToken as NewSideTokenEvent } from '../../generated/Bridge/Bridge'
-import { CrossDirection, CrossStatus } from './types'
+import { NewSideToken as NewSideTokenEvent } from '../../generated/Bridge/Bridge'
+import { BridgeType } from './types'
 import { createAndReturnUser } from './User'
 
 export class CrossTransferEvent {
@@ -22,8 +22,8 @@ export class CrossTransferEvent {
 }
 
 export const getCrossTransferId = (crossTransferEvent: CrossTransferEvent): ByteArray => {
-  return crypto.keccak256(
-    Bytes.fromUTF8(
+  const id = crypto.keccak256(
+    ByteArray.fromUTF8(
       crossTransferEvent.originalTokenAddress.toHex() +
         '-' +
         crossTransferEvent.receiver.toHex() +
@@ -39,6 +39,7 @@ export const getCrossTransferId = (crossTransferEvent: CrossTransferEvent): Byte
       // crossTransferEvent.userData.toHex(),
     ),
   )
+  return id
 }
 
 export const createAndReturnBridge = (bridgeAddress: Address, event: ethereum.Event): Bridge => {
@@ -80,14 +81,7 @@ export const createAndReturnFederation = (federationAddress: Address, event: eth
 }
 
 export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEvent): CrossTransfer => {
-  const id = crossTransferEvent.id != null ? crossTransferEvent.id : getCrossTransferId(crossTransferEvent).toHex()
-  // let id: string
-  // if (crossTransferEvent.id != null) {
-  //   id = crossTransferEvent.id
-  // } else {
-  //   // if id is null, then we need to generate it from the event
-  //   id = crossTransferEvent.transaction.id + '-' + crossTransferEvent.logIndex.toString()
-  // }
+  const id = crossTransferEvent.id != '' ? crossTransferEvent.id : getCrossTransferId(crossTransferEvent).toHex()
   let crossTransfer = CrossTransfer.load(id)
   if (crossTransfer == null) {
     crossTransfer = new CrossTransfer(id)
