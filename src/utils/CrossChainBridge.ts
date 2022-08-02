@@ -23,6 +23,8 @@ export class CrossTransferEvent {
   transaction: Transaction
 }
 
+// we create a crossTransferId for outgoing transfers from the params of the cross events
+// the id is created this way to simulate the as close as possible (but not exactly) the same id as in the smart contract
 export const getCrossTransferId = (crossTransferEvent: CrossTransferEvent): ByteArray => {
   const id = crypto.keccak256(
     ByteArray.fromUTF8(
@@ -57,9 +59,6 @@ export const createAndReturnBridge = (bridgeAddress: Address, event: ethereum.Ev
     }
     bridge.isUpgrading = false
     bridge.isPaused = false
-    bridge.totalFundsReceived = BigInt.zero()
-    bridge.totalFundsReceived = BigInt.zero()
-    bridge.feesCollected = BigInt.zero()
     bridge.federation = ZERO_ADDRESS
     const tx = createAndReturnTransaction(event)
     bridge.createdAtTx = tx.id
@@ -83,6 +82,8 @@ export const createAndReturnFederation = (federationAddress: Address, event: eth
 }
 
 export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEvent): CrossTransfer => {
+  // on votes and executed events (incoming transfers) from the federation we have the ID in the events,
+  // on cross events (from the bridge) for outgoing transfers we don't have an id and therefor we have to generate it
   const id = crossTransferEvent.id != '' ? crossTransferEvent.id : getCrossTransferId(crossTransferEvent).toHex()
   let crossTransfer = CrossTransfer.load(id)
   if (crossTransfer == null) {
@@ -122,7 +123,6 @@ export const createAndReturnSideToken = (sideTokenAddress: Address, event: NewSi
 }
 
 export const handleFederatorVoted = (event: VotedEvent, transaction: Transaction): void => {
-  log.info('src/Federation.ts ~ Federation.ts ~ 999 ~  event.params.transactionId: {}', [event.params.transactionId.toHex()])
   const federation = createAndReturnFederation(event.address, event)
   federation.totalVotes = federation.totalVotes + 1
   federation.updatedAtTx = transaction.id

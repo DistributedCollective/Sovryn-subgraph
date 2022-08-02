@@ -72,7 +72,7 @@ export function handleFederationChanged(event: FederationChangedEvent): void {
   let transaction = createAndReturnTransaction(event)
 
   FederationTemplate.create(event.params._newFederation)
-  log.debug('Federation created: {}', [event.params._newFederation.toHex()])
+  log.info('Federation created: {}', [event.params._newFederation.toHex()])
   const bridge = createAndReturnBridge(event.address, event)
   const oldFederationAddress = bridge.federation
   if (oldFederationAddress != ZERO_ADDRESS) {

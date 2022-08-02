@@ -1,10 +1,37 @@
+"""
+Federation - the federation entity
+"""
 type Federation @entity {
+  """
+  Id - the id of the federation entity is the federation contract address
+  """
   id: ID! # Bridge address
+  """
+  IsActive - is this federation contract active
+  """
   isActive: Boolean! # Is active
+  """
+  Bridge - the bridge that is associated with this federation contract
+  """
   bridge: Bridge!
+  """
+  TotalVotes - total votes cast on this federation
+  """
   totalVotes: Int!
+  """
+  TotalExecuted - total transfers executed by this federation
+  """
   totalExecuted: Int!
+  """
+  Members - federators that are members of this federation
+  """
   members: [Bytes!]!
+  """
+  CreatedAtTx - the creation transaction of this federation
+  """
   createdAtTx: Transaction! # Transaction
+  """
+  UpdatedAtTx - the transaction at which this entity was last updated
+  """
   updatedAtTx: Transaction! # Transaction
 }
