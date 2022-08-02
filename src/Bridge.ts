@@ -125,6 +125,8 @@ export function handleCross(event: CrossEvent): void {
   crossTransfer.sourceChain = BridgeChain.RSK
   const destinationChain = isETHBridge(event.address.toHex()) ? BridgeChain.ETH : BridgeChain.BSC
   crossTransfer.destinationChain = destinationChain
+  crossTransfer.sourceChainBlockHash = event.block.hash
+  crossTransfer.sourceChainTransactionHash = event.transaction.hash
   crossTransfer.updatedAtTx = transaction.id
   crossTransfer.updatedAtTimestamp = transaction.timestamp
   crossTransfer.save()
