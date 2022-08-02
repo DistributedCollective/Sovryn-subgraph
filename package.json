@@ -21,8 +21,6 @@
     "prepare:RSK:testnet": "sh ./scripts/prepare_testnet.sh && npm run schema",
     "prepare:RSK:mainnet": "sh ./scripts/prepare_mainnet.sh && npm run schema",
     "test-start-block": "node -r esm utils/startFromLaterBlock.js",
-    "build-tests": "sudo docker build -t matchstick .",
-    "run-tests": "docker run --rm matchstick",
     "schema": "sh ./scripts/schema.sh",
     "partial-manifest": "node utils/buildPartialManifest.js"
   },

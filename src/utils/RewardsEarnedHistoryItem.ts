@@ -1,5 +1,4 @@
 import { Bytes, Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
-import { RewardsEarnedAction } from './types'
 import { RewardsEarnedHistoryItem } from '../../generated/schema'
 
 class CreateOrIncrementRewardParams {

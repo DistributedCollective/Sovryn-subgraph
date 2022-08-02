@@ -92,7 +92,7 @@ function createAndReturnLiquidityMiningAllocation(
     allocationEntity.poolTokenAddedBlock = blockNumber
     allocationEntity.poolTokenAddedTimestamp = timestamp
     allocationEntity.poolTokenUpdatedBlock = blockNumber
-    allocationEntity.poolTokenAddedTimestamp = timestamp
+    allocationEntity.poolTokenUpdatedTimestamp = timestamp
     allocationEntity.rewardPerBlock = calculateRewardPerBlock(global.totalRewardPerBlock, allocationPoint, global.totalAllocationPoint)
     /** Check if the pool token is for a lending or amm pool */
     let smartTokenEntity = SmartToken.load(token.toHexString())
@@ -110,7 +110,7 @@ function createAndReturnLiquidityMiningAllocation(
   if (allocationEntity.allocationPoint !== allocationPoint) {
     allocationEntity.allocationPoint = allocationPoint
     allocationEntity.poolTokenUpdatedBlock = blockNumber
-    allocationEntity.poolTokenAddedTimestamp = timestamp
+    allocationEntity.poolTokenUpdatedTimestamp = timestamp
     allocationEntity.rewardPerBlock = calculateRewardPerBlock(global.totalRewardPerBlock, allocationPoint, global.totalAllocationPoint)
     allocationEntity.save()
     return allocationEntity
