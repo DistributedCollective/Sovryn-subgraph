@@ -762,23 +762,27 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - AcceptedCrossTransfer
-        - AllowTokenChanged
-        - BridgeReceiverStatusChanged
-        - Cross
-        - ErrorTokenReceiver
-        - FederationChanged
-        - NewSideToken
+        # - AcceptedCrossTransfer
+        # - AllowTokenChanged
+        # - BridgeReceiverStatusChanged
+        # - Cross
+        # - ErrorTokenReceiver
+        # - FederationChanged
+        # - NewSideToken
         # - OwnershipTransferred
-        - Paused
-        - PauserAdded
-        - PauserRemoved
-        - PrefixUpdated
-        - RevokeTx
-        - SideTokenFactoryChanged
-        - Unpaused
-        - Upgrading
-        - erc777ConverterSet
+        # - Paused
+        # - PauserAdded
+        # - PauserRemoved
+        # - PrefixUpdated
+        # - RevokeTx
+        # - SideTokenFactoryChanged
+        # - Unpaused
+        # - Upgrading
+        # - erc777ConverterSet
+        - Bridge
+        - CrossTransfer
+        - SideToken
+        
       abis:
         - name: Bridge
           file: ./abis/Bridge.json
@@ -786,16 +790,16 @@ dataSources:
           file: ./abis/Federation.json
       eventHandlers:
         
-        - event: AcceptedCrossTransfer(indexed address,indexed address,uint256,uint8,uint256,uint256,uint8,uint256,bytes)
-          handler: handleAcceptedCrossTransfer
-        - event: AllowTokenChanged(address)
-          handler: handleAllowTokenChanged
-        - event: BridgeReceiverStatusChanged(address,bool)
-          handler: handleBridgeReceiverStatusChanged
+        # - event: AcceptedCrossTransfer(indexed address,indexed address,uint256,uint8,uint256,uint256,uint8,uint256,bytes)
+        #   handler: handleAcceptedCrossTransfer
+        # - event: AllowTokenChanged(address)
+        #   handler: handleAllowTokenChanged
+        # - event: BridgeReceiverStatusChanged(address,bool)
+        #   handler: handleBridgeReceiverStatusChanged
         - event: Cross(indexed address,indexed address,uint256,string,bytes,uint8,uint256)
           handler: handleCross
-        - event: ErrorTokenReceiver(bytes)
-          handler: handleErrorTokenReceiver
+        # - event: ErrorTokenReceiver(bytes)
+        #   handler: handleErrorTokenReceiver
         - event: FederationChanged(address)
           handler: handleFederationChanged
         - event: NewSideToken(indexed address,indexed address,string,uint256)
@@ -810,16 +814,16 @@ dataSources:
           handler: handlePauserRemoved
         - event: PrefixUpdated(bool,string)
           handler: handlePrefixUpdated
-        - event: RevokeTx(bytes32)
-          handler: handleRevokeTx
-        - event: SideTokenFactoryChanged(address)
-          handler: handleSideTokenFactoryChanged
+        # - event: RevokeTx(bytes32)
+        #   handler: handleRevokeTx
+        # - event: SideTokenFactoryChanged(address)
+        #   handler: handleSideTokenFactoryChanged
         - event: Unpaused(address)
           handler: handleUnpaused
         - event: Upgrading(bool)
           handler: handleUpgrading
-        - event: erc777ConverterSet(address)
-          handler: handleerc777ConverterSet
+        # - event: erc777ConverterSet(address)
+        #   handler: handleerc777ConverterSet
       file: ./src/Bridge.ts
 
   # Bridge ETH
@@ -835,23 +839,26 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - AcceptedCrossTransfer
-        - AllowTokenChanged
-        - BridgeReceiverStatusChanged
-        - Cross
-        - ErrorTokenReceiver
-        - FederationChanged
-        - NewSideToken
+        # - AcceptedCrossTransfer
+        # - AllowTokenChanged
+        # - BridgeReceiverStatusChanged
+        # - Cross
+        # - ErrorTokenReceiver
+        # - FederationChanged
+        # - NewSideToken
         # - OwnershipTransferred
-        - Paused
-        - PauserAdded
-        - PauserRemoved
-        - PrefixUpdated
-        - RevokeTx
-        - SideTokenFactoryChanged
-        - Unpaused
-        - Upgrading
-        - erc777ConverterSet
+        # - Paused
+        # - PauserAdded
+        # - PauserRemoved
+        # - PrefixUpdated
+        # - RevokeTx
+        # - SideTokenFactoryChanged
+        # - Unpaused
+        # - Upgrading
+        # - erc777ConverterSet
+        - Bridge
+        - CrossTransfer
+        - SideToken
       abis:
         - name: Bridge
           file: ./abis/Bridge.json
@@ -859,16 +866,16 @@ dataSources:
           file: ./abis/Federation.json
       eventHandlers:
         
-        - event: AcceptedCrossTransfer(indexed address,indexed address,uint256,uint8,uint256,uint256,uint8,uint256,bytes)
-          handler: handleAcceptedCrossTransfer
-        - event: AllowTokenChanged(address)
-          handler: handleAllowTokenChanged
-        - event: BridgeReceiverStatusChanged(address,bool)
-          handler: handleBridgeReceiverStatusChanged
+        # - event: AcceptedCrossTransfer(indexed address,indexed address,uint256,uint8,uint256,uint256,uint8,uint256,bytes)
+        #   handler: handleAcceptedCrossTransfer
+        # - event: AllowTokenChanged(address)
+        #   handler: handleAllowTokenChanged
+        # - event: BridgeReceiverStatusChanged(address,bool)
+        #   handler: handleBridgeReceiverStatusChanged
         - event: Cross(indexed address,indexed address,uint256,string,bytes,uint8,uint256)
           handler: handleCross
-        - event: ErrorTokenReceiver(bytes)
-          handler: handleErrorTokenReceiver
+        # - event: ErrorTokenReceiver(bytes)
+        #   handler: handleErrorTokenReceiver
         - event: FederationChanged(address)
           handler: handleFederationChanged
         - event: NewSideToken(indexed address,indexed address,string,uint256)
@@ -883,16 +890,16 @@ dataSources:
           handler: handlePauserRemoved
         - event: PrefixUpdated(bool,string)
           handler: handlePrefixUpdated
-        - event: RevokeTx(bytes32)
-          handler: handleRevokeTx
-        - event: SideTokenFactoryChanged(address)
-          handler: handleSideTokenFactoryChanged
+        # - event: RevokeTx(bytes32)
+        #   handler: handleRevokeTx
+        # - event: SideTokenFactoryChanged(address)
+        #   handler: handleSideTokenFactoryChanged
         - event: Unpaused(address)
           handler: handleUnpaused
         - event: Upgrading(bool)
           handler: handleUpgrading
-        - event: erc777ConverterSet(address)
-          handler: handleerc777ConverterSet
+        # - event: erc777ConverterSet(address)
+        #   handler: handleerc777ConverterSet
       file: ./src/Bridge.ts
 
 
@@ -1086,15 +1093,7 @@ templates:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - BridgeChanged
-        - Executed
-        - MemberAddition
-        - MemberRemoval
-        # - OwnershipTransferred
-        - RequirementChange
-        - RevokeTxAndVote
-        - StoreFormerFederationExecutedTx
-        - Voted
+        - CrossTransfer
       abis:
         - name: Federation
           file: ./abis/Federation.json
@@ -1110,12 +1109,12 @@ templates:
           handler: handleMemberRemoval
         # - event: OwnershipTransferred(indexed address,indexed address)
         #   handler: handleOwnershipTransferred
-        - event: RequirementChange(uint256)
-          handler: handleRequirementChange
+        # - event: RequirementChange(uint256)
+        #   handler: handleRequirementChange
         - event: RevokeTxAndVote(bytes32)
           handler: handleRevokeTxAndVote
-        - event: StoreFormerFederationExecutedTx(bytes32[])
-          handler: handleStoreFormerFederationExecutedTx
+        # - event: StoreFormerFederationExecutedTx(bytes32[])
+        #   handler: handleStoreFormerFederationExecutedTx
         - event: Voted(indexed address,indexed bytes32,address,address,uint256,string,bytes32,indexed bytes32,uint32,uint8,uint256,bytes)
           handler: handleVoted
         - event: Voted(indexed address,indexed bytes32)
