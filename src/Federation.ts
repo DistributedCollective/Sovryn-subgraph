@@ -125,6 +125,14 @@ export function handleRevokeTxAndVote(event: RevokeTxAndVoteEvent): void {
   federation.totalVotes = federation.totalVotes + 1
   federation.updatedAtTx = transaction.id
   federation.save()
+
+  const crossTransfer = CrossTransfer.load(event.params.tx_revoked.toHex())
+  if (crossTransfer != null) {
+    crossTransfer.status = CrossStatus.Revoked
+    crossTransfer.updatedAtTx = transaction.id
+    crossTransfer.updatedAtTimestamp = transaction.timestamp
+    crossTransfer.save()
+  }
 }
 
 export function handleStoreFormerFederationExecutedTx(event: StoreFormerFederationExecutedTxEvent): void {

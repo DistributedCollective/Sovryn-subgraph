@@ -53,6 +53,7 @@ export class CrossDirection {
 export class CrossStatus {
   static Voting: string = 'Voting'
   static Executed: string = 'Executed'
+  static Revoked: string = 'Revoked'
 }
 
 export class BridgeChain {
