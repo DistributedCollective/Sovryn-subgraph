@@ -1,4 +1,4 @@
-import { NewConverter as NewConverterEvent, OwnerUpdate as OwnerUpdateEvent } from '../generated/ConverterFactory/ConverterFactory'
+import { NewConverter as NewConverterEvent } from '../generated/ConverterFactory/ConverterFactory'
 
 import { createAndReturnTransaction } from './utils/Transaction'
 import { createAndReturnLiquidityPool } from './utils/LiquidityPool'

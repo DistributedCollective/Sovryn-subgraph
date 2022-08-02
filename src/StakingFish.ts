@@ -10,7 +10,7 @@ import { Address, BigDecimal } from '@graphprotocol/graph-ts'
 import { VestingHistoryActionItem } from './utils/types'
 
 export function handleTokensStaked(event: TokensStakedEvent): void {
-  let vestingContract = VestingContract.load(event.params.staker.toHexString())
+  const vestingContract = VestingContract.load(event.params.staker.toHexString())
   if (vestingContract != null) {
     const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
     vestingContract.currentBalance = vestingContract.currentBalance.plus(amount)
@@ -24,7 +24,7 @@ function createVestingTokensStaked(event: TokensStakedEvent): void {
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
   const totalStaked = decimal.fromBigInt(event.params.totalStaked, DEFAULT_DECIMALS)
 
-  let vestingTokensStakedEntity = new VestingHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
+  const vestingTokensStakedEntity = new VestingHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   vestingTokensStakedEntity.staker = event.params.staker.toHexString()
   vestingTokensStakedEntity.action = VestingHistoryActionItem.TokensStaked
   vestingTokensStakedEntity.amount = amount
@@ -37,7 +37,7 @@ function createVestingTokensStaked(event: TokensStakedEvent): void {
 }
 
 export function handleTokensWithdrawn(event: TokensWithdrawnEvent): void {
-  let transaction = createAndReturnTransaction(event)
+  const transaction = createAndReturnTransaction(event)
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
   const id = event.transaction.hash.toHex() + event.logIndex.toHex()
   handleStakingOrTokensWithdrawn({
@@ -52,7 +52,7 @@ export function handleTokensWithdrawn(event: TokensWithdrawnEvent): void {
 
 /** This is a copy of handleTokensWithdrawn. The event was renamed but params remained the same. */
 export function handleStakingWithdrawn(event: StakingWithdrawnEvent): void {
-  let transaction = createAndReturnTransaction(event)
+  const transaction = createAndReturnTransaction(event)
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
   const id = event.transaction.hash.toHex() + event.logIndex.toHex()
   handleStakingOrTokensWithdrawn({
@@ -75,9 +75,9 @@ class TokensWithdrawnParams {
 }
 
 function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams): void {
-  let vesting = VestingContract.load(params.staker.toHexString().toLowerCase())
+  const vesting = VestingContract.load(params.staker.toHexString().toLowerCase())
   if (vesting !== null) {
-    let vestingHistoryItem = new VestingHistoryItem(params.id)
+    const vestingHistoryItem = new VestingHistoryItem(params.id)
     vestingHistoryItem.action = VestingHistoryActionItem.TokensWithdrawn
     vestingHistoryItem.amount = params.amount
     vestingHistoryItem.staker = vesting.id

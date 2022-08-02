@@ -16,10 +16,10 @@ import { adminContracts } from './contracts/contracts'
 import { StakeHistoryAction, VestingHistoryActionItem, VestingContractType } from './utils/types'
 
 export function handleDelegateChanged(event: DelegateChangedEvent): void {
-  let user = User.load(event.params.delegator.toHexString())
+  const user = User.load(event.params.delegator.toHexString())
   if (event.params.fromDelegate.toHexString() != ZERO_ADDRESS && user != null) {
-    let transaction = createAndReturnTransaction(event)
-    let stakeHistoryItem = new StakeHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
+    const transaction = createAndReturnTransaction(event)
+    const stakeHistoryItem = new StakeHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
     stakeHistoryItem.user = event.params.delegator.toHexString()
     stakeHistoryItem.action = StakeHistoryAction.Delegate
     stakeHistoryItem.timestamp = event.block.timestamp.toI32()
@@ -30,8 +30,8 @@ export function handleDelegateChanged(event: DelegateChangedEvent): void {
 }
 
 export function handleExtendedStakingDuration(event: ExtendedStakingDurationEvent): void {
-  let transaction = createAndReturnTransaction(event)
-  let stakeHistoryItem = new StakeHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
+  const transaction = createAndReturnTransaction(event)
+  const stakeHistoryItem = new StakeHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   stakeHistoryItem.user = event.params.staker.toHexString()
   stakeHistoryItem.action = StakeHistoryAction.ExtendStake
   stakeHistoryItem.timestamp = event.block.timestamp.toI32()
@@ -43,8 +43,8 @@ export function handleExtendedStakingDuration(event: ExtendedStakingDurationEven
 export function handleTokensStaked(event: TokensStakedEvent): void {
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
   const totalStaked = decimal.fromBigInt(event.params.totalStaked, DEFAULT_DECIMALS)
-  let entity = new TokensStaked(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
-  let transaction = createAndReturnTransaction(event)
+  const entity = new TokensStaked(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
+  const transaction = createAndReturnTransaction(event)
   entity.staker = event.params.staker
   entity.amount = amount
   entity.lockedUntil = event.params.lockedUntil.toI32()
@@ -53,7 +53,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
 
-  let vestingContract = VestingContract.load(event.params.staker.toHexString())
+  const vestingContract = VestingContract.load(event.params.staker.toHexString())
   entity.isUserStaked == false
 
   /** Gensis Vesting contracts did not emit a VestingCreated event. Therefore, they need to be created from here.
@@ -66,8 +66,8 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     event.block.number >= genesisVestingStartBlock &&
     event.transaction.from.toHexString() != event.params.staker.toHexString()
   ) {
-    let newVestingContract = new VestingContract(event.params.staker.toHexString())
-    let user = createAndReturnUser(event.transaction.from, event.block.timestamp)
+    const newVestingContract = new VestingContract(event.params.staker.toHexString())
+    const user = createAndReturnUser(event.transaction.from, event.block.timestamp)
     newVestingContract.user = user.id
     newVestingContract.type = VestingContractType.Genesis
     newVestingContract.createdAtTimestamp = event.block.timestamp.toI32()
@@ -85,14 +85,14 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
 
     createAndReturnUser(event.params.staker, event.block.timestamp)
 
-    let userStakeHistory = createAndReturnUserStakeHistory(event.params.staker)
+    const userStakeHistory = createAndReturnUserStakeHistory(event.params.staker)
     userStakeHistory.totalStaked = userStakeHistory.totalStaked.plus(amount)
     userStakeHistory.totalRemaining = userStakeHistory.totalRemaining.plus(amount)
     userStakeHistory.save()
 
     entity.isUserStaked = true
     entity.user = event.params.staker.toHexString()
-    let stakeHistoryItem = new StakeHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
+    const stakeHistoryItem = new StakeHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
     stakeHistoryItem.user = event.params.staker.toHexString()
     stakeHistoryItem.action = event.params.amount < event.params.totalStaked ? StakeHistoryAction.IncreaseStake : StakeHistoryAction.Stake
     stakeHistoryItem.timestamp = event.block.timestamp.toI32()
@@ -101,7 +101,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     stakeHistoryItem.lockedUntil = event.params.lockedUntil.toI32()
     stakeHistoryItem.save()
 
-    let protocolStatsEntity = createAndReturnProtocolStats()
+    const protocolStatsEntity = createAndReturnProtocolStats()
     protocolStatsEntity.currentVoluntarilyStakedSov = protocolStatsEntity.currentVoluntarilyStakedSov.plus(
       decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS),
     )
@@ -110,7 +110,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     vestingContract.currentBalance = vestingContract.currentBalance.plus(amount)
     vestingContract.save()
 
-    let protocolStatsEntity = createAndReturnProtocolStats()
+    const protocolStatsEntity = createAndReturnProtocolStats()
     protocolStatsEntity.currentStakedByVestingSov = protocolStatsEntity.currentStakedByVestingSov.plus(
       decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS),
     )
@@ -127,7 +127,7 @@ function createVestingTokensStaked(event: TokensStakedEvent): void {
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
   const totalStaked = decimal.fromBigInt(event.params.totalStaked, DEFAULT_DECIMALS)
 
-  let vestingTokensStakedEntity = new VestingHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
+  const vestingTokensStakedEntity = new VestingHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   vestingTokensStakedEntity.staker = event.params.staker.toHexString()
   vestingTokensStakedEntity.action = VestingHistoryActionItem.TokensStaked
   vestingTokensStakedEntity.amount = amount
@@ -140,7 +140,7 @@ function createVestingTokensStaked(event: TokensStakedEvent): void {
 }
 
 export function handleTokensWithdrawn(event: TokensWithdrawnEvent): void {
-  let transaction = createAndReturnTransaction(event)
+  const transaction = createAndReturnTransaction(event)
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
   const id = event.transaction.hash.toHex() + event.logIndex.toHex()
   handleStakingOrTokensWithdrawn({
@@ -155,7 +155,7 @@ export function handleTokensWithdrawn(event: TokensWithdrawnEvent): void {
 
 /** This is a copy of handleTokensWithdrawn. The event was renamed but params remained the same. */
 export function handleStakingWithdrawn(event: StakingWithdrawnEvent): void {
-  let transaction = createAndReturnTransaction(event)
+  const transaction = createAndReturnTransaction(event)
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
   const id = event.transaction.hash.toHex() + event.logIndex.toHex()
   handleStakingOrTokensWithdrawn({
@@ -178,12 +178,12 @@ class TokensWithdrawnParams {
 }
 
 function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams): void {
-  let user = User.load(params.staker.toHexString().toLowerCase())
-  let vesting = VestingContract.load(params.staker.toHexString().toLowerCase())
+  const user = User.load(params.staker.toHexString().toLowerCase())
+  const vesting = VestingContract.load(params.staker.toHexString().toLowerCase())
   if (user !== null) {
-    let stakeHistoryItem = new StakeHistoryItem(params.id)
+    const stakeHistoryItem = new StakeHistoryItem(params.id)
     /** Check if there was a fee sharing event in this transaction. If there was, this was early unstaking */
-    let feeSharingTokensTransferredEvent = FeeSharingTokensTransferred.load(params.transaction.id)
+    const feeSharingTokensTransferredEvent = FeeSharingTokensTransferred.load(params.transaction.id)
     stakeHistoryItem.user = params.receiver.toHexString()
     stakeHistoryItem.action = feeSharingTokensTransferredEvent == null ? StakeHistoryAction.WithdrawStaked : StakeHistoryAction.Unstake
     stakeHistoryItem.amount = params.amount
@@ -191,7 +191,7 @@ function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams): void {
     stakeHistoryItem.transaction = params.transaction.id
     stakeHistoryItem.save()
 
-    let userStakeHistory = createAndReturnUserStakeHistory(params.receiver)
+    const userStakeHistory = createAndReturnUserStakeHistory(params.receiver)
     userStakeHistory.totalWithdrawn = userStakeHistory.totalWithdrawn.plus(params.amount)
     userStakeHistory.totalRemaining = userStakeHistory.totalRemaining.minus(params.amount)
     if (feeSharingTokensTransferredEvent != null) {
@@ -199,11 +199,11 @@ function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams): void {
     }
     userStakeHistory.save()
 
-    let protocolStatsEntity = createAndReturnProtocolStats()
+    const protocolStatsEntity = createAndReturnProtocolStats()
     protocolStatsEntity.currentVoluntarilyStakedSov = protocolStatsEntity.currentVoluntarilyStakedSov.minus(params.amount)
     protocolStatsEntity.save()
   } else if (vesting != null) {
-    let vestingHistoryItem = new VestingHistoryItem(params.id)
+    const vestingHistoryItem = new VestingHistoryItem(params.id)
     if (adminContracts.includes(params.receiver.toHexString().toLowerCase()) && vesting.type == VestingContractType.Team) {
       /** This happens when a team member with vesting contract leaves the project and their remaining balance is returned to the protocol */
       vestingHistoryItem.action = VestingHistoryActionItem.TeamTokensRevoked
@@ -221,7 +221,7 @@ function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams): void {
     vesting.currentBalance = vesting.currentBalance.minus(params.amount)
     vesting.save()
 
-    let protocolStatsEntity = createAndReturnProtocolStats()
+    const protocolStatsEntity = createAndReturnProtocolStats()
     protocolStatsEntity.currentStakedByVestingSov = protocolStatsEntity.currentStakedByVestingSov.minus(params.amount)
     protocolStatsEntity.save()
   }

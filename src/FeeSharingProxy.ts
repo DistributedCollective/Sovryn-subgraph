@@ -11,7 +11,7 @@ export function handleTokensTransferred(event: TokensTransferredEvent): void {
    * This event is emitted BEFORE TokensWithdrawn
    */
 
-  let tokensTransferredEntity = new FeeSharingTokensTransferred(event.transaction.hash.toHexString())
+  const tokensTransferredEntity = new FeeSharingTokensTransferred(event.transaction.hash.toHexString())
   tokensTransferredEntity.sender = event.params.sender
   tokensTransferredEntity.token = event.params.token
   tokensTransferredEntity.amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
@@ -20,7 +20,7 @@ export function handleTokensTransferred(event: TokensTransferredEvent): void {
 
 export function handleUserFeeWithdrawn(event: UserFeeWithdrawnEvent): void {
   createAndReturnTransaction(event)
-  let stakeHistoryItem = new StakeHistoryItem(event.params.sender.toHexString())
+  const stakeHistoryItem = new StakeHistoryItem(event.params.sender.toHexString())
   stakeHistoryItem.user = event.params.sender.toHexString()
   stakeHistoryItem.action = StakeHistoryAction.FeeWithdrawn
   stakeHistoryItem.timestamp = event.block.timestamp.toI32()

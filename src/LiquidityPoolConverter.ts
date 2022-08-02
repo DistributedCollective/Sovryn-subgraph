@@ -27,9 +27,9 @@ import { decimal } from '@protofire/subgraph-toolkit'
 
 export function handleLiquidityAdded(event: LiquidityAddedEvent): void {
   createAndReturnTransaction(event)
-  let liquidityPool = LiquidityPool.load(event.address.toHexString())
-  let liquidityPoolToken = LiquidityPoolToken.load(event.address.toHexString() + event.params._reserveToken.toHexString())
-  let token = Token.load(event.params._reserveToken.toHexString())
+  const liquidityPool = LiquidityPool.load(event.address.toHexString())
+  const liquidityPoolToken = LiquidityPoolToken.load(event.address.toHexString() + event.params._reserveToken.toHexString())
+  const token = Token.load(event.params._reserveToken.toHexString())
 
   if (liquidityPool != null && liquidityPoolToken != null && token != null) {
     updateLiquidityHistory({
@@ -53,9 +53,9 @@ export function handleLiquidityAdded(event: LiquidityAddedEvent): void {
 
 export function handleLiquidityRemoved(event: LiquidityRemovedEvent): void {
   createAndReturnTransaction(event)
-  let liquidityPool = LiquidityPool.load(event.address.toHexString())
-  let liquidityPoolToken = LiquidityPoolToken.load(event.address.toHexString() + event.params._reserveToken.toHexString())
-  let token = Token.load(event.params._reserveToken.toHexString())
+  const liquidityPool = LiquidityPool.load(event.address.toHexString())
+  const liquidityPoolToken = LiquidityPoolToken.load(event.address.toHexString() + event.params._reserveToken.toHexString())
+  const token = Token.load(event.params._reserveToken.toHexString())
 
   if (liquidityPool != null && liquidityPoolToken != null && token != null) {
     updateLiquidityHistory({
@@ -82,22 +82,22 @@ export function handleLiquidityRemoved(event: LiquidityRemovedEvent): void {
  */
 export function handleActivation(event: ActivationEvent): void {
   createAndReturnTransaction(event)
-  let liquidityPool = LiquidityPool.load(dataSource.address().toHex())
+  const liquidityPool = LiquidityPool.load(dataSource.address().toHex())
 
   if (liquidityPool != null) {
     liquidityPool.activated = event.params._activated
 
     if (event.params._activated == true) {
-      let smartToken = createAndReturnSmartToken(event.params._anchor)
+      const smartToken = createAndReturnSmartToken(event.params._anchor)
       liquidityPool.smartToken = smartToken.smartToken.id
     }
 
     if (event.params._type == 1) {
       const contract = LiquidityPoolV1Contract.bind(event.address)
-      let reserveTokenCountResult = contract.try_reserveTokenCount()
+      const reserveTokenCountResult = contract.try_reserveTokenCount()
       if (!reserveTokenCountResult.reverted) {
         for (let i = 0; i < reserveTokenCountResult.value; i++) {
-          let reserveTokenResult = contract.try_reserveTokens(BigInt.fromI32(i))
+          const reserveTokenResult = contract.try_reserveTokens(BigInt.fromI32(i))
           if (!reserveTokenResult.reverted) {
             createAndReturnToken(reserveTokenResult.value, event.address, event.params._anchor)
             createAndReturnPoolToken(event.params._anchor, event.address, reserveTokenResult.value)
@@ -111,13 +111,13 @@ export function handleActivation(event: ActivationEvent): void {
       }
     } else if (event.params._type == 2) {
       const contract = LiquidityPoolV2Contract.bind(event.address)
-      let reserveTokenCountResult = contract.try_reserveTokenCount()
+      const reserveTokenCountResult = contract.try_reserveTokenCount()
       if (!reserveTokenCountResult.reverted) {
         for (let i = 0; i < reserveTokenCountResult.value; i++) {
-          let reserveTokenResult = contract.try_reserveTokens(BigInt.fromI32(i))
+          const reserveTokenResult = contract.try_reserveTokens(BigInt.fromI32(i))
           if (!reserveTokenResult.reverted) {
             createAndReturnToken(reserveTokenResult.value, event.address, event.params._anchor)
-            let poolTokenResult = contract.try_poolToken(reserveTokenResult.value)
+            const poolTokenResult = contract.try_poolToken(reserveTokenResult.value)
             if (!poolTokenResult.reverted) {
               createAndReturnPoolToken(poolTokenResult.value, event.address, reserveTokenResult.value)
             }
@@ -136,7 +136,7 @@ export function handleActivation(event: ActivationEvent): void {
 }
 
 export function handleConversionV1(event: ConversionEventV1): void {
-  let transaction = createAndReturnTransaction(event)
+  const transaction = createAndReturnTransaction(event)
 
   handleConversion({
     transaction: transaction,
@@ -154,7 +154,7 @@ export function handleConversionV1(event: ConversionEventV1): void {
 }
 
 export function handleConversionV2(event: ConversionEventV2): void {
-  let transaction = createAndReturnTransaction(event)
+  const transaction = createAndReturnTransaction(event)
 
   handleConversion({
     transaction: transaction,
@@ -172,7 +172,7 @@ export function handleConversionV2(event: ConversionEventV2): void {
 }
 
 export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void {
-  let transaction = createAndReturnTransaction(event)
+  const transaction = createAndReturnTransaction(event)
 
   handleConversion({
     transaction: transaction,
@@ -210,7 +210,7 @@ function handleConversion(event: IConversionEvent): void {
   const protocolFee = decimalize(event.protocolFee, event.toToken)
   let liquidityPool = LiquidityPool.load(event.liquidityPool.toHexString())
 
-  let entity = new Conversion(event.transaction.id + '-' + event.logIndex.toString())
+  const entity = new Conversion(event.transaction.id + '-' + event.logIndex.toString())
   entity._fromToken = event.fromToken.toHexString()
   entity._toToken = event.toToken.toHexString()
   entity._trader = event.trader
@@ -250,8 +250,8 @@ function handleConversion(event: IConversionEvent): void {
 
 /** For debugging: Emitted from SOV pool at 2425895 */
 export function handleWithdrawFees(event: WithdrawFeesEvent): void {
-  let liquidityPool = LiquidityPool.load(event.address.toHexString())
-  let token = Token.load(event.params.token.toHexString())
+  const liquidityPool = LiquidityPool.load(event.address.toHexString())
+  const token = Token.load(event.params.token.toHexString())
   if (liquidityPool !== null && token !== null) {
     const feeAmount = decimal.fromBigInt(event.params.protocolFeeAmount, token.decimals)
     decrementPoolBalance(liquidityPool, event.params.token, feeAmount)

@@ -275,8 +275,6 @@ dataSources:
         - name: VestingRegistry
           file: ./abis/VestingRegistry.json
       eventHandlers:
-        - event: CSOVTokensExchanged(indexed address,uint256)
-          handler: handleCSOVTokensExchanged
         - event: TeamVestingCreated(indexed address,address,uint256,uint256,uint256)
           handler: handleTeamVestingCreated
         - event: VestingCreated(indexed address,address,uint256,uint256,uint256)
@@ -308,8 +306,6 @@ dataSources:
         - name: VestingRegistry
           file: ./abis/VestingRegistry.json
       eventHandlers:
-        - event: CSOVTokensExchanged(indexed address,uint256)
-          handler: handleCSOVTokensExchanged
         - event: TeamVestingCreated(indexed address,address,uint256,uint256,uint256)
           handler: handleTeamVestingCreated
         - event: VestingCreated(indexed address,address,uint256,uint256,uint256)
@@ -341,8 +337,6 @@ dataSources:
         - name: VestingRegistry
           file: ./abis/VestingRegistry.json
       eventHandlers:
-        - event: CSOVTokensExchanged(indexed address,uint256)
-          handler: handleCSOVTokensExchanged
         - event: TeamVestingCreated(indexed address,address,uint256,uint256,uint256)
           handler: handleTeamVestingCreated
         - event: VestingCreated(indexed address,address,uint256,uint256,uint256)

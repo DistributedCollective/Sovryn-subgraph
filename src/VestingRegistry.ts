@@ -1,8 +1,4 @@
-import {
-  CSOVTokensExchanged as CSOVTokensExchangedEvent,
-  TeamVestingCreated as TeamVestingCreatedEvent,
-  VestingCreated as VestingCreatedEvent,
-} from '../generated/VestingRegistry1/VestingRegistry'
+import { TeamVestingCreated as TeamVestingCreatedEvent, VestingCreated as VestingCreatedEvent } from '../generated/VestingRegistry1/VestingRegistry'
 import { VestingCreated as VestingCreatedProxyEvent, TeamVestingCreated as TeamVestingCreatedProxyEvent } from '../generated/VestingRegistryProxy/VestingProxy'
 import { VestingContract } from '../generated/schema'
 import { BigDecimal, BigInt } from '@graphprotocol/graph-ts'
@@ -12,25 +8,18 @@ import { createAndReturnUser } from './utils/User'
 import { VestingContractType } from './utils/types'
 import { DEFAULT_DECIMALS, decimal } from '@protofire/subgraph-toolkit'
 
-export function handleCSOVTokensExchanged(event: CSOVTokensExchangedEvent): void {
-  /**
-   * Genesis vesting contract creation did not trigger a VestingCreated event.
-   * However, it did trigger this event.
-   */
-}
-
 export function handleTeamVestingCreated(event: TeamVestingCreatedEvent): void {
   /** Some contracts are created twice. So, we need to first check if the contract already exists */
-  let existingContract = VestingContract.load(event.params.vesting.toHexString())
+  const existingContract = VestingContract.load(event.params.vesting.toHexString())
   if (existingContract == null) {
-    let entity = new VestingContract(event.params.vesting.toHexString())
-    let user = createAndReturnUser(event.params.tokenOwner, event.block.timestamp)
+    const entity = new VestingContract(event.params.vesting.toHexString())
+    const user = createAndReturnUser(event.params.tokenOwner, event.block.timestamp)
     entity.user = user.id
     entity.cliff = event.params.cliff.toI32()
     entity.duration = event.params.duration.toI32()
     entity.startingBalance = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
     entity.currentBalance = BigDecimal.zero()
-    let transaction = createAndReturnTransaction(event)
+    const transaction = createAndReturnTransaction(event)
     entity.createdAtTransaction = transaction.id
     entity.createdAtTimestamp = transaction.timestamp
     entity.emittedBy = event.address
@@ -43,16 +32,16 @@ export function handleTeamVestingCreated(event: TeamVestingCreatedEvent): void {
  * TODO: Dry up this code
  */
 export function handleTeamVestingCreatedProxy(event: TeamVestingCreatedProxyEvent): void {
-  let existingContract = VestingContract.load(event.params.vesting.toHexString())
+  const existingContract = VestingContract.load(event.params.vesting.toHexString())
   if (existingContract == null) {
-    let entity = new VestingContract(event.params.vesting.toHexString())
-    let user = createAndReturnUser(event.params.tokenOwner, event.block.timestamp)
+    const entity = new VestingContract(event.params.vesting.toHexString())
+    const user = createAndReturnUser(event.params.tokenOwner, event.block.timestamp)
     entity.user = user.id
     entity.cliff = event.params.cliff.toI32()
     entity.duration = event.params.duration.toI32()
     entity.startingBalance = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
     entity.currentBalance = BigDecimal.zero()
-    let transaction = createAndReturnTransaction(event)
+    const transaction = createAndReturnTransaction(event)
     entity.createdAtTransaction = transaction.id
     entity.createdAtTimestamp = transaction.timestamp
     entity.emittedBy = event.address
@@ -62,35 +51,35 @@ export function handleTeamVestingCreatedProxy(event: TeamVestingCreatedProxyEven
 }
 
 export function handleVestingCreated(event: VestingCreatedEvent): void {
-  let existingContract = VestingContract.load(event.params.vesting.toHexString())
+  const existingContract = VestingContract.load(event.params.vesting.toHexString())
   if (existingContract == null) {
-    let entity = new VestingContract(event.params.vesting.toHexString())
-    let user = createAndReturnUser(event.params.tokenOwner, event.block.timestamp)
+    const entity = new VestingContract(event.params.vesting.toHexString())
+    const user = createAndReturnUser(event.params.tokenOwner, event.block.timestamp)
     entity.user = user.id
     entity.cliff = event.params.cliff.toI32()
     entity.duration = event.params.duration.toI32()
     entity.startingBalance = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
     entity.currentBalance = BigDecimal.zero()
-    let transaction = createAndReturnTransaction(event)
+    const transaction = createAndReturnTransaction(event)
     entity.createdAtTransaction = transaction.id
     entity.createdAtTimestamp = transaction.timestamp
     entity.emittedBy = event.address
-    entity.type = getVestingContractType(event.address.toHexString(), event.params.cliff, event.params.duration, event.block.timestamp)
+    entity.type = getVestingContractType(event.address.toHexString(), event.params.cliff, event.params.duration)
     entity.save()
   }
 }
 
 export function handleVestingCreatedProxy(event: VestingCreatedProxyEvent): void {
-  let existingContract = VestingContract.load(event.params.vesting.toHexString())
+  const existingContract = VestingContract.load(event.params.vesting.toHexString())
   if (existingContract == null) {
-    let entity = new VestingContract(event.params.vesting.toHexString())
-    let user = createAndReturnUser(event.params.tokenOwner, event.block.timestamp)
+    const entity = new VestingContract(event.params.vesting.toHexString())
+    const user = createAndReturnUser(event.params.tokenOwner, event.block.timestamp)
     entity.user = user.id
     entity.cliff = event.params.cliff.toI32()
     entity.duration = event.params.duration.toI32()
     entity.startingBalance = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
     entity.currentBalance = BigDecimal.zero()
-    let transaction = createAndReturnTransaction(event)
+    const transaction = createAndReturnTransaction(event)
     entity.createdAtTransaction = transaction.id
     entity.createdAtTimestamp = transaction.timestamp
     entity.emittedBy = event.address
@@ -99,7 +88,7 @@ export function handleVestingCreatedProxy(event: VestingCreatedProxyEvent): void
   }
 }
 
-function getVestingContractType(address: string, cliff: BigInt, duration: BigInt, timestamp: BigInt): string {
+function getVestingContractType(address: string, cliff: BigInt, duration: BigInt): string {
   /** To determine if a vesting contract from vesting registries 1 and 2 is from Origins or from a Strategic investment round, check if the cliff is equal to the duration
    * We could maybe also check the timestamp as added redundancy, but this adds testnet/mainnet complexity that I want to avoid
    */

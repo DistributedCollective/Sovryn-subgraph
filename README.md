@@ -2,13 +2,11 @@
 
 ## Description
 
-Subgraph for sovryn core protocol including amm, staking, vesting, governance, fastBTC, bridges, margin trading and borrowing
+Subgraph for the Sovryn Core Protocol contracts including AMM, Staking, Vesting, Governance, FastBTC, Margin Trading and Borrowing. Other products like Perpetual Swaps and Zero have their own subgraphs.
 
-Other products like Perp Swaps and Zero have their own subgraphs here (link when they are public)
+This subgraph contains logic for transforming and storing blockchain events in the Sovryn Protocol, and serving up a publicly available graphQL API for this data. The iGraphQL explorer is deployed [here](https://subgraph.sovryn.app/subgraphs/name/DistributedCollective/sovryn-subgraph/graphql), and you can find detailed schema documentation there or in the ./schema directory in this repo.
 
-See the deployed version here: (LINK) for more detailed docs in the iGraphQL explorer
-
-Please note that this is still an early version of the subgraph. While it has undergone testing, we are aware there may be some bugs. If you wish to report a bug, please contact us on discord through the technical-support(LINK) or user-feedback(LINK) channels to let us know.
+Please note that this is still an early version of the subgraph. While it has undergone testing, we are aware there may be some bugs. If you wish to report a bug, please contact us on discord through the [tech-support](https://discord.com/channels/729675474665603133/813119624098611260) or [user-feedback](https://discord.com/channels/729675474665603133/750376232771780608) channels to let us know.
 
 For more information on The Graph protocol, head to the Graph documentation here: https://thegraph.com/docs/.
 

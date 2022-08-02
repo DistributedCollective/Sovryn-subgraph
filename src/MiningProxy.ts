@@ -64,12 +64,12 @@ function createOrUpdateLiquidityMiningGlobal(proxyAddress: Address): LiquidityMi
     globalEntity = new LiquidityMiningGlobal('0')
   }
 
-  let liquidityMiningContract = MiningProxy.bind(proxyAddress)
-  let totalAllocationPointResult = liquidityMiningContract.try_totalAllocationPoint()
+  const liquidityMiningContract = MiningProxy.bind(proxyAddress)
+  const totalAllocationPointResult = liquidityMiningContract.try_totalAllocationPoint()
   if (!totalAllocationPointResult.reverted) {
     globalEntity.totalAllocationPoint = totalAllocationPointResult.value
   }
-  let rewardPerBlockResult = liquidityMiningContract.try_rewardTokensPerBlock()
+  const rewardPerBlockResult = liquidityMiningContract.try_rewardTokensPerBlock()
   if (!rewardPerBlockResult.reverted) {
     globalEntity.totalRewardPerBlock = rewardPerBlockResult.value
   }
@@ -95,8 +95,8 @@ function createAndReturnLiquidityMiningAllocation(
     allocationEntity.poolTokenUpdatedTimestamp = timestamp
     allocationEntity.rewardPerBlock = calculateRewardPerBlock(global.totalRewardPerBlock, allocationPoint, global.totalAllocationPoint)
     /** Check if the pool token is for a lending or amm pool */
-    let smartTokenEntity = SmartToken.load(token.toHexString())
-    let lendingPoolEntity = LendingPool.load(token.toHexString())
+    const smartTokenEntity = SmartToken.load(token.toHexString())
+    const lendingPoolEntity = LendingPool.load(token.toHexString())
     if (smartTokenEntity !== null) {
       allocationEntity.ammPoolToken = token.toHexString()
     }
