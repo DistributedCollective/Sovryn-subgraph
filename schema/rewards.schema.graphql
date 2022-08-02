@@ -10,21 +10,40 @@ type UserRewardsEarnedHistory @entity {
   """
   totalFeesAndRewardsEarned: BigDecimal!
   """
-  This is incremented by EarnReward events, and set to 0 by TokensStaked events on the LockedSOV contract
+  SOV rewards earned from margin trading, but not yet claimed and vested
+  Incremented by EarnReward events, and set to 0 by TokensStaked events on the LockedSOV contract
   """
   availableTradingRewards: BigDecimal!
   """
-  This is incremented by EarnReward and RewardClaimed events, and set to 0 by RewardWithdrawn events
+  Sum of all SOV rewards earned from margin trading.
+  Incremented by EarnReward events
   """
-  availableRewardSov: BigDecimal!
+  totalTradingRewards: BigDecimal!
   rewardsEarnedHistory: [RewardsEarnedHistoryItem!] @derivedFrom(field: "user")
 }
 
 enum RewardsEarnedAction {
+  """
+  When a SOV Staker withdraws their liquid SOV reward for staking
+  """
   StakingRewardWithdrawn
+  """
+  SOV reward earned when a user margin trades or one of their trades is rolled over.
+  The reward is a percentage of the trading fee, paid in SOV.
+  """
   EarnReward
+  """
+  When a user claims a liquidity mining reward
+  """
   RewardClaimed
+  """
+  When SOV is staked by a Rewards vesting contract (eg after it has been claimed by the user)
+  """
   RewardSovStaked
+  """
+  When an SOV Staker withdraws their share of the fees earned by the Protocol
+  """
+  UserFeeWithdrawn
 }
 
 type RewardsEarnedHistoryItem @entity {

@@ -148,7 +148,7 @@ dataSources:
           handler: handleCloseWithDeposit
         - event: CloseWithSwap(indexed address,indexed address,indexed bytes32,address,address,address,uint256,uint256,uint256,uint256)
           handler: handleCloseWithSwap
-        - event: DepositCollateral(bytes32,uint256,uint256)
+        - event: DepositCollateral(indexed bytes32,uint256,uint256)
           handler: handleDepositCollateral
         - event: EarnReward(indexed address,indexed address,indexed bytes32,uint256,uint256,uint256)
           handler: handleEarnReward
@@ -195,6 +195,27 @@ dataSources:
       eventHandlers:
         - event: DepositCollateral(bytes32,uint256)
           handler: handleDepositCollateralLegacy
+      file: ./src/ISovryn.ts
+
+  - kind: ethereum/contract
+    name: DepositCollateralNonIndexed
+    network: {{network}}
+    source: 
+      address: '{{ISovryn.address}}'
+      abi: DepositCollateralNonIndexed
+      startBlock: {{ISovryn.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - DepositCollateral
+      abis: 
+        - name: DepositCollateralNonIndexed
+          file: ./abis/DepositCollateralNonIndexed.json
+      eventHandlers:
+        - event: DepositCollateral(bytes32,uint256,uint256)
+          handler: handleDepositCollateralNonIndexed
       file: ./src/ISovryn.ts
 
   - kind: ethereum/contract
@@ -437,6 +458,29 @@ dataSources:
         - event: VestingCreated(indexed address,address,uint256,uint256,uint256)
           handler: handleVestingCreated
       file: ./src/VestingRegistry.ts
+
+  # Four Year Vesting
+  - kind: ethereum/contract
+    name: FourYearVesting
+    network: {{network}}
+    source:
+      address: '{{FourYearVesting.address}}'
+      abi: FourYearVesting
+      startBlock: {{FourYearVesting.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - FourYearVestingCreated
+      abis:
+        - name: FourYearVesting
+          file: ./abis/FourYearVesting.json
+      eventHandlers:
+        
+        - event: FourYearVestingCreated(indexed address,indexed address)
+          handler: handleFourYearVestingCreated
+      file: ./src/FourYearVesting.ts
 
   # Staking
   - kind: ethereum/contract
@@ -850,7 +894,6 @@ dataSources:
         - event: erc777ConverterSet(address)
           handler: handleerc777ConverterSet
       file: ./src/Bridge.ts
-
 
 
 templates:

@@ -1,4 +1,4 @@
-# Vesting Resistry
+# Vesting Registry
 
 enum VestingContractType {
   Origins
@@ -7,6 +7,8 @@ enum VestingContractType {
   FishTeam
   Team
   Rewards
+  FourYearVesting
+  Strategic
 }
 
 type VestingContract @entity {
