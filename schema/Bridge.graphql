@@ -193,8 +193,6 @@ enum BridgeChain {
   BSC
 }
 
-union Test = Token | SideToken
-
 type CrossTransfer @entity {
   id: ID! # TransactionIdU
   direction: CrossDirection! # CrossDirection
@@ -204,8 +202,8 @@ type CrossTransfer @entity {
   status: CrossStatus! # CrossStatus
   originalTokenAddress: Bytes!
   tokenAddress: Bytes # address
-  token: Test
-  # sideToken: SideToken # SideToken
+  token: Token # Token
+  sideToken: SideToken # SideToken
   receiver: User # address
   sender: User
   amount: BigDecimal!
