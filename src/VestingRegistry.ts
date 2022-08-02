@@ -1,13 +1,7 @@
 import {
-  AdminAdded as AdminAddedEvent,
-  AdminRemoved as AdminRemovedEvent,
-  CSOVReImburse as CSOVReImburseEvent,
   CSOVTokensExchanged as CSOVTokensExchangedEvent,
-  OwnershipTransferred as OwnershipTransferredEvent,
-  SOVTransferred as SOVTransferredEvent,
   TeamVestingCreated as TeamVestingCreatedEvent,
   VestingCreated as VestingCreatedEvent,
-  TokensStaked as TokensStakedEvent,
 } from '../generated/VestingRegistry1/VestingRegistry'
 import { VestingCreated as VestingCreatedProxyEvent, TeamVestingCreated as TeamVestingCreatedProxyEvent } from '../generated/VestingRegistryProxy/VestingProxy'
 import { VestingContract } from '../generated/schema'
@@ -18,22 +12,12 @@ import { createAndReturnUser } from './utils/User'
 import { VestingContractType } from './utils/types'
 import { DEFAULT_DECIMALS, decimal } from '@protofire/subgraph-toolkit'
 
-export function handleAdminAdded(event: AdminAddedEvent): void {}
-
-export function handleAdminRemoved(event: AdminRemovedEvent): void {}
-
-export function handleCSOVReImburse(event: CSOVReImburseEvent): void {}
-
 export function handleCSOVTokensExchanged(event: CSOVTokensExchangedEvent): void {
   /**
    * Genesis vesting contract creation did not trigger a VestingCreated event.
    * However, it did trigger this event.
    */
 }
-
-export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {}
-
-export function handleSOVTransferred(event: SOVTransferredEvent): void {}
 
 export function handleTeamVestingCreated(event: TeamVestingCreatedEvent): void {
   /** Some contracts are created twice. So, we need to first check if the contract already exists */
@@ -76,8 +60,6 @@ export function handleTeamVestingCreatedProxy(event: TeamVestingCreatedProxyEven
     entity.save()
   }
 }
-
-export function handleTokensStaked(event: TokensStakedEvent): void {}
 
 export function handleVestingCreated(event: VestingCreatedEvent): void {
   let existingContract = VestingContract.load(event.params.vesting.toHexString())

@@ -3,7 +3,6 @@ import {
   LiquidityRemoved as LiquidityRemovedEvent,
   Activation as ActivationEvent,
   Conversion as ConversionEventV1,
-  ConversionFeeUpdate as ConversionFeeUpdateEvent,
   LiquidityPoolV1Converter as LiquidityPoolV1Contract,
   WithdrawFees as WithdrawFeesEvent,
 } from '../generated/templates/LiquidityPoolV1Converter/LiquidityPoolV1Converter'
@@ -11,10 +10,7 @@ import {
   Conversion as ConversionEventV2,
   LiquidityPoolV2Converter as LiquidityPoolV2Contract,
 } from '../generated/templates/LiquidityPoolV2Converter/LiquidityPoolV2Converter'
-import {
-  Conversion as ConversionEventV1WithProtocol,
-  LiquidityPoolV1ConverterProtocolFee as LiquidityPoolV1ConverterProtocolFeeContract,
-} from '../generated/templates/LiquidityPoolV1ConverterProtocolFee/LiquidityPoolV1ConverterProtocolFee'
+import { Conversion as ConversionEventV1WithProtocol } from '../generated/templates/LiquidityPoolV1ConverterProtocolFee/LiquidityPoolV1ConverterProtocolFee'
 import { Conversion, LiquidityPool, LiquidityPoolToken, Token, Transaction } from '../generated/schema'
 import { ConversionEventForSwap, createAndReturnSwap, updatePricing } from './utils/Swap'
 import { createAndReturnToken, decimalize, decimalizeFromToken } from './utils/Token'
@@ -206,8 +202,6 @@ class IConversionEvent {
   conversionFee: BigInt
   protocolFee: BigInt
 }
-
-export function handleConversionFeeUpdate(event: ConversionFeeUpdateEvent): void {}
 
 function handleConversion(event: IConversionEvent): void {
   const fromAmount = decimalize(event.fromAmount, event.fromToken)

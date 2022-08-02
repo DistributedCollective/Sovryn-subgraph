@@ -1,4 +1,4 @@
-import { Burn as BurnEvent, FlashBorrow as FlashBorrowEvent, Mint as MintEvent } from '../generated/templates/LoanTokenLogicStandard/LoanTokenLogicStandard'
+import { Burn as BurnEvent, Mint as MintEvent } from '../generated/templates/LoanTokenLogicStandard/LoanTokenLogicStandard'
 import { UserLendingHistory, LendingHistoryItem, LendingPool } from '../generated/schema'
 import { createAndReturnTransaction } from './utils/Transaction'
 import { Address, BigDecimal, dataSource } from '@graphprotocol/graph-ts'
@@ -53,8 +53,6 @@ export function handleBurn(event: BurnEvent): void {
   protocolStatsEntity.save()
   userTotalsEntity.save()
 }
-
-export function handleFlashBorrow(event: FlashBorrowEvent): void {}
 
 export function handleMint(event: MintEvent): void {
   createAndReturnTransaction(event)

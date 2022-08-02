@@ -30,10 +30,6 @@ export function updateLastPriceUsdAll(): void {
   }
 }
 
-export function updateTokenUsdCandlesticks(token: Address, newUsdPrice: BigDecimal): void {}
-
-export function updateTokenBtcCandlesticks(token: Address, newBtcPrice: BigDecimal): void {}
-
 export function convertToUsd(currency: Address, amount: BigInt): BigDecimal {
   let token = Token.load(currency.toHexString())
   if (token != null) {

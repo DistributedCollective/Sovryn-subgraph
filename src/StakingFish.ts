@@ -1,9 +1,7 @@
 import {
   TokensStaked as TokensStakedEvent,
-  TokensUnlocked as TokensUnlockedEvent,
   TokensWithdrawn as TokensWithdrawnEvent,
   StakingWithdrawn as StakingWithdrawnEvent,
-  VestingTokensWithdrawn as VestingTokensWithdrawnEvent,
 } from '../generated/Staking/Staking'
 import { VestingContract, Transaction, VestingHistoryItem } from '../generated/schema'
 import { createAndReturnTransaction } from './utils/Transaction'
@@ -37,8 +35,6 @@ function createVestingTokensStaked(event: TokensStakedEvent): void {
   vestingTokensStakedEntity.transaction = event.transaction.hash.toHex()
   vestingTokensStakedEntity.save()
 }
-
-export function handleTokensUnlocked(event: TokensUnlockedEvent): void {}
 
 export function handleTokensWithdrawn(event: TokensWithdrawnEvent): void {
   let transaction = createAndReturnTransaction(event)
@@ -92,5 +88,3 @@ function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams): void {
     vesting.save()
   }
 }
-
-export function handleVestingTokensWithdrawn(event: VestingTokensWithdrawnEvent): void {}

@@ -1,26 +1,9 @@
-import {
-  CheckpointAdded as CheckpointAddedEvent,
-  FeeAMMWithdrawn as FeeAMMWithdrawnEvent,
-  FeeWithdrawn as FeeWithdrawnEvent,
-  OwnershipTransferred as OwnershipTransferredEvent,
-  TokensTransferred as TokensTransferredEvent,
-  UnwhitelistedConverter as UnwhitelistedConverterEvent,
-  UserFeeWithdrawn as UserFeeWithdrawnEvent,
-  WhitelistedConverter as WhitelistedConverterEvent,
-} from '../generated/FeeSharingProxy/FeeSharingProxy'
+import { TokensTransferred as TokensTransferredEvent, UserFeeWithdrawn as UserFeeWithdrawnEvent } from '../generated/FeeSharingProxy/FeeSharingProxy'
 import { StakeHistoryItem, FeeSharingTokensTransferred } from '../generated/schema'
 import { StakeHistoryAction, RewardsEarnedAction } from './utils/types'
 import { createAndReturnTransaction } from './utils/Transaction'
 import { DEFAULT_DECIMALS, decimal } from '@protofire/subgraph-toolkit'
 import { createOrIncrementRewardItem } from './utils/RewardsEarnedHistoryItem'
-
-export function handleCheckpointAdded(event: CheckpointAddedEvent): void {}
-
-export function handleFeeAMMWithdrawn(event: FeeAMMWithdrawnEvent): void {}
-
-export function handleFeeWithdrawn(event: FeeWithdrawnEvent): void {}
-
-export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {}
 
 export function handleTokensTransferred(event: TokensTransferredEvent): void {
   /** If this event occurs in the same transaction as a StakingWithdrawn or TokensWithdrawn event on the staking contract, it means the user unstaked their SOV early
@@ -34,8 +17,6 @@ export function handleTokensTransferred(event: TokensTransferredEvent): void {
   tokensTransferredEntity.amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
   tokensTransferredEntity.save()
 }
-
-export function handleUnwhitelistedConverter(event: UnwhitelistedConverterEvent): void {}
 
 export function handleUserFeeWithdrawn(event: UserFeeWithdrawnEvent): void {
   createAndReturnTransaction(event)
@@ -55,5 +36,3 @@ export function handleUserFeeWithdrawn(event: UserFeeWithdrawnEvent): void {
     transactionHash: event.transaction.hash,
   })
 }
-
-export function handleWhitelistedConverter(event: WhitelistedConverterEvent): void {}

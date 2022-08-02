@@ -21,8 +21,6 @@ export function handleBitcoinTransferBatchSending(event: BitcoinTransferBatchSen
   entity.save()
 }
 
-export function handleBitcoinTransferFeeChanged(event: BitcoinTransferFeeChangedEvent): void {}
-
 export function handleBitcoinTransferStatusUpdated(event: BitcoinTransferStatusUpdatedEvent): void {
   let transaction = createAndReturnTransaction(event)
 

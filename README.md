@@ -63,12 +63,14 @@ To reset start blocks back to original state:
 
 ## Build a partial subgraph
 
-While developing, you can partially build a subgraph if you don't need data from all the contracts.
+While developing, you can partially build a subgraph if you don't need data to sync from all the contracts.
 
 To build a partial manifest run:
 * ``npm run partial-manifest -- -sect [ SUBSECTION_NAME ]``
 
 To add a new manifest subsection (eg vesting, governance, bridges), go to ``utils/buildPartialManifest.js`` and add an array of the contracts you want in your subsection to the manifestSections array.
+
+You can also add to the keywords array if you want to filter the contracts by keyword, for example only keeping contracts that contain 'Vesting'.
 
 ## Useful info
 
@@ -77,7 +79,7 @@ To add a new manifest subsection (eg vesting, governance, bridges), go to ``util
 
 ## Acknowledgments
 
-Thanks to creators/contributors of the following repos for inspiration, code snippets and libraries:
+Thanks to creators/contributors of the following repos for inspiration and code snippets:
 - Bancor Blocklytics
 - Uniswap
 - Protofire library

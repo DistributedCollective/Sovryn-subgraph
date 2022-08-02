@@ -11,13 +11,10 @@ import {
   EarnReward as EarnRewardEvent, // User event
   ExternalSwap as ExternalSwapEvent,
   Liquidate as LiquidateEvent, // User event
-  LoanSwap as LoanSwapEvent,
   PayBorrowingFee as PayBorrowingFeeEvent,
   PayLendingFee as PayLendingFeeEvent,
-  PayInterestTransfer as PayInterestTransferEvent,
   PayTradingFee as PayTradingFeeEvent,
   SetLoanPool as SetLoanPoolEvent,
-  SetWrbtcToken as SetWrbtcTokenEvent,
   Trade as TradeEvent, // User event
   Rollover as RolloverEvent, // User event
 } from '../generated/ISovryn/ISovryn'
@@ -355,8 +352,6 @@ export function handleLiquidate(event: LiquidateEvent): void {
   userTotalsEntity.save()
 }
 
-export function handleLoanSwap(event: LoanSwapEvent): void {}
-
 export function handlePayBorrowingFee(event: PayBorrowingFeeEvent): void {
   let entity = new PayBorrowingFee(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   entity.payer = event.params.payer
@@ -398,8 +393,6 @@ export function handlePayLendingFee(event: PayLendingFeeEvent): void {
   userTotalsEntity.save()
 }
 
-export function handlePayInterestTransfer(event: PayInterestTransferEvent): void {}
-
 export function handlePayTradingFee(event: PayTradingFeeEvent): void {
   let entity = new PayTradingFee(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   entity.payer = event.params.payer
@@ -429,8 +422,6 @@ export function handleSetLoanPool(event: SetLoanPoolEvent): void {
   createAndReturnTransaction(event)
   createAndReturnLendingPool(event)
 }
-
-export function handleSetWrbtcToken(event: SetWrbtcTokenEvent): void {}
 
 export function handleTrade(event: TradeEvent): void {
   const positionSize = decimal.fromBigInt(event.params.positionSize, DEFAULT_DECIMALS)

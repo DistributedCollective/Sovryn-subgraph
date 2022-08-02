@@ -1,13 +1,9 @@
 import {
   DelegateChanged as DelegateChangedEvent,
-  DelegateStakeChanged as DelegateStakeChangedEvent,
   ExtendedStakingDuration as ExtendedStakingDurationEvent,
-  OwnershipTransferred as OwnershipTransferredEvent,
   TokensStaked as TokensStakedEvent,
-  TokensUnlocked as TokensUnlockedEvent,
   TokensWithdrawn as TokensWithdrawnEvent,
   StakingWithdrawn as StakingWithdrawnEvent,
-  VestingTokensWithdrawn as VestingTokensWithdrawnEvent,
 } from '../generated/Staking/Staking'
 import { StakeHistoryItem, TokensStaked, VestingContract, User, Transaction, VestingHistoryItem, FeeSharingTokensTransferred } from '../generated/schema'
 import { createAndReturnTransaction } from './utils/Transaction'
@@ -16,7 +12,7 @@ import { DEFAULT_DECIMALS, ZERO_ADDRESS, decimal } from '@protofire/subgraph-too
 import { Address, BigDecimal } from '@graphprotocol/graph-ts'
 import { genesisVestingStartBlock, genesisVestingEndBlock } from './blockNumbers/blockNumbers'
 import { createAndReturnProtocolStats } from './utils/ProtocolStats'
-import { adminContracts, stakingFish } from './contracts/contracts'
+import { adminContracts } from './contracts/contracts'
 import { StakeHistoryAction, VestingHistoryActionItem, VestingContractType } from './utils/types'
 
 export function handleDelegateChanged(event: DelegateChangedEvent): void {
@@ -33,8 +29,6 @@ export function handleDelegateChanged(event: DelegateChangedEvent): void {
   }
 }
 
-export function handleDelegateStakeChanged(event: DelegateStakeChangedEvent): void {}
-
 export function handleExtendedStakingDuration(event: ExtendedStakingDurationEvent): void {
   let transaction = createAndReturnTransaction(event)
   let stakeHistoryItem = new StakeHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
@@ -45,8 +39,6 @@ export function handleExtendedStakingDuration(event: ExtendedStakingDurationEven
   stakeHistoryItem.lockedUntil = event.params.newDate.toI32()
   stakeHistoryItem.save()
 }
-
-export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {}
 
 export function handleTokensStaked(event: TokensStakedEvent): void {
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
@@ -147,8 +139,6 @@ function createVestingTokensStaked(event: TokensStakedEvent): void {
   vestingTokensStakedEntity.save()
 }
 
-export function handleTokensUnlocked(event: TokensUnlockedEvent): void {}
-
 export function handleTokensWithdrawn(event: TokensWithdrawnEvent): void {
   let transaction = createAndReturnTransaction(event)
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
@@ -236,5 +226,3 @@ function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams): void {
     protocolStatsEntity.save()
   }
 }
-
-export function handleVestingTokensWithdrawn(event: VestingTokensWithdrawnEvent): void {}
