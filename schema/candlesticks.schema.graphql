@@ -4,7 +4,7 @@
 Candlesticks are for presentational purposes on the dapp. This entity supports the candlestick trading data on the trading view charts.
 Trading data is available for the following pairs:
 1. All tokens to RBTC
-2. All tokens to XUSD
+2. All tokens to current usdStablecoin (see ProtocolStats entity for more information)
 There is not candlestick data for other trading pairs as this would cause the amount of data stored to increase exponentially
 """
 type CandleStick @entity {

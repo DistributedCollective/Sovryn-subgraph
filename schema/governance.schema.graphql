@@ -52,7 +52,7 @@ type Proposal @entity {
   """
   proposer: Bytes! # address
   """
-  Contract or contract that this proposal targets
+  Contract or contracts that this proposal targets
   """
   targets: [String!]! # address[]
   values: [BigInt!]! # uint256[] 

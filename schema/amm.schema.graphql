@@ -100,7 +100,7 @@ type PoolToken @entity {
   decimals: Int
   liquidityPool: LiquidityPool!
   """
-  For V1 pools, there will be 2 underlying assets, however for V1 pools there will be just one
+  For V1 pools, there will be 2 underlying assets, however for V2 pools there will be just one
   """
   underlyingAssets: [Token!]!
 }
@@ -123,11 +123,11 @@ type Swap @entity {
   """
   numConversions: Int!
   """
-  Token the user sold
+  Token the user converted
   """
   fromToken: Token!
   """
-  Token the user bought
+  Token the user received
   """
   toToken: Token!
   fromAmount: BigDecimal!
@@ -213,8 +213,6 @@ type LiquidityPool @entity {
   activated: Boolean
   # hasRBTCReserve: Boolean!
   maxConversionFee: BigInt
-  lastResetBlockNumber: Int # Todo: Is this used?
-  lastResetTimestamp: Int
   createdAtTimestamp: Int
   createdAtBlockNumber: Int
   createdAtTransaction: Transaction!
