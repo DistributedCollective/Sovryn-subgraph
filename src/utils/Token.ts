@@ -42,6 +42,14 @@ export function createAndReturnToken(tokenAddress: Address, converterAddress: Ad
     if (!connectorTokenDecimalsResult.reverted) {
       token.decimals = connectorTokenDecimalsResult.value
     }
+
+    // initialize bridge aggregation per token properties
+    token.totalAmountCrossedIn = BigDecimal.zero()
+    token.totalAmountCrossedOut = BigDecimal.zero()
+    token.totalAmountCrossedInBSC = BigDecimal.zero()
+    token.totalAmountCrossedOutBSC = BigDecimal.zero()
+    token.totalAmountCrossedInETH = BigDecimal.zero()
+    token.totalAmountCrossedOutETH = BigDecimal.zero()
   }
   let liquidityPoolToken = LiquidityPoolToken.load(converterAddress.toHex() + tokenAddress.toHex())
   if (liquidityPoolToken == null) {

@@ -169,6 +169,36 @@ type Token @entity {
   Does this token have an AMM pool with the protocol stablecoin as the other reserve asset?
   """
   hasStablecoinPool: Boolean
+
+  """
+  CrossTransfers: cross transfers list
+  """
+  crossTransfers: [CrossTransfer!] @derivedFrom(field: "token")
+
+  """
+  TotalAmountCrossedIn - total amount of token received from all bridges
+  """
+  totalAmountCrossedIn: BigDecimal!
+  """
+  TotalAmountCrossedOut - total amount of token sent across all bridges
+  """
+  totalAmountCrossedOut: BigDecimal!
+  """
+  TotalAmountCrossedInBSC - total amount received from BSC bridge
+  """
+  totalAmountCrossedInBSC: BigDecimal!
+  """
+  TotalAmountCrossedOutBSC - total amount sent across BSC bridge
+  """
+  totalAmountCrossedOutBSC: BigDecimal!
+  """
+  TotalAmountCrossedInETH - total amount received from ETH bridge
+  """
+  totalAmountCrossedInETH: BigDecimal!
+  """
+  TotalAmountCrossedOutEth - total amount sent across ETH bridge
+  """
+  totalAmountCrossedOutETH: BigDecimal!
 }
 
 type OwnerUpdate @entity {

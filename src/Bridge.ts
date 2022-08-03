@@ -43,6 +43,7 @@ export function handleCross(event: CrossEvent): void {
 
   const crossTransferEvent: CrossTransferEvent = {
     receiver: event.params._to,
+    bridgeAddress: event.address.toHex(),
     originalTokenAddress: event.params._tokenAddress,
     amount: event.params._amount,
     decimals: event.params._decimals,
