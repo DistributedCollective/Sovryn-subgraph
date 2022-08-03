@@ -902,7 +902,6 @@ dataSources:
         #   handler: handleerc777ConverterSet
       file: ./src/Bridge.ts
 
-
 templates:
   # LiquidityPoolV1Converter
   - kind: ethereum/contract
