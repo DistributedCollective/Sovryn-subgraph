@@ -131,8 +131,6 @@ dataSources:
         - PayBorrowingFee
         - PayLendingFee
         - PayTradingFee
-        - SetWrbtcToken
-        - SetLoanPool
         - Trade
         - Rollover
         # - WithdrawFees # this needs to be changed due to naming clash
@@ -156,8 +154,6 @@ dataSources:
           handler: handleExternalSwap
         - event: Liquidate(indexed address,indexed address,indexed bytes32,address,address,address,uint256,uint256,uint256,uint256)
           handler: handleLiquidate
-        - event: LoanSwap(indexed bytes32,indexed address,indexed address,address,uint256,uint256)
-          handler: handleLoanSwap
         - event: PayBorrowingFee(indexed address,indexed address,indexed bytes32,uint256)
           handler: handlePayBorrowingFee
         - event: PayLendingFee(indexed address,indexed address,uint256)
