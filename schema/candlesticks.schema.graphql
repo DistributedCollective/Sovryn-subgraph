@@ -1,10 +1,16 @@
 # Candlesticks
+enum CandleSticksInterval {
+  MinuteInterval
+  FifteenMinutesInterval
+  HourInterval
+  FourHourInterval
+  DayInterval
+}
 
-type CandleStick @entity {
+interface ICandleStick {
   id: ID! # fromToken + toToken + timestamp + interval
   baseToken: Token
   quoteToken: Token
-  interval: CandleSticksInterval
   open: BigDecimal # opening price
   high: BigDecimal! # high price
   low: BigDecimal! # low price
@@ -14,10 +20,67 @@ type CandleStick @entity {
   periodStartUnix: Int! # unix timestamp for start of candle
 }
 
-enum CandleSticksInterval {
-  MinuteInterval
-  FifteenMinutesInterval
-  HourInterval
-  FourHourInterval
-  DayInterval
+type CandleStickMinute implements ICandleStick @entity {
+  id: ID! # fromToken + toToken + timestamp + interval
+  baseToken: Token
+  quoteToken: Token
+  open: BigDecimal # opening price
+  high: BigDecimal! # high price
+  low: BigDecimal! # low price
+  close: BigDecimal! # close price
+  txCount: Int! # number of transactions during period
+  totalVolume: BigDecimal! # total volume in quote currency
+  periodStartUnix: Int! # unix timestamp for start of candle
+}
+
+type CandleStickFifteenMinute implements ICandleStick @entity {
+  id: ID! # fromToken + toToken + timestamp + interval
+  baseToken: Token
+  quoteToken: Token
+  open: BigDecimal # opening price
+  high: BigDecimal! # high price
+  low: BigDecimal! # low price
+  close: BigDecimal! # close price
+  txCount: Int! # number of transactions during period
+  totalVolume: BigDecimal! # total volume in quote currency
+  periodStartUnix: Int! # unix timestamp for start of candle
+}
+
+type CandleStickHour implements ICandleStick @entity {
+  id: ID! # fromToken + toToken + timestamp + interval
+  baseToken: Token
+  quoteToken: Token
+  open: BigDecimal # opening price
+  high: BigDecimal! # high price
+  low: BigDecimal! # low price
+  close: BigDecimal! # close price
+  txCount: Int! # number of transactions during period
+  totalVolume: BigDecimal! # total volume in quote currency
+  periodStartUnix: Int! # unix timestamp for start of candle
+}
+
+type CandleStickFourHour implements ICandleStick @entity {
+  id: ID! # fromToken + toToken + timestamp + interval
+  baseToken: Token
+  quoteToken: Token
+  open: BigDecimal # opening price
+  high: BigDecimal! # high price
+  low: BigDecimal! # low price
+  close: BigDecimal! # close price
+  txCount: Int! # number of transactions during period
+  totalVolume: BigDecimal! # total volume in quote currency
+  periodStartUnix: Int! # unix timestamp for start of candle
+}
+
+type CandleStickDay implements ICandleStick @entity {
+  id: ID! # fromToken + toToken + timestamp + interval
+  baseToken: Token
+  quoteToken: Token
+  open: BigDecimal # opening price
+  high: BigDecimal! # high price
+  low: BigDecimal! # low price
+  close: BigDecimal! # close price
+  txCount: Int! # number of transactions during period
+  totalVolume: BigDecimal! # total volume in quote currency
+  periodStartUnix: Int! # unix timestamp for start of candle
 }
