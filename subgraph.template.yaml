@@ -158,8 +158,6 @@ dataSources:
           handler: handlePayBorrowingFee
         - event: PayLendingFee(indexed address,indexed address,uint256)
           handler: handlePayLendingFee
-        - event: PayInterestTransfer(indexed address,indexed address,uint256)
-          handler: handlePayInterestTransfer
         - event: PayTradingFee(indexed address,indexed address,indexed bytes32,uint256)
           handler: handlePayTradingFee
         - event: SetLoanPool(indexed address,indexed address,indexed address)
@@ -499,8 +497,6 @@ dataSources:
         - name: FeeSharingProxy
           file: ./abis/FeeSharingProxy.json
       eventHandlers:
-        - event: FeeWithdrawn(indexed address,indexed address,uint256)
-          handler: handleFeeWithdrawn
         - event: TokensTransferred(indexed address,indexed address,uint256)
           handler: handleTokensTransferred
         - event: UserFeeWithdrawn(indexed address,indexed address,indexed address,uint256)
