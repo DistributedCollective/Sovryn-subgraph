@@ -37,12 +37,22 @@ const pruneManifest = (section) => {
         }
     }
 
+    const appendNewTemplates = (dataSource) => {
+        const containsKeywords = keyword.filter(item => dataSource.name.includes(item)).length > 0
+        if (!contracts.includes(dataSource.name) && !containsKeywords) {
+            console.log(`${dataSource.name} removed`)
+        } else {
+            newTemplates.push(dataSource)
+            console.log('\x1b[36m%s\x1b[0m', `${dataSource.name} kept`)
+        }
+    }
+
     for (const dataSource of doc.dataSources) {
         appendNewDataSources(dataSource)
     }
 
     for (const dataSource of doc.templates) {
-        appendNewDataSources(dataSource)
+        appendNewTemplates(dataSource)
     }
 
     doc.dataSources = newDataSources
