@@ -13,24 +13,7 @@ enum Interval {
   DayInterval = 60 * 60 * 24,
 }
 
-class IntervalStr {
-  static MinuteInterval: string = 'MinuteInterval'
-  static FifteenMinutesInterval: string = 'FifteenMinutesInterval'
-  static HourInterval: string = 'HourInterval'
-  static FourHourInterval: string = 'FourHourInterval'
-  static DayInterval: string = 'DayInterval'
-}
-
-export class ICandleSticks {
-  tradingPair: string
-  blockTimestamp: i32
-  oldPrice: BigDecimal
-  newPrice: BigDecimal
-  volume: BigDecimal
-  baseToken: string
-  quoteToken: string
-}
-
+// TODO: this method needs to be refactored into smaller methods for cleaner code
 export function updateCandleSticks(event: ConversionEventForSwap): void {
   let baseToken: Token
   let quoteToken: Token
