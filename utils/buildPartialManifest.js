@@ -27,32 +27,27 @@ const pruneManifest = (section) => {
     let newDataSources = []
     let newTemplates = []
 
-    const appendNewDataSources = (dataSource) => {
+    const appendNewDataSources = (dataSource, type) => {
         const containsKeywords = keyword.filter(item => dataSource.name.includes(item)).length > 0
         if (!contracts.includes(dataSource.name) && !containsKeywords) {
             console.log(`${dataSource.name} removed`)
         } else {
-            newDataSources.push(dataSource)
-            console.log('\x1b[36m%s\x1b[0m', `${dataSource.name} kept`)
-        }
-    }
-
-    const appendNewTemplates = (dataSource) => {
-        const containsKeywords = keyword.filter(item => dataSource.name.includes(item)).length > 0
-        if (!contracts.includes(dataSource.name) && !containsKeywords) {
-            console.log(`${dataSource.name} removed`)
-        } else {
-            newTemplates.push(dataSource)
-            console.log('\x1b[36m%s\x1b[0m', `${dataSource.name} kept`)
+            if (type === "dataSource") {
+                newDataSources.push(dataSource)
+                console.log('\x1b[36m%s\x1b[0m', `${dataSource.name} kept as dataSource`)
+            } else if (type === "template") {
+                newTemplates.push(dataSource)
+                console.log('\x1b[36m%s\x1b[0m', `${dataSource.name} kept as template`)
+            }
         }
     }
 
     for (const dataSource of doc.dataSources) {
-        appendNewDataSources(dataSource)
+        appendNewDataSources(dataSource, "dataSource")
     }
 
     for (const dataSource of doc.templates) {
-        appendNewTemplates(dataSource)
+        appendNewDataSources(dataSource, "template")
     }
 
     doc.dataSources = newDataSources
