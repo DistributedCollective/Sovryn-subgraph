@@ -1,13 +1,9 @@
-import { log } from '@graphprotocol/graph-ts'
 import {
   BridgeChanged as BridgeChangedEvent,
   Executed as ExecutedEvent,
   MemberAddition as MemberAdditionEvent,
   MemberRemoval as MemberRemovalEvent,
-  // OwnershipTransferred as OwnershipTransferredEvent,
-  RequirementChange as RequirementChangeEvent,
   RevokeTxAndVote as RevokeTxAndVoteEvent,
-  StoreFormerFederationExecutedTx as StoreFormerFederationExecutedTxEvent,
   Voted as VotedEvent,
 } from '../generated/templates/Federation/Federation'
 import { CrossTransfer } from '../generated/schema'
@@ -17,7 +13,7 @@ import { createAndReturnFederation, handleFederatorVoted } from './utils/CrossCh
 import { CrossStatus } from './utils/types'
 
 export function handleBridgeChanged(event: BridgeChangedEvent): void {
-  let transaction = createAndReturnTransaction(event)
+  const transaction = createAndReturnTransaction(event)
 
   const federation = createAndReturnFederation(event.address, event)
   federation.bridge = event.params.bridge.toHex()
@@ -26,7 +22,7 @@ export function handleBridgeChanged(event: BridgeChangedEvent): void {
 }
 
 export function handleExecuted(event: ExecutedEvent): void {
-  let transaction = createAndReturnTransaction(event)
+  const transaction = createAndReturnTransaction(event)
 
   const federation = createAndReturnFederation(event.address, event)
   federation.totalExecuted = federation.totalExecuted + 1
@@ -43,7 +39,7 @@ export function handleExecuted(event: ExecutedEvent): void {
 }
 
 export function handleMemberAddition(event: MemberAdditionEvent): void {
-  let transaction = createAndReturnTransaction(event)
+  const transaction = createAndReturnTransaction(event)
 
   const federation = createAndReturnFederation(event.address, event)
   const members = federation.members
@@ -54,7 +50,7 @@ export function handleMemberAddition(event: MemberAdditionEvent): void {
 }
 
 export function handleMemberRemoval(event: MemberRemovalEvent): void {
-  let transaction = createAndReturnTransaction(event)
+  const transaction = createAndReturnTransaction(event)
 
   const federation = createAndReturnFederation(event.address, event)
   const members = federation.members
@@ -64,10 +60,8 @@ export function handleMemberRemoval(event: MemberRemovalEvent): void {
   federation.save()
 }
 
-export function handleRequirementChange(event: RequirementChangeEvent): void {}
-
 export function handleRevokeTxAndVote(event: RevokeTxAndVoteEvent): void {
-  let transaction = createAndReturnTransaction(event)
+  const transaction = createAndReturnTransaction(event)
 
   const federation = createAndReturnFederation(event.address, event)
   federation.totalVotes = federation.totalVotes + 1
@@ -83,16 +77,14 @@ export function handleRevokeTxAndVote(event: RevokeTxAndVoteEvent): void {
   }
 }
 
-export function handleStoreFormerFederationExecutedTx(event: StoreFormerFederationExecutedTxEvent): void {}
-
 export function handleVoted(event: VotedEvent): void {
-  let transaction = createAndReturnTransaction(event)
+  const transaction = createAndReturnTransaction(event)
   handleFederatorVoted(event, transaction)
 }
 
 // this is an old event with a lot of missing data so it is not processed and not suppose to happen
 export function handleVotedV0(event: VotedEvent): void {
-  let transaction = createAndReturnTransaction(event)
+  const transaction = createAndReturnTransaction(event)
 
   const federation = createAndReturnFederation(event.address, event)
   federation.totalVotes = federation.totalVotes + 1
@@ -101,6 +93,6 @@ export function handleVotedV0(event: VotedEvent): void {
 }
 
 export function handleVotedV1(event: VotedEvent): void {
-  let transaction = createAndReturnTransaction(event)
+  const transaction = createAndReturnTransaction(event)
   handleFederatorVoted(event, transaction)
 }
