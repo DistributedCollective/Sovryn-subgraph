@@ -20,9 +20,9 @@ export function updateCandleSticks(event: ConversionEventForSwap): void {
   let oldPrice = BigDecimal.zero()
   let newPrice = BigDecimal.zero()
   let volume = BigDecimal.zero()
-  let blockTimestamp = event.timestamp
+  const blockTimestamp = event.timestamp
 
-  let protocolStats = createAndReturnProtocolStats()
+  const protocolStats = createAndReturnProtocolStats()
   const usdStablecoin = protocolStats.usdStablecoin.toLowerCase()
 
   if (event.fromToken.toHex().toLowerCase() == WRBTCAddress.toLowerCase()) {
