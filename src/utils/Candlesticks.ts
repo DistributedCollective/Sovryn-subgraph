@@ -114,7 +114,7 @@ function updateCandlestickMinute(
   txCount: i32,
   blockTimestamp: i32,
 ): void {
-  let candleStickTimestamp = blockTimestamp - (blockTimestamp % Interval.MinuteInterval)
+  const candleStickTimestamp = blockTimestamp - (blockTimestamp % Interval.MinuteInterval)
   const candlestickId = getCandleStickId(baseToken, quoteToken, candleStickTimestamp, Interval.MinuteInterval)
   let candleStickMinute = CandleStickMinute.load(candlestickId)
   if (candleStickMinute == null) {
@@ -153,7 +153,7 @@ function updateCandlestickFifteenMinute(
   txCount: i32,
   blockTimestamp: i32,
 ): void {
-  let candleStickTimestamp = blockTimestamp - (blockTimestamp % Interval.FifteenMinutesInterval)
+  const candleStickTimestamp = blockTimestamp - (blockTimestamp % Interval.FifteenMinutesInterval)
   const candlestickId = getCandleStickId(baseToken, quoteToken, candleStickTimestamp, Interval.FifteenMinutesInterval)
   let candleStickFifteenMinute = CandleStickFifteenMinute.load(candlestickId)
   if (candleStickFifteenMinute == null) {
@@ -192,7 +192,7 @@ function updateCandlestickHour(
   txCount: i32,
   blockTimestamp: i32,
 ): void {
-  let candleStickTimestamp = blockTimestamp - (blockTimestamp % Interval.HourInterval)
+  const candleStickTimestamp = blockTimestamp - (blockTimestamp % Interval.HourInterval)
   const candlestickId = getCandleStickId(baseToken, quoteToken, candleStickTimestamp, Interval.HourInterval)
   let candleStick = CandleStickHour.load(candlestickId)
   if (candleStick == null) {
@@ -231,7 +231,7 @@ function updateCandlestickFourHour(
   txCount: i32,
   blockTimestamp: i32,
 ): void {
-  let candleStickTimestamp = blockTimestamp - (blockTimestamp % Interval.FourHourInterval)
+  const candleStickTimestamp = blockTimestamp - (blockTimestamp % Interval.FourHourInterval)
   const candlestickId = getCandleStickId(baseToken, quoteToken, candleStickTimestamp, Interval.FourHourInterval)
   let candleStick = CandleStickFourHour.load(candlestickId)
   if (candleStick == null) {
@@ -270,7 +270,7 @@ function updateCandlestickDay(
   txCount: i32,
   blockTimestamp: i32,
 ): void {
-  let candleStickTimestamp = blockTimestamp - (blockTimestamp % Interval.DayInterval)
+  const candleStickTimestamp = blockTimestamp - (blockTimestamp % Interval.DayInterval)
   const candlestickId = getCandleStickId(baseToken, quoteToken, candleStickTimestamp, Interval.DayInterval)
   let candleStick = CandleStickDay.load(candlestickId)
   if (candleStick == null) {
