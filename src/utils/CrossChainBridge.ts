@@ -2,7 +2,7 @@ import { BigInt, Address, ethereum, crypto, ByteArray, log } from '@graphprotoco
 import { decimal, ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
 import { Federation, Bridge, CrossTransfer, Token, SideToken, Transaction } from '../../generated/schema'
 import { createAndReturnTransaction } from './Transaction'
-import { NewSideToken as NewSideTokenEvent } from '../../generated/Bridge/Bridge'
+import { NewSideToken as NewSideTokenEvent } from '../../generated/BridgeETH/Bridge'
 import { Voted as VotedEvent } from '../../generated/templates/Federation/Federation'
 import { BridgeChain, BridgeType, CrossDirection, CrossStatus } from './types'
 import { createAndReturnUser } from './User'

@@ -10,7 +10,7 @@ import {
   PrefixUpdated as PrefixUpdatedEvent,
   Unpaused as UnpausedEvent,
   Upgrading as UpgradingEvent,
-} from '../generated/Bridge/Bridge'
+} from '../generated/BridgeETH/Bridge'
 
 import { Federation as FederationTemplate } from '../generated/templates'
 import {
