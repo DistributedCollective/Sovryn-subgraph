@@ -104,8 +104,6 @@ export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEv
     crossTransfer.createdAtTx = crossTransferEvent.transaction.id
     crossTransfer.createdAtTimestamp = crossTransferEvent.transaction.timestamp
     crossTransfer.save()
-
-    aggregateTokenAmounts(crossTransferEvent, crossTransfer)
   }
   return crossTransfer
 }
@@ -165,34 +163,6 @@ export const handleFederatorVoted = (event: VotedEvent, transaction: Transaction
   crossTransfer.updatedAtTx = transaction.id
   crossTransfer.updatedAtTimestamp = transaction.timestamp
   crossTransfer.save()
-}
-
-function aggregateTokenAmounts(crossTransferEvent: CrossTransferEvent, crossTransfer: CrossTransfer): void {
-  const token = Token.load(crossTransferEvent.originalTokenAddress.toHex())
-  if (token != null) {
-    if (crossTransferEvent.direction == CrossDirection.Incoming) {
-      token.totalAmountCrossedIn = token.totalAmountCrossedIn.plus(crossTransfer.amount)
-      if (isBSCBridge(crossTransferEvent.bridgeAddress)) {
-        token.totalAmountCrossedInBSC = token.totalAmountCrossedInBSC.plus(crossTransfer.amount)
-      } else if (isETHBridge(crossTransferEvent.bridgeAddress)) {
-        token.totalAmountCrossedInETH = token.totalAmountCrossedInETH.plus(crossTransfer.amount)
-      } else {
-        log.warning('Unknown bridge type for bridgeAddress: {}', [crossTransferEvent.bridgeAddress])
-      }
-    } else if (crossTransferEvent.direction == CrossDirection.Outgoing) {
-      token.totalAmountCrossedOut = token.totalAmountCrossedOut.plus(crossTransfer.amount)
-      if (isBSCBridge(crossTransferEvent.bridgeAddress)) {
-        token.totalAmountCrossedOutBSC = token.totalAmountCrossedOutBSC.plus(crossTransfer.amount)
-      } else if (isETHBridge(crossTransferEvent.bridgeAddress)) {
-        token.totalAmountCrossedOutETH = token.totalAmountCrossedOutETH.plus(crossTransfer.amount)
-      } else {
-        log.warning('Unknown bridge type for bridgeAddress: {}', [crossTransferEvent.bridgeAddress])
-      }
-    } else {
-      log.warning('Unknown crossTransfer direction: {}', [crossTransferEvent.direction])
-    }
-    token.save()
-  }
 }
 
 export function isETHBridge(address: string): boolean {
