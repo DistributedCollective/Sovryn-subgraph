@@ -1,6 +1,6 @@
 import { BigInt, Address, ethereum, crypto, ByteArray, log } from '@graphprotocol/graph-ts'
 import { decimal, ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
-import { Federation, Bridge, CrossTransfer, Token, SideToken, Transaction } from '../../generated/schema'
+import { Federation, Bridge, CrossTransfer, SideToken, Transaction } from '../../generated/schema'
 import { createAndReturnTransaction } from './Transaction'
 import { NewSideToken as NewSideTokenEvent } from '../../generated/BridgeETH/Bridge'
 import { Voted as VotedEvent } from '../../generated/templates/Federation/Federation'
