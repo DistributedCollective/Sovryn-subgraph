@@ -19,11 +19,8 @@ For more information on The Graph protocol, head to the Graph documentation here
 
 - clone repo
 - Run `npm install`
-
 - Add a `.env.dev` file in the root of the project. Copy the contents of `.env.example` into this file (you can change the password to your own password if you wish)
-
 - Run `npm run schema` to generate the schema.graphql file from the ./schema directory
-
 - Run `npm run prepare:RSK:testnet`. This will create the docker-compose.yml file and the subgraph.yaml file from the template files.
 - Run `npm run dev:up`. This will run docker compose up -d and pass in your environment file.
 - Run `npm run codegen`. This will generate the ./generated folder with types and contract objects.
@@ -37,7 +34,7 @@ For more information on The Graph protocol, head to the Graph documentation here
 When adding a new abi to the subgraph, you can s
 
 - `npm run scaffold -- -fp <ABI_FILE_PATH> -gm -gs -a <CONTRACT_ADDRESS>`
-  This will generate a mapping file in ./src with the name of the abi, a schema file in ./schema with
+  This will generate a mapping file in ./src with the name of the abi, a schema file in ./schema with an entity for each event, and a datasource in the subgraph.template.yml
 
 - `npm run scaffold -- --help` for more options
 
@@ -70,6 +67,18 @@ You can also add to the keywords array if you want to filter the contracts by ke
 - The subgraph mappings files are written in AssemblyScript, not Typescript. AssemblyScript docs can be found here: https://www.assemblyscript.org/. Pay particular attention to the difference in the equality operator - `===` compares referencess, `==` compares values.
 - If you are having issues with postgres, try deleting the `data/` directory from the subgraph root
 - The block numbers for Orderbook contracts on mainnet are set to blocks far in the future, because these contracts only exist on testnet
+
+## How to contribute
+
+To contribute, open a PR to development branch using a branch name prefaced with `feat/`, `fix/` or `hotfix/`, and request @omerzam or @BetsyBraddock as the reviewer.
+
+## Code of Conduct
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+## Licence
+
+The Sovryn DApp is open-sourced software licensed under the [MIT license](LICENSE).
 
 ## Acknowledgments
 
