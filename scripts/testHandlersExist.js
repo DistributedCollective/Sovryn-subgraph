@@ -27,6 +27,7 @@ function main() {
             item.handlers.forEach(functionName => {
                 if (data.indexOf(functionName) < 0) {
                     console.error(`${functionName} missing from file ${item.file}`)
+                    process.exit(1)
                 }
             })
         });
