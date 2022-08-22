@@ -33,7 +33,7 @@ function main() {
             })
         });
     })
-    console.log("All handlers exist - woohoo!!")
+    console.log("All handlers exist - woohoo!!\n\n")
 }
 
 main()

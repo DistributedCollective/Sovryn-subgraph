@@ -6,7 +6,7 @@
     "create-local": "graph create  DistributedCollective/sovryn-subgraph --node http://127.0.0.1:8020",
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy  DistributedCollective/sovryn-subgraph --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
+    "deploy": "graph deploy  DistributedCollective/sovryn-subgraph --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ && node scripts/db_triggers.js",
     "deploy-local": "graph deploy  DistributedCollective/sovryn-subgraph --ipfs http://localhost:5001 --node http://127.0.0.1:8020",
     "dev": "npm run schema && npm run codegen && npm run deploy-local -- --version-label v0.0.1",
     "dev:no-build": "npm run codegen && npm run deploy-local",
@@ -22,8 +22,7 @@
     "prepare:RSK:mainnet": "sh ./scripts/prepare_mainnet.sh && npm run schema",
     "test-start-block": "node -r esm utils/startFromLaterBlock.js",
     "schema": "sh ./scripts/schema.sh",
-    "partial-manifest": "node utils/buildPartialManifest.js",
-    "check-handlers": "node scripts/testHandlersExist.js"
+    "partial-manifest": "node utils/buildPartialManifest.js"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.25.3",
@@ -44,6 +43,7 @@
   },
   "dependencies": {
     "esm": "^3.2.25",
-    "matchstick-as": "^0.3.0"
+    "matchstick-as": "^0.3.0",
+    "pg": "^8.7.3"
   }
 }

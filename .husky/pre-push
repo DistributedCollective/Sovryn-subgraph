@@ -4,4 +4,4 @@
 npm run lint
 npm run codegen
 npm run build
-npm run check-handlers
+node scripts/testHandlersExist
