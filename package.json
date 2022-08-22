@@ -22,7 +22,8 @@
     "prepare:RSK:mainnet": "sh ./scripts/prepare_mainnet.sh && npm run schema",
     "test-start-block": "node -r esm utils/startFromLaterBlock.js",
     "schema": "sh ./scripts/schema.sh",
-    "partial-manifest": "node utils/buildPartialManifest.js"
+    "partial-manifest": "node utils/buildPartialManifest.js",
+    "check-handlers": "node scripts/testHandlersExist.js"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.25.3",
