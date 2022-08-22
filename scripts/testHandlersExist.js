@@ -13,6 +13,7 @@ program.version('0.0.1');
 const yaml = require('js-yaml');
 
 function main() {
+    console.log("Testing handlers exist")
     let doc = yaml.load(fs.readFileSync('./subgraph.template.yaml', 'utf8'));
     let handlers = doc.dataSources.map(item => {
         return {
@@ -32,6 +33,7 @@ function main() {
             })
         });
     })
+    console.log("All handlers exist - woohoo!!")
 }
 
 main()
