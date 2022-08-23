@@ -1,6 +1,8 @@
+require('dotenv').config();
 const { Client } = require('pg')
 var fs = require('fs');
 var sql = fs.readFileSync('scripts/db_triggers.sql').toString();
+
 const client = new Client({
     user: 'postgres',
     host: 'localhost',
