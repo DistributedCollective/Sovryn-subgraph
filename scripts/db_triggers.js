@@ -5,7 +5,7 @@ const client = new Client({
     user: 'postgres',
     host: 'localhost',
     database: 'postgres',
-    password: 'postgres',
+    password: process.env.POSTGRES_PASSWORD || 'postgres',
     port: 5432,
 })
 client.connect(function (err) {
@@ -15,6 +15,8 @@ client.connect(function (err) {
         if (err) {
             console.log('error: ', err);
             process.exit(1);
+        } else {
+            console.log('Database triggers added')
         }
         process.exit(0);
     });
