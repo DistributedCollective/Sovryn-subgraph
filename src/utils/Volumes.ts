@@ -1,4 +1,4 @@
-import { Address, BigDecimal, log } from '@graphprotocol/graph-ts'
+import { Address, BigDecimal } from '@graphprotocol/graph-ts'
 
 import { Token, LiquidityPoolToken } from '../../generated/schema'
 import { ConversionEventForSwap } from './Swap'
