@@ -92,8 +92,7 @@ export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEv
     crossTransfer.direction = crossTransferEvent.direction.toString()
     crossTransfer.votes = 0
     crossTransfer.status = crossTransferEvent.status.toString()
-    const user = createAndReturnUser(crossTransferEvent.receiver, crossTransferEvent.timestamp)
-    crossTransfer.receiver = user.id
+    crossTransfer.receiver = crossTransferEvent.receiver
     crossTransfer.originalTokenAddress = crossTransferEvent.originalTokenAddress
     // TODO: get side token
     // const token = Token.load(crossTransferEvent.tokenAddress.toHex())
@@ -144,6 +143,13 @@ export const handleFederatorVoted = (event: VotedEvent, transaction: Transaction
     transaction,
   }
   const crossTransfer = createAndReturnCrossTransfer(crossTransferEvent)
+  const receiver = createAndReturnUser(event.params.receiver, event.block.timestamp)
+  if (receiver != null) {
+    const receivedCrossChainTransfers = receiver.receivedCrossChainTransfers
+    receivedCrossChainTransfers.push(crossTransfer.id)
+    receiver.receivedCrossChainTransfers = receivedCrossChainTransfers
+    receiver.save()
+  }
   crossTransfer.sourceChainTransactionHash = event.params.transactionHash
   crossTransfer.sourceChainBlockHash = event.params.blockHash
   // TODO: tokenAddress might not be a side token but rather a token that is "native" to RSK (WRBTC, SOV etc.) need to check
@@ -153,8 +159,7 @@ export const handleFederatorVoted = (event: VotedEvent, transaction: Transaction
   }
   // TODO: if token is native to RSK, then symbol should be from token entity and not side token
   crossTransfer.symbol = event.params.symbol
-  createAndReturnUser(event.params.sender, event.block.timestamp) // making sure sender is created as a user in the graph
-  crossTransfer.sender = event.params.sender.toHex()
+  crossTransfer.sender = event.params.sender
   crossTransfer.votes = crossTransfer.votes + 1
 
   const bridgeAddress = federation.bridge

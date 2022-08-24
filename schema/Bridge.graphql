@@ -148,13 +148,13 @@ type CrossTransfer @entity {
   """
   sideToken: SideToken # SideToken
   """
-  Receiver - the user entity for the receiver
+  Receiver - The receiver of funds (can be a wallet or contract)
   """
-  receiver: User! # address
+  receiver: Bytes # address
   """
-  Sender - the user entity for the sender
+  Sender - The sender of funds (can be a wallet or contracts)
   """
-  sender: User
+  sender: Bytes
   """
   Amount - the amount of originalToken transferred across the bridge
   """

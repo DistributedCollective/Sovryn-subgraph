@@ -70,8 +70,8 @@ type User @entity {
   """
   Cross ChainBridge transfers from RSK and to RSK
   """
-  receivedCrossChainTransfers: [CrossTransfer!] @derivedFrom(field: "receiver")
-  sentCrossChainTransfers: [CrossTransfer!] @derivedFrom(field: "sender")
+  receivedCrossChainTransfers: [CrossTransfer!]!
+  sentCrossChainTransfers: [CrossTransfer!]!
   """
   Transactions initiated by this user
   """
