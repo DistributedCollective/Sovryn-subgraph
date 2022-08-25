@@ -31,7 +31,6 @@ import {
   PayTradingFee,
   Trade,
   Swap,
-  UserRewardsEarnedHistory,
   Loan,
   Rollover,
 } from '../generated/schema'
@@ -45,6 +44,7 @@ import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
 import { createAndReturnLendingPool } from './utils/LendingPool'
 import { RewardsEarnedAction } from './utils/types'
 import { createOrIncrementRewardItem } from './utils/RewardsEarnedHistoryItem'
+import { incrementAvailableTradingRewards, incrementTotalFeesAndRewardsEarned, incrementTotalTradingRewards } from './utils/UserRewardsEarnedHistory'
 
 export function handleBorrow(event: BorrowEvent): void {
   createAndReturnTransaction(event)
@@ -274,23 +274,10 @@ export function handleDepositCollateralLegacy(event: DepositCollateralLegacyEven
  */
 export function handleEarnReward(event: EarnRewardEvent): void {
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
-
   createAndReturnTransaction(event)
-  let userRewardsEarnedHistory = UserRewardsEarnedHistory.load(event.params.receiver.toHexString())
-  if (userRewardsEarnedHistory != null) {
-    userRewardsEarnedHistory.totalTradingRewards = userRewardsEarnedHistory.totalTradingRewards.plus(amount)
-    userRewardsEarnedHistory.availableTradingRewards = userRewardsEarnedHistory.availableTradingRewards.plus(amount)
-    userRewardsEarnedHistory.totalFeesAndRewardsEarned = userRewardsEarnedHistory.totalFeesAndRewardsEarned.plus(amount)
-    userRewardsEarnedHistory.save()
-  } else {
-    userRewardsEarnedHistory = new UserRewardsEarnedHistory(event.params.receiver.toHexString())
-    userRewardsEarnedHistory.totalTradingRewards = amount
-    userRewardsEarnedHistory.availableTradingRewards = amount
-    userRewardsEarnedHistory.totalFeesAndRewardsEarned = amount
-    userRewardsEarnedHistory.user = event.params.receiver.toHexString()
-    userRewardsEarnedHistory.save()
-  }
-
+  incrementTotalTradingRewards(event.params.receiver, amount)
+  incrementTotalFeesAndRewardsEarned(event.params.receiver, amount)
+  incrementAvailableTradingRewards(event.params.receiver, amount)
   createOrIncrementRewardItem({
     action: RewardsEarnedAction.EarnReward,
     user: event.params.receiver,

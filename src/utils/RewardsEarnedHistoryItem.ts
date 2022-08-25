@@ -10,7 +10,6 @@ class CreateOrIncrementRewardParams {
 }
 
 export function createOrIncrementRewardItem(params: CreateOrIncrementRewardParams): void {
-  // ID here is txHash + reward type
   let rewardsEarnedHistoryItem = RewardsEarnedHistoryItem.load(params.transactionHash.toHexString() + '-' + params.action)
   if (rewardsEarnedHistoryItem == null) {
     rewardsEarnedHistoryItem = new RewardsEarnedHistoryItem(params.transactionHash.toHexString() + '-' + params.action)
