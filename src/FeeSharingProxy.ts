@@ -27,6 +27,7 @@ export function handleUserFeeWithdrawn(event: UserFeeWithdrawnEvent): void {
   stakeHistoryItem.action = StakeHistoryAction.FeeWithdrawn
   stakeHistoryItem.timestamp = event.block.timestamp.toI32()
   stakeHistoryItem.amount = amount
+  stakeHistoryItem.token = event.params.token.toHexString()
   stakeHistoryItem.transaction = event.transaction.hash.toHexString()
   stakeHistoryItem.save()
   incrementTotalFeeWithdrawn(event.params.sender, amount, event.params.token)
@@ -36,5 +37,6 @@ export function handleUserFeeWithdrawn(event: UserFeeWithdrawnEvent): void {
     amount: amount,
     timestamp: event.block.timestamp,
     transactionHash: event.transaction.hash,
+    token: event.params.token.toHexString(),
   })
 }

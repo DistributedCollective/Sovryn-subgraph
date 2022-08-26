@@ -5,6 +5,7 @@ import { RewardsEarnedAction } from './utils/types'
 import { DEFAULT_DECIMALS, decimal } from '@protofire/subgraph-toolkit'
 import { createOrIncrementRewardItem } from './utils/RewardsEarnedHistoryItem'
 import { incrementTotalStakingRewards } from './utils/UserRewardsEarnedHistory'
+import { SOVAddress } from './contracts/contracts'
 
 export function handleRewardWithdrawn(event: RewardWithdrawnEvent): void {
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
@@ -17,5 +18,6 @@ export function handleRewardWithdrawn(event: RewardWithdrawnEvent): void {
     amount: amount,
     timestamp: event.block.timestamp,
     transactionHash: event.transaction.hash,
+    token: SOVAddress,
   })
 }

@@ -7,6 +7,7 @@ class CreateOrIncrementRewardParams {
   user: Address
   amount: BigDecimal
   timestamp: BigInt
+  token: string
 }
 
 export function createOrIncrementRewardItem(params: CreateOrIncrementRewardParams): void {
@@ -18,9 +19,9 @@ export function createOrIncrementRewardItem(params: CreateOrIncrementRewardParam
     rewardsEarnedHistoryItem.amount = params.amount
     rewardsEarnedHistoryItem.timestamp = params.timestamp.toI32()
     rewardsEarnedHistoryItem.transaction = params.transactionHash.toHexString()
-    rewardsEarnedHistoryItem.save()
   } else {
     rewardsEarnedHistoryItem.amount = rewardsEarnedHistoryItem.amount.plus(params.amount)
-    rewardsEarnedHistoryItem.save()
   }
+  rewardsEarnedHistoryItem.token = params.token
+  rewardsEarnedHistoryItem.save()
 }

@@ -45,6 +45,7 @@ import { createAndReturnLendingPool } from './utils/LendingPool'
 import { RewardsEarnedAction } from './utils/types'
 import { createOrIncrementRewardItem } from './utils/RewardsEarnedHistoryItem'
 import { incrementAvailableTradingRewards, incrementTotalFeesAndRewardsEarned, incrementTotalTradingRewards } from './utils/UserRewardsEarnedHistory'
+import { SOVAddress } from './contracts/contracts'
 
 export function handleBorrow(event: BorrowEvent): void {
   createAndReturnTransaction(event)
@@ -284,6 +285,7 @@ export function handleEarnReward(event: EarnRewardEvent): void {
     amount: amount,
     timestamp: event.block.timestamp,
     transactionHash: event.transaction.hash,
+    token: SOVAddress,
   })
 }
 

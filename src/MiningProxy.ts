@@ -13,6 +13,7 @@ import {
   incrementTotalLiquidityRewards,
   getPoolTokenType,
 } from './utils/UserRewardsEarnedHistory'
+import { SOVAddress } from './contracts/contracts'
 
 export function handleRewardClaimed(event: RewardClaimedEvent): void {
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
@@ -31,6 +32,7 @@ export function handleRewardClaimed(event: RewardClaimedEvent): void {
     amount: amount,
     timestamp: event.block.timestamp,
     transactionHash: event.transaction.hash,
+    token: SOVAddress,
   })
 }
 
