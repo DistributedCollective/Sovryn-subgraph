@@ -166,7 +166,6 @@ type Conversion @entity {
   timestamp: Int!
   emittedBy: LiquidityPool! #address
   transaction: Transaction!
-  swapTransaction: Swap!
   blockNumber: Int!
 }
 
