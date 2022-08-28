@@ -57,6 +57,7 @@ export function createAndReturnLoan(startParams: LoanStartState): Loan {
     loanEntity.startPositionSize = startParams.positionSize
     loanEntity.maximumPositionSize = startParams.positionSize
     loanEntity.totalBought = startParams.positionSize
+    loanEntity.startRate = startParams.startRate
     loanEntity.totalSold = BigDecimal.zero()
     loanEntity.averageBuyPrice = startParams.startRate
     loanEntity.averageSellPrice = BigDecimal.zero()
