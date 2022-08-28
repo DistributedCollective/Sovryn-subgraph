@@ -111,10 +111,6 @@ type Swap @entity {
   """
   id: ID!
   """
-  The AMM Conversion events involved in this swap
-  """
-  conversions: [Conversion!] @derivedFrom(field: "swapTransaction")
-  """
   The number of AMM Conversions involved in this swap (this is primarily for debugging purposes)
   """
   numConversions: Int!
