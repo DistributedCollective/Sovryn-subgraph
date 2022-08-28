@@ -143,13 +143,8 @@ export const handleFederatorVoted = (event: VotedEvent, transaction: Transaction
     transaction,
   }
   const crossTransfer = createAndReturnCrossTransfer(crossTransferEvent)
-  const receiver = createAndReturnUser(event.params.receiver, event.block.timestamp)
-  if (receiver != null) {
-    const receivedCrossChainTransfers = receiver.receivedCrossChainTransfers
-    receivedCrossChainTransfers.push(crossTransfer.id)
-    receiver.receivedCrossChainTransfers = receivedCrossChainTransfers
-    receiver.save()
-  }
+  createAndReturnUser(event.transaction.from, event.block.timestamp)
+  crossTransfer.rskUser = event.transaction.from.toHexString()
   crossTransfer.sourceChainTransactionHash = event.params.transactionHash
   crossTransfer.sourceChainBlockHash = event.params.blockHash
   // TODO: tokenAddress might not be a side token but rather a token that is "native" to RSK (WRBTC, SOV etc.) need to check

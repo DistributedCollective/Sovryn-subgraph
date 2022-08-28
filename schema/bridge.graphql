@@ -148,6 +148,10 @@ type CrossTransfer @entity {
   """
   sideToken: SideToken # SideToken
   """
+  Address of the user on RSK chain
+  """
+  rskUser: User!
+  """
   Receiver - The receiver of funds (can be a wallet or contract)
   """
   receiver: Bytes # address

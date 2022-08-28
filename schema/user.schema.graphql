@@ -68,6 +68,10 @@ type User @entity {
   bitcoinTransfers: [BitcoinTransfer!] @derivedFrom(field: "user")
   fastBTCBridgeStats: [FastBTCBridgeStat!] @derivedFrom(field: "user")
   """
+  EVM Bridge transfers
+  """
+  crossChainTransfer: [CrossTransfer!] @derivedFrom(field: "rskUser")
+  """
   Transactions initiated by this user
   """
   transactions: [Transaction!] @derivedFrom(field: "from")
