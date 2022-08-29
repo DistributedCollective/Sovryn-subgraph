@@ -60,6 +60,7 @@ export const createAndReturnBridge = (bridgeAddress: Address, event: ethereum.Ev
     }
     bridge.isUpgrading = false
     bridge.isPaused = false
+    bridge.pausers = []
     bridge.federation = ZERO_ADDRESS
     const tx = createAndReturnTransaction(event)
     bridge.createdAtTx = tx.id
