@@ -125,14 +125,11 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
 /** When tokens are staked by a vesting contract, create a history item for that contract */
 function createVestingTokensStaked(event: TokensStakedEvent): void {
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
-  const totalStaked = decimal.fromBigInt(event.params.totalStaked, DEFAULT_DECIMALS)
-
   const vestingTokensStakedEntity = new VestingHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   vestingTokensStakedEntity.staker = event.params.staker.toHexString()
   vestingTokensStakedEntity.action = VestingHistoryActionItem.TokensStaked
   vestingTokensStakedEntity.amount = amount
   vestingTokensStakedEntity.lockedUntil = event.params.lockedUntil.toI32()
-  vestingTokensStakedEntity.totalStaked = totalStaked
   vestingTokensStakedEntity.timestamp = event.block.timestamp.toI32()
   vestingTokensStakedEntity.emittedBy = event.address
   vestingTokensStakedEntity.transaction = event.transaction.hash.toHex()
@@ -207,13 +204,11 @@ function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams): void {
     if (adminContracts.includes(params.receiver.toHexString().toLowerCase()) && vesting.type == VestingContractType.Team) {
       /** This happens when a team member with vesting contract leaves the project and their remaining balance is returned to the protocol */
       vestingHistoryItem.action = VestingHistoryActionItem.TeamTokensRevoked
-      vestingHistoryItem.staker = vesting.id
-      vestingHistoryItem.amount = params.amount
     } else {
       vestingHistoryItem.action = VestingHistoryActionItem.TokensWithdrawn
-      vestingHistoryItem.amount = params.amount
-      vestingHistoryItem.staker = vesting.id
     }
+    vestingHistoryItem.staker = vesting.id
+    vestingHistoryItem.amount = params.amount
     vestingHistoryItem.timestamp = params.transaction.timestamp
     vestingHistoryItem.transaction = params.transaction.id
     vestingHistoryItem.save()

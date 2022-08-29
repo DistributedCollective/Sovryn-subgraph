@@ -22,14 +22,11 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
 /** When tokens are staked by a vesting contract, create a history item for that contract */
 function createVestingTokensStaked(event: TokensStakedEvent): void {
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
-  const totalStaked = decimal.fromBigInt(event.params.totalStaked, DEFAULT_DECIMALS)
-
   const vestingTokensStakedEntity = new VestingHistoryItem(event.transaction.hash.toHex() + '-' + event.logIndex.toString())
   vestingTokensStakedEntity.staker = event.params.staker.toHexString()
   vestingTokensStakedEntity.action = VestingHistoryActionItem.TokensStaked
   vestingTokensStakedEntity.amount = amount
   vestingTokensStakedEntity.lockedUntil = event.params.lockedUntil.toI32()
-  vestingTokensStakedEntity.totalStaked = totalStaked
   vestingTokensStakedEntity.timestamp = event.block.timestamp.toI32()
   vestingTokensStakedEntity.emittedBy = event.address
   vestingTokensStakedEntity.transaction = event.transaction.hash.toHex()
