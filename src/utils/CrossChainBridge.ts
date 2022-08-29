@@ -1,7 +1,6 @@
 import { BigInt, Address, ethereum, crypto, ByteArray, log } from '@graphprotocol/graph-ts'
 import { decimal, ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
 import { Federation, Bridge, CrossTransfer, SideToken, Transaction } from '../../generated/schema'
-import { createAndReturnTransaction } from './Transaction'
 import { NewSideToken as NewSideTokenEvent } from '../../generated/BridgeETH/Bridge'
 import { Voted as VotedEvent } from '../../generated/templates/Federation/Federation'
 import { BridgeChain, BridgeType, CrossDirection, CrossStatus } from './types'
@@ -62,8 +61,7 @@ export const createAndReturnBridge = (bridgeAddress: Address, event: ethereum.Ev
     bridge.isPaused = false
     bridge.pausers = []
     bridge.federation = ZERO_ADDRESS
-    const tx = createAndReturnTransaction(event)
-    bridge.createdAtTx = tx.id
+    bridge.createdAtTx = event.transaction.hash.toHexString()
     bridge.save()
   }
   return bridge
@@ -76,8 +74,7 @@ export const createAndReturnFederation = (federationAddress: Address, event: eth
     federation.totalExecuted = 0
     federation.totalVotes = 0
     federation.isActive = true
-    const tx = createAndReturnTransaction(event)
-    federation.createdAtTx = tx.id
+    federation.createdAtTx = event.transaction.hash.toHexString()
     federation.save()
   }
   return federation
