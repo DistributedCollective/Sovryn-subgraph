@@ -192,7 +192,7 @@ type Token @entity {
   """
   CrossTransfers: cross transfers list (currently only relevant to SOV)
   """
-  crossTransfers: [CrossTransfer!] @derivedFrom(field: "token")
+  crossTransfers: [CrossTransfer!] @derivedFrom(field: "rskToken")
 }
 
 type OwnerUpdate @entity {

@@ -11,50 +11,31 @@ import {
   Unpaused as UnpausedEvent,
   Upgrading as UpgradingEvent,
 } from '../generated/BridgeETH/Bridge'
-
 import { Federation as FederationTemplate } from '../generated/templates'
-import {
-  createAndReturnBridge,
-  createAndReturnCrossTransfer,
-  createAndReturnFederation,
-  createAndReturnSideToken,
-  CrossTransferEvent,
-  isETHBridge,
-} from './utils/CrossChainBridge'
-
+import { createAndReturnBridge, createAndReturnFederation, createAndReturnSideToken, isETHBridge } from './utils/CrossChainBridge'
+import { createAndReturnCrossTransfer, CrossTransferEvent } from './utils/CrossTransfer'
 import { createAndReturnTransaction } from './utils/Transaction'
 import { BridgeChain, CrossDirection, CrossStatus } from './utils/types'
-import { createAndReturnUser } from './utils/User'
 
 export function handleCross(event: CrossEvent): void {
   const transaction = createAndReturnTransaction(event)
-
   const crossTransferEvent: CrossTransferEvent = {
     id: '',
     receiver: event.params._to,
     bridgeAddress: event.address.toHex(),
-    originalTokenAddress: event.params._tokenAddress,
+    originalTokenAddress: event.params._tokenAddress.toHexString(),
     amount: event.params._amount,
     decimals: event.params._decimals,
     granularity: event.params._granularity,
     status: CrossStatus.Executed,
     direction: CrossDirection.Outgoing,
-    timestamp: event.block.timestamp,
+    externalChain: isETHBridge(event.address.toHex()) ? BridgeChain.ETH : BridgeChain.BSC,
+    sender: event.transaction.from.toHexString(),
+    symbol: event.params._symbol,
+    sourceChainTransactionHash: event.transaction.hash.toHexString(),
     transaction,
   }
-
   const crossTransfer = createAndReturnCrossTransfer(crossTransferEvent)
-  crossTransfer.symbol = event.params._symbol
-  crossTransfer.sourceChain = BridgeChain.RSK
-  crossTransfer.sender = event.transaction.from
-  createAndReturnUser(event.transaction.from, event.block.timestamp)
-
-  const destinationChain = isETHBridge(event.address.toHex()) ? BridgeChain.ETH : BridgeChain.BSC
-  crossTransfer.destinationChain = destinationChain
-  crossTransfer.sourceChainBlockHash = event.block.hash
-  crossTransfer.sourceChainTransactionHash = event.transaction.hash
-  crossTransfer.updatedAtTx = transaction.id
-  crossTransfer.updatedAtTimestamp = transaction.timestamp
   crossTransfer.save()
 }
 

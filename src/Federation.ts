@@ -14,7 +14,6 @@ import { CrossStatus } from './utils/types'
 
 export function handleBridgeChanged(event: BridgeChangedEvent): void {
   const transaction = createAndReturnTransaction(event)
-
   const federation = createAndReturnFederation(event.address, event)
   federation.bridge = event.params.bridge.toHex()
   federation.updatedAtTx = transaction.id
@@ -23,7 +22,6 @@ export function handleBridgeChanged(event: BridgeChangedEvent): void {
 
 export function handleExecuted(event: ExecutedEvent): void {
   const transaction = createAndReturnTransaction(event)
-
   const federation = createAndReturnFederation(event.address, event)
   federation.totalExecuted = federation.totalExecuted + 1
   federation.updatedAtTx = transaction.id
@@ -62,7 +60,6 @@ export function handleMemberRemoval(event: MemberRemovalEvent): void {
 
 export function handleRevokeTxAndVote(event: RevokeTxAndVoteEvent): void {
   const transaction = createAndReturnTransaction(event)
-
   const federation = createAndReturnFederation(event.address, event)
   federation.totalVotes = federation.totalVotes + 1
   federation.updatedAtTx = transaction.id
@@ -85,7 +82,6 @@ export function handleVoted(event: VotedEvent): void {
 // this is an old event with a lot of missing data so it is not processed and not suppose to happen
 export function handleVotedV0(event: VotedEvent): void {
   const transaction = createAndReturnTransaction(event)
-
   const federation = createAndReturnFederation(event.address, event)
   federation.totalVotes = federation.totalVotes + 1
   federation.updatedAtTx = transaction.id

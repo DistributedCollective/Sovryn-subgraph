@@ -1,5 +1,5 @@
 /**
- * This file is a work in progress - the goal is to have all PnL calculations and ot
+ * This file is a work in progress - the goal is to have all PnL calculations and other stats related to a loan handled by this entity
  */
 
 import { BigDecimal, BigInt, Bytes } from '@graphprotocol/graph-ts'
