@@ -122,6 +122,5 @@ type VestingHistoryItem @entity {
   """
   lockedUntil: Int # uint256
   timestamp: Int!
-  emittedBy: Bytes! #address
   transaction: Transaction!
 }

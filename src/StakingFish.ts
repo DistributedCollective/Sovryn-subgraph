@@ -28,7 +28,6 @@ function createVestingTokensStaked(event: TokensStakedEvent): void {
   vestingTokensStakedEntity.amount = amount
   vestingTokensStakedEntity.lockedUntil = event.params.lockedUntil.toI32()
   vestingTokensStakedEntity.timestamp = event.block.timestamp.toI32()
-  vestingTokensStakedEntity.emittedBy = event.address
   vestingTokensStakedEntity.transaction = event.transaction.hash.toHex()
   vestingTokensStakedEntity.save()
 }

@@ -131,7 +131,6 @@ function createVestingTokensStaked(event: TokensStakedEvent): void {
   vestingTokensStakedEntity.amount = amount
   vestingTokensStakedEntity.lockedUntil = event.params.lockedUntil.toI32()
   vestingTokensStakedEntity.timestamp = event.block.timestamp.toI32()
-  vestingTokensStakedEntity.emittedBy = event.address
   vestingTokensStakedEntity.transaction = event.transaction.hash.toHex()
   vestingTokensStakedEntity.save()
 }
@@ -212,7 +211,6 @@ function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams): void {
     vestingHistoryItem.timestamp = params.transaction.timestamp
     vestingHistoryItem.transaction = params.transaction.id
     vestingHistoryItem.save()
-
     vesting.currentBalance = vesting.currentBalance.minus(params.amount)
     vesting.save()
 
