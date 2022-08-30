@@ -3,10 +3,9 @@ import {
   BitcoinTransferStatusUpdated as BitcoinTransferStatusUpdatedEvent,
   NewBitcoinTransfer as NewBitcoinTransferEvent,
 } from '../generated/FastBTCBridge/FastBTCBridge'
-import { BitcoinTransferBatchSending } from '../generated/schema'
+import { BitcoinTransfer, BitcoinTransferBatchSending } from '../generated/schema'
 import { aggregateFastBTCBridgeStat, createFastBTCBridgeStat } from './utils/FastBTCBridgeStats'
-import { BitcoinTransferStatus, createBitcoinTransfer, loadBitcoinTransfer } from './utils/BitcoinTransfer'
-
+import { BitcoinTransferStatus, createBitcoinTransfer } from './utils/BitcoinTransfer'
 import { createAndReturnTransaction } from './utils/Transaction'
 
 export function handleBitcoinTransferBatchSending(event: BitcoinTransferBatchSendingEvent): void {
@@ -25,17 +24,18 @@ export function handleBitcoinTransferStatusUpdated(event: BitcoinTransferStatusU
 
   const bitcoinTransferBatchSending = BitcoinTransferBatchSending.load(event.transaction.hash.toHex())
 
-  const bitcoinTransfer = loadBitcoinTransfer(event.params.transferId)
-  bitcoinTransfer.status = BitcoinTransferStatus.getStatus(event.params.newStatus)
-  bitcoinTransfer.bitcoinTxHash = bitcoinTransferBatchSending != null ? bitcoinTransferBatchSending.bitcoinTxHash : bitcoinTransfer.bitcoinTxHash
+  const bitcoinTransfer = BitcoinTransfer.load(event.params.transferId.toHexString())
+  if (bitcoinTransfer != null) {
+    bitcoinTransfer.status = BitcoinTransferStatus.getStatus(event.params.newStatus)
+    bitcoinTransfer.bitcoinTxHash = bitcoinTransferBatchSending != null ? bitcoinTransferBatchSending.bitcoinTxHash : bitcoinTransfer.bitcoinTxHash
+    bitcoinTransfer.updatedAtBlockNumber = event.block.number.toI32()
+    bitcoinTransfer.updatedAtTimestamp = event.block.timestamp.toI32()
+    bitcoinTransfer.updatedAtTx = event.transaction.hash.toHex()
+    bitcoinTransfer.save()
 
-  bitcoinTransfer.updatedAtBlockNumber = event.block.number.toI32()
-  bitcoinTransfer.updatedAtTimestamp = event.block.timestamp.toI32()
-  bitcoinTransfer.updatedAtTx = event.transaction.hash.toHex()
-  bitcoinTransfer.save()
-
-  aggregateFastBTCBridgeStat('0', event.params.newStatus, bitcoinTransfer, transaction)
-  aggregateFastBTCBridgeStat(bitcoinTransfer.user, event.params.newStatus, bitcoinTransfer, transaction)
+    aggregateFastBTCBridgeStat('0', event.params.newStatus, bitcoinTransfer, transaction)
+    aggregateFastBTCBridgeStat(bitcoinTransfer.user, event.params.newStatus, bitcoinTransfer, transaction)
+  }
 }
 
 export function handleNewBitcoinTransfer(event: NewBitcoinTransferEvent): void {

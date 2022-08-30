@@ -4,6 +4,7 @@ BridgeType - only 2 bridges at the moment - RSK <-> BSC and RSK <-> ETH
 enum BridgeType {
   RSK_BSC
   RSK_ETH
+  Unknown
 }
 """
 Cross Chain Bridge
@@ -114,15 +115,8 @@ type CrossTransfer @entity {
   """
   Direction - the direction of the cross transfer (Incoming or Outgoing)
   """
-  direction: CrossDirection! # CrossDirection
-  """
-  sourceChain - the source chain - for outgoing it is RSK and for incoming it is BSC/ETH
-  """
-  sourceChain: BridgeChain!
-  """
-  DestinationChain - the destination chain - for outgoing it is BSC/ETH and for incoming it is RSK
-  """
-  destinationChain: BridgeChain!
+  direction: CrossDirection!
+  externalChain: BridgeChain!
   """
   Votes - Number of votes cast for this transfer
   """
@@ -134,19 +128,11 @@ type CrossTransfer @entity {
   """
   originalTokenAddress - the original token address for the transfer (for outgoing it is just the RSK token address)
   """
-  originalTokenAddress: Bytes!
+  originalTokenAddress: String!
   """
-  TokenAddress - the token address for the transfer (only relevant for incoming transfers)
+  The Rsk Token entity if the original token address is of an amm-traded RStoken
   """
-  tokenAddress: Bytes # address
-  """
-  Token - the token entity if exist of original token address
-  """
-  token: Token # Token
-  """
-  sideToken - the SideToken entity if exist of original token address
-  """
-  sideToken: SideToken # SideToken
+  rskToken: Token # Token
   """
   Address of the user on RSK chain
   """
@@ -154,11 +140,11 @@ type CrossTransfer @entity {
   """
   Receiver - The receiver of funds (can be a wallet or contract)
   """
-  receiver: Bytes # address
+  receiver: String # address
   """
   Sender - The sender of funds (can be a wallet or contracts)
   """
-  sender: Bytes
+  sender: String
   """
   Amount - the amount of originalToken transferred across the bridge
   """
@@ -168,13 +154,9 @@ type CrossTransfer @entity {
   """
   symbol: String # string
   """
-  SourceChainBlockHash - the source chain block hash of the transfer, for outgoing transfers this is just the RSK block hash
-  """
-  sourceChainBlockHash: Bytes # bytes
-  """
   SourceChainTransactionHash - the source chain transaction hash of the transfer, for outgoing transfers this is just the RSK transaction hash
   """
-  sourceChainTransactionHash: Bytes # bytes
+  sourceChainTransactionHash: String # bytes
   """
   CreatedAtTx - the transaction at which this transfer was created
   """

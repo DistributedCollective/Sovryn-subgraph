@@ -1,5 +1,4 @@
-import { Address, log } from '@graphprotocol/graph-ts'
-import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
+import { log } from '@graphprotocol/graph-ts'
 import {
   Cross as CrossEvent,
   FederationChanged as FederationChangedEvent,
@@ -11,74 +10,47 @@ import {
   Unpaused as UnpausedEvent,
   Upgrading as UpgradingEvent,
 } from '../generated/BridgeETH/Bridge'
-
 import { Federation as FederationTemplate } from '../generated/templates'
-import {
-  createAndReturnBridge,
-  createAndReturnCrossTransfer,
-  createAndReturnFederation,
-  createAndReturnSideToken,
-  CrossTransferEvent,
-  isETHBridge,
-} from './utils/CrossChainBridge'
-
+import { createAndReturnBridge, createAndReturnFederation, createAndReturnSideToken, getBridgeChain } from './utils/CrossChainBridge'
+import { createAndReturnCrossTransfer, CrossTransferEvent } from './utils/CrossTransfer'
 import { createAndReturnTransaction } from './utils/Transaction'
-import { BridgeChain, CrossDirection, CrossStatus } from './utils/types'
-import { createAndReturnUser } from './utils/User'
+import { CrossDirection, CrossStatus } from './utils/types'
+import { Federation, Bridge } from '../generated/schema'
 
 export function handleCross(event: CrossEvent): void {
+  createAndReturnBridge(event.address, event, [])
   const transaction = createAndReturnTransaction(event)
-
   const crossTransferEvent: CrossTransferEvent = {
     id: '',
     receiver: event.params._to,
     bridgeAddress: event.address.toHex(),
-    originalTokenAddress: event.params._tokenAddress,
+    originalTokenAddress: event.params._tokenAddress.toHexString(),
     amount: event.params._amount,
     decimals: event.params._decimals,
     granularity: event.params._granularity,
     status: CrossStatus.Executed,
     direction: CrossDirection.Outgoing,
-    timestamp: event.block.timestamp,
+    externalChain: getBridgeChain(event.address.toHexString()),
+    sender: event.transaction.from.toHexString(),
+    symbol: event.params._symbol,
+    sourceChainTransactionHash: event.transaction.hash.toHexString(),
     transaction,
   }
-
   const crossTransfer = createAndReturnCrossTransfer(crossTransferEvent)
-  crossTransfer.symbol = event.params._symbol
-  crossTransfer.sourceChain = BridgeChain.RSK
-  crossTransfer.sender = event.transaction.from
-  createAndReturnUser(event.transaction.from, event.block.timestamp)
-
-  const destinationChain = isETHBridge(event.address.toHex()) ? BridgeChain.ETH : BridgeChain.BSC
-  crossTransfer.destinationChain = destinationChain
-  crossTransfer.sourceChainBlockHash = event.block.hash
-  crossTransfer.sourceChainTransactionHash = event.transaction.hash
-  crossTransfer.updatedAtTx = transaction.id
-  crossTransfer.updatedAtTimestamp = transaction.timestamp
   crossTransfer.save()
 }
 
 export function handleFederationChanged(event: FederationChangedEvent): void {
   const transaction = createAndReturnTransaction(event)
-
   FederationTemplate.create(event.params._newFederation)
   log.info('Federation created: {}', [event.params._newFederation.toHex()])
-  const bridge = createAndReturnBridge(event.address, event)
-  const oldFederationAddress = bridge.federation
-  if (oldFederationAddress != ZERO_ADDRESS) {
-    const oldFederation = createAndReturnFederation(Address.fromString(oldFederationAddress), event)
+  const oldFederation = Federation.load(event.address.toHexString())
+  if (oldFederation != null) {
     oldFederation.isActive = false
     oldFederation.updatedAtTx = transaction.id
     oldFederation.save()
   }
-  bridge.federation = event.params._newFederation.toHex()
-  bridge.updatedAtTx = transaction.id
-  bridge.save()
-
-  const federation = createAndReturnFederation(event.params._newFederation, event)
-  federation.bridge = bridge.id
-  federation.updatedAtTx = transaction.id
-  federation.save()
+  createAndReturnFederation(event.params._newFederation, event, event.address)
 }
 
 export function handleNewSideToken(event: NewSideTokenEvent): void {
@@ -95,59 +67,59 @@ export function handleNewSideToken(event: NewSideTokenEvent): void {
 
 export function handlePaused(event: PausedEvent): void {
   const transaction = createAndReturnTransaction(event)
-
-  const bridge = createAndReturnBridge(event.address, event)
-  bridge.isPaused = true
-  bridge.updatedAtTx = transaction.id
-  bridge.save()
+  const bridge = Bridge.load(event.address.toHexString())
+  if (bridge != null) {
+    bridge.isPaused = true
+    bridge.updatedAtTx = transaction.id
+    bridge.save()
+  }
 }
 
 export function handlePauserAdded(event: PauserAddedEvent): void {
-  const transaction = createAndReturnTransaction(event)
-
-  const bridge = createAndReturnBridge(event.address, event)
-  const pausers = bridge.pausers
-  pausers.push(event.params.account)
-  bridge.pausers = pausers
-  bridge.updatedAtTx = transaction.id
-  bridge.save()
+  createAndReturnTransaction(event)
+  createAndReturnBridge(event.address, event, [event.params.account])
 }
 
 export function handlePauserRemoved(event: PauserRemovedEvent): void {
   const transaction = createAndReturnTransaction(event)
-
-  const bridge = createAndReturnBridge(event.address, event)
-  const pausers = bridge.pausers
-  pausers.splice(pausers.indexOf(event.params.account), 1)
-  bridge.pausers = pausers
-  bridge.updatedAtTx = transaction.id
-  bridge.save()
+  const bridge = Bridge.load(event.address.toHexString())
+  if (bridge != null) {
+    const pausers = bridge.pausers
+    pausers.splice(pausers.indexOf(event.params.account), 1)
+    bridge.pausers = pausers
+    bridge.updatedAtTx = transaction.id
+    bridge.save()
+  }
 }
 
 export function handlePrefixUpdated(event: PrefixUpdatedEvent): void {
   const transaction = createAndReturnTransaction(event)
   // TODO: check if this event is ever fired, if not remove this logic and these fields from the bridge
-  const bridge = createAndReturnBridge(event.address, event)
-  bridge.prefix = event.params._prefix
-  bridge.isSuffix = event.params._isSuffix
-  bridge.updatedAtTx = transaction.id
-  bridge.save()
+  const bridge = Bridge.load(event.address.toHexString())
+  if (bridge != null) {
+    bridge.prefix = event.params._prefix
+    bridge.isSuffix = event.params._isSuffix
+    bridge.updatedAtTx = transaction.id
+    bridge.save()
+  }
 }
 
 export function handleUnpaused(event: UnpausedEvent): void {
   const transaction = createAndReturnTransaction(event)
-
-  const bridge = createAndReturnBridge(event.address, event)
-  bridge.isPaused = false
-  bridge.updatedAtTx = transaction.id
-  bridge.save()
+  const bridge = Bridge.load(event.address.toHexString())
+  if (bridge != null) {
+    bridge.isPaused = false
+    bridge.updatedAtTx = transaction.id
+    bridge.save()
+  }
 }
 
 export function handleUpgrading(event: UpgradingEvent): void {
   const transaction = createAndReturnTransaction(event)
-
-  const bridge = createAndReturnBridge(event.address, event)
-  bridge.isUpgrading = event.params.isUpgrading
-  bridge.updatedAtTx = transaction.id
-  bridge.save()
+  const bridge = Bridge.load(event.address.toHexString())
+  if (bridge != null) {
+    bridge.isUpgrading = event.params.isUpgrading
+    bridge.updatedAtTx = transaction.id
+    bridge.save()
+  }
 }

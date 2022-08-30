@@ -68,6 +68,7 @@ export class BridgeChain {
 export class BridgeType {
   static RSK_BSC: string = 'RSK_BSC'
   static RSK_ETH: string = 'RSK_ETH'
+  static UNKNOWN: string = 'Unknown'
 }
 
 export class PoolTokenType {

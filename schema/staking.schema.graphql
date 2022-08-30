@@ -24,7 +24,7 @@ type TokensStaked @entity {
   The date when these tokens will unlock
   A user/vesting contract can have multiple stakes with different lockedUntil dates
   """
-  lockedUntil: Int! # uint256
+  lockedUntil: Int
   """
   The total amount staked for this specific user until this specific lockedUntil date
   """

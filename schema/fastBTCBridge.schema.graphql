@@ -1,6 +1,6 @@
 type BitcoinTransferBatchSending @entity {
   id: ID!
-  bitcoinTxHash: Bytes! # bytes32
+  bitcoinTxHash: Bytes # bytes32
   transferBatchSize: Int! # uint8
   timestamp: Int!
   emittedBy: Bytes! #address
@@ -43,7 +43,7 @@ type BitcoinTransfer @entity {
   totalAmountBTC: BigDecimal!
   user: User! # user
   status: BitcoinTransferStatus!
-  bitcoinTxHash: Bytes!
+  bitcoinTxHash: Bytes
   createdAtTimestamp: Int!
   createdAtBlockNumber: Int!
   createdAtTx: Transaction!
