@@ -7,6 +7,7 @@ function getUserRewardsEarnedHistory(user: Address): UserRewardsEarnedHistory {
   let userRewardsEarnedHistory = UserRewardsEarnedHistory.load(user.toHexString())
   if (userRewardsEarnedHistory == null) {
     userRewardsEarnedHistory = new UserRewardsEarnedHistory(user.toHexString())
+    userRewardsEarnedHistory.user = user.toHexString()
     userRewardsEarnedHistory.totalLendingRewards = BigDecimal.zero()
     userRewardsEarnedHistory.totalLiquidityRewards = BigDecimal.zero()
     userRewardsEarnedHistory.totalStakingRewards = BigDecimal.zero()
