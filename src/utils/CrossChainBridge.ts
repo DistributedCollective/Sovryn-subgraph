@@ -17,8 +17,14 @@ export const createAndReturnBridge = (bridgeAddress: Address, event: ethereum.Ev
     bridge.pausers = pausers
     bridge.federation = ZERO_ADDRESS
     bridge.createdAtTx = event.transaction.hash.toHexString()
-    bridge.save()
+    bridge.updatedAtTx = event.transaction.hash.toString()
+  } else {
+    for (let i = 0; i < pausers.length; i++) {
+      bridge.pausers.push(pausers[i])
+    }
+    bridge.updatedAtTx = event.transaction.hash.toString()
   }
+  bridge.save()
   return bridge
 }
 
@@ -69,7 +75,7 @@ export const handleFederatorVoted = (event: VotedEvent, transaction: Transaction
       amount: event.params.amount,
       decimals: event.params.decimals,
       granularity: event.params.granularity,
-      externalChain: isETHBridge(bridgeAddress) ? BridgeChain.ETH : BridgeChain.BSC,
+      externalChain: getBridgeChain(bridgeAddress),
       sender: event.params.sender.toHexString(),
       symbol: event.params.symbol,
       sourceChainTransactionHash: event.params.transactionHash.toHexString(),
@@ -90,12 +96,24 @@ export function isBSCBridge(address: string): boolean {
   return address.toLowerCase() == bridgeBSC.toLowerCase()
 }
 
-const bridgeMap = new Map<string, string>()
-bridgeMap.set(bridgeETH.toLowerCase(), BridgeType.RSK_ETH)
-bridgeMap.set(bridgeBSC.toLowerCase(), BridgeType.RSK_BSC)
+const bridgeTypeMap = new Map<string, string>()
+bridgeTypeMap.set(bridgeETH.toLowerCase(), BridgeType.RSK_ETH)
+bridgeTypeMap.set(bridgeBSC.toLowerCase(), BridgeType.RSK_BSC)
+
+const bridgeChainMap = new Map<string, string>()
+bridgeChainMap.set(bridgeETH.toLowerCase(), BridgeChain.ETH)
+bridgeChainMap.set(bridgeBSC.toLowerCase(), BridgeChain.BSC)
 
 export function getBridgeType(address: string): string {
-  const bridge = bridgeMap.get(address)
+  const bridge = bridgeTypeMap.get(address)
+  if (bridge == null) {
+    return BridgeType.UNKNOWN
+  } else {
+    return bridge
+  }
+}
+export function getBridgeChain(address: string): string {
+  const bridge = bridgeChainMap.get(address)
   if (bridge == null) {
     return BridgeType.UNKNOWN
   } else {

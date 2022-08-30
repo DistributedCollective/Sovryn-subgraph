@@ -11,6 +11,7 @@ const manifestSections = {
     voting: [],
     trading: [],
     bridge: ["BridgeETH", "BridgeBSC", "Federation"],
+    fastBtc: ["FastBTCBridge"],
     // sovrynProtocol: [...amm, "ISovryn"]
     vestingStaking: ["FourYearVesting", "Staking", "VestingRegistryProxy", "VestingRegistry1", "VestingRegistry2", "VestingRegistry3", "VestingRegistryFish"]
 }

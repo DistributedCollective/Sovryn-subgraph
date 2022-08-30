@@ -11,13 +11,14 @@ import {
   Upgrading as UpgradingEvent,
 } from '../generated/BridgeETH/Bridge'
 import { Federation as FederationTemplate } from '../generated/templates'
-import { createAndReturnFederation, createAndReturnSideToken, getBridgeType } from './utils/CrossChainBridge'
+import { createAndReturnBridge, createAndReturnFederation, createAndReturnSideToken, getBridgeChain } from './utils/CrossChainBridge'
 import { createAndReturnCrossTransfer, CrossTransferEvent } from './utils/CrossTransfer'
 import { createAndReturnTransaction } from './utils/Transaction'
 import { CrossDirection, CrossStatus } from './utils/types'
 import { Federation, Bridge } from '../generated/schema'
 
 export function handleCross(event: CrossEvent): void {
+  createAndReturnBridge(event.address, event, [])
   const transaction = createAndReturnTransaction(event)
   const crossTransferEvent: CrossTransferEvent = {
     id: '',
@@ -29,7 +30,7 @@ export function handleCross(event: CrossEvent): void {
     granularity: event.params._granularity,
     status: CrossStatus.Executed,
     direction: CrossDirection.Outgoing,
-    externalChain: getBridgeType(event.address.toHexString()),
+    externalChain: getBridgeChain(event.address.toHexString()),
     sender: event.transaction.from.toHexString(),
     symbol: event.params._symbol,
     sourceChainTransactionHash: event.transaction.hash.toHexString(),
@@ -66,7 +67,6 @@ export function handleNewSideToken(event: NewSideTokenEvent): void {
 
 export function handlePaused(event: PausedEvent): void {
   const transaction = createAndReturnTransaction(event)
-
   const bridge = Bridge.load(event.address.toHexString())
   if (bridge != null) {
     bridge.isPaused = true
@@ -76,20 +76,12 @@ export function handlePaused(event: PausedEvent): void {
 }
 
 export function handlePauserAdded(event: PauserAddedEvent): void {
-  const transaction = createAndReturnTransaction(event)
-  const bridge = Bridge.load(event.address.toHexString())
-  if (bridge != null) {
-    const pausers = bridge.pausers
-    pausers.push(event.params.account)
-    bridge.pausers = pausers
-    bridge.updatedAtTx = transaction.id
-    bridge.save()
-  }
+  createAndReturnTransaction(event)
+  createAndReturnBridge(event.address, event, [event.params.account])
 }
 
 export function handlePauserRemoved(event: PauserRemovedEvent): void {
   const transaction = createAndReturnTransaction(event)
-
   const bridge = Bridge.load(event.address.toHexString())
   if (bridge != null) {
     const pausers = bridge.pausers
@@ -114,7 +106,6 @@ export function handlePrefixUpdated(event: PrefixUpdatedEvent): void {
 
 export function handleUnpaused(event: UnpausedEvent): void {
   const transaction = createAndReturnTransaction(event)
-
   const bridge = Bridge.load(event.address.toHexString())
   if (bridge != null) {
     bridge.isPaused = false
@@ -125,7 +116,6 @@ export function handleUnpaused(event: UnpausedEvent): void {
 
 export function handleUpgrading(event: UpgradingEvent): void {
   const transaction = createAndReturnTransaction(event)
-
   const bridge = Bridge.load(event.address.toHexString())
   if (bridge != null) {
     bridge.isUpgrading = event.params.isUpgrading

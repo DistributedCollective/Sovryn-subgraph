@@ -7,7 +7,6 @@ import {
   Voted as VotedEvent,
 } from '../generated/templates/Federation/Federation'
 import { CrossTransfer, Federation } from '../generated/schema'
-
 import { createAndReturnTransaction } from './utils/Transaction'
 import { handleFederatorVoted } from './utils/CrossChainBridge'
 import { CrossStatus } from './utils/types'
