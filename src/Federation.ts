@@ -6,26 +6,30 @@ import {
   RevokeTxAndVote as RevokeTxAndVoteEvent,
   Voted as VotedEvent,
 } from '../generated/templates/Federation/Federation'
-import { CrossTransfer } from '../generated/schema'
+import { CrossTransfer, Federation } from '../generated/schema'
 
 import { createAndReturnTransaction } from './utils/Transaction'
-import { createAndReturnFederation, handleFederatorVoted } from './utils/CrossChainBridge'
+import { handleFederatorVoted } from './utils/CrossChainBridge'
 import { CrossStatus } from './utils/types'
 
 export function handleBridgeChanged(event: BridgeChangedEvent): void {
   const transaction = createAndReturnTransaction(event)
-  const federation = createAndReturnFederation(event.address, event)
-  federation.bridge = event.params.bridge.toHex()
-  federation.updatedAtTx = transaction.id
-  federation.save()
+  const federation = Federation.load(event.address.toHexString())
+  if (federation != null) {
+    federation.bridge = event.params.bridge.toHex()
+    federation.updatedAtTx = transaction.id
+    federation.save()
+  }
 }
 
 export function handleExecuted(event: ExecutedEvent): void {
   const transaction = createAndReturnTransaction(event)
-  const federation = createAndReturnFederation(event.address, event)
-  federation.totalExecuted = federation.totalExecuted + 1
-  federation.updatedAtTx = transaction.id
-  federation.save()
+  const federation = Federation.load(event.address.toHexString())
+  if (federation != null) {
+    federation.totalExecuted = federation.totalExecuted + 1
+    federation.updatedAtTx = transaction.id
+    federation.save()
+  }
 
   const crossTransfer = CrossTransfer.load(event.params.transactionId.toHex())
   if (crossTransfer != null) {
@@ -38,32 +42,36 @@ export function handleExecuted(event: ExecutedEvent): void {
 
 export function handleMemberAddition(event: MemberAdditionEvent): void {
   const transaction = createAndReturnTransaction(event)
-
-  const federation = createAndReturnFederation(event.address, event)
-  const members = federation.members
-  members.push(event.params.member)
-  federation.members = members
-  federation.updatedAtTx = transaction.id
-  federation.save()
+  const federation = Federation.load(event.address.toHexString())
+  if (federation != null) {
+    const members = federation.members
+    members.push(event.params.member)
+    federation.members = members
+    federation.updatedAtTx = transaction.id
+    federation.save()
+  }
 }
 
 export function handleMemberRemoval(event: MemberRemovalEvent): void {
   const transaction = createAndReturnTransaction(event)
-
-  const federation = createAndReturnFederation(event.address, event)
-  const members = federation.members
-  members.splice(members.indexOf(event.params.member), 1)
-  federation.members = members
-  federation.updatedAtTx = transaction.id
-  federation.save()
+  const federation = Federation.load(event.address.toHexString())
+  if (federation != null) {
+    const members = federation.members
+    members.splice(members.indexOf(event.params.member), 1)
+    federation.members = members
+    federation.updatedAtTx = transaction.id
+    federation.save()
+  }
 }
 
 export function handleRevokeTxAndVote(event: RevokeTxAndVoteEvent): void {
   const transaction = createAndReturnTransaction(event)
-  const federation = createAndReturnFederation(event.address, event)
-  federation.totalVotes = federation.totalVotes + 1
-  federation.updatedAtTx = transaction.id
-  federation.save()
+  const federation = Federation.load(event.address.toHexString())
+  if (federation != null) {
+    federation.totalVotes = federation.totalVotes + 1
+    federation.updatedAtTx = transaction.id
+    federation.save()
+  }
 
   const crossTransfer = CrossTransfer.load(event.params.tx_revoked.toHex())
   if (crossTransfer != null) {
@@ -82,10 +90,12 @@ export function handleVoted(event: VotedEvent): void {
 // this is an old event with a lot of missing data so it is not processed and not suppose to happen
 export function handleVotedV0(event: VotedEvent): void {
   const transaction = createAndReturnTransaction(event)
-  const federation = createAndReturnFederation(event.address, event)
-  federation.totalVotes = federation.totalVotes + 1
-  federation.updatedAtTx = transaction.id
-  federation.save()
+  const federation = Federation.load(event.address.toHexString())
+  if (federation != null) {
+    federation.totalVotes = federation.totalVotes + 1
+    federation.updatedAtTx = transaction.id
+    federation.save()
+  }
 }
 
 export function handleVotedV1(event: VotedEvent): void {
