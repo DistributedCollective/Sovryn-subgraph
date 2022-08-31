@@ -7,6 +7,7 @@
         "graph_graphql_query_timeout": 10,
         "graph_sql_statement_timeout": 10,
         "graph_graphql_max_depth": 16,
+        "graph_graphql_max_complexity": 1500000,
         "restart": "always"
     },
     "SOV": {
