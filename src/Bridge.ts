@@ -28,7 +28,6 @@ import { createAndReturnUser } from './utils/User'
 
 export function handleCross(event: CrossEvent): void {
   const transaction = createAndReturnTransaction(event)
-
   const crossTransferEvent: CrossTransferEvent = {
     id: '',
     receiver: event.params._to,

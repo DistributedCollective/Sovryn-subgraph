@@ -14,10 +14,8 @@ export class CrossTransferEvent {
   receiver: Address
   originalTokenAddress: Address
   amount: BigInt
-  // symbol?: string
   decimals: i32
   granularity: BigInt
-  // userData: Bytes
   status: string
   direction: string
   timestamp: BigInt
@@ -94,7 +92,8 @@ export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEv
     crossTransfer.status = crossTransferEvent.status.toString()
     crossTransfer.receiver = crossTransferEvent.receiver
     crossTransfer.originalTokenAddress = crossTransferEvent.originalTokenAddress
-    crossTransfer.rskUser = crossTransferEvent.transaction.from
+    crossTransfer.rskUser =
+      crossTransferEvent.direction == CrossDirection.Incoming ? crossTransferEvent.receiver.toHexString() : crossTransferEvent.transaction.from
     // TODO: get side token
     // const token = Token.load(crossTransferEvent.tokenAddress.toHex())
     crossTransfer.token = crossTransferEvent.originalTokenAddress.toHex()
