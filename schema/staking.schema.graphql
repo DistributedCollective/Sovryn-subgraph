@@ -67,6 +67,20 @@ type UserStakeHistory @entity {
   totalRemaining: BigDecimal!
 }
 
+type Stake @entity {
+  id: ID! # ID is the user address + lockedUntil date. ID can change
+  user: User!
+  amount: BigDecimal
+  lockedUntil: Int
+  stakeType: StakeType
+}
+
+enum StakeType {
+  UserStaked
+  VestingStaked
+  Delegated
+}
+
 enum StakeHistoryAction {
   """
   Voluntarily staking SOV (ie not staked through a vesting contract)
