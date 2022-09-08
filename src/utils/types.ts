@@ -21,6 +21,12 @@ export class RewardsEarnedAction {
   static UserFeeWithdrawn: string = 'UserFeeWithdrawn'
 }
 
+export class StakeType {
+  static UserStaked: string = 'UserStaked'
+  static VestingStaked: string = 'VestingStaked'
+  static Delegated: string = 'Delegateds'
+}
+
 export class StakeHistoryAction {
   static Stake: string = 'Stake'
   static IncreaseStake: string = 'IncreaseStake'
