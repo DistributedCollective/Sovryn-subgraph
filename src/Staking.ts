@@ -28,8 +28,10 @@ import { createAndReturnVestingHistoryItem } from './utils/VestingHistoryItem'
 
 export function handleDelegateChanged(event: DelegateChangedEvent): void {
   createAndReturnTransaction(event)
-  const user = User.load(event.params.delegator.toHexString())
-  if (event.params.fromDelegate.toHexString() != ZERO_ADDRESS && user != null) {
+  const user = User.load(event.params.fromDelegate.toHexString())
+  const isUserDelegated = event.params.fromDelegate.toHexString() != ZERO_ADDRESS && user != null
+  if (isUserDelegated) {
+    createAndReturnUser(event.params.toDelegate, event.block.timestamp)
     createAndReturnStakeHistoryItem({
       event,
       user: event.params.delegator.toHexString(),
@@ -65,9 +67,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
   const totalStaked = decimal.fromBigInt(event.params.totalStaked, DEFAULT_DECIMALS)
   let vestingContract = VestingContract.load(event.params.staker.toHexString())
-  /** Gensis Vesting contracts did not emit a VestingCreated event. Therefore, they need to be created from here.
-   * We will create a special case for if caller != staker between the genesis block range
-   */
+  /** Gensis Vesting contracts did not emit a VestingCreated event. Therefore, they need to be created from here. **/
   const isGenesisContract =
     vestingContract == null &&
     event.block.number <= genesisVestingEndBlock &&
@@ -99,6 +99,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     if (!isGenesisContract) {
       incrementVestingContractBalance(vestingContract, amount)
     }
+    setStakeType(vestingContract.user, event.params.lockedUntil, 'VestingStaked')
   } else {
     createAndReturnUser(event.params.staker, event.block.timestamp)
     createAndReturnStakeHistoryItem({
@@ -111,8 +112,8 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     })
     userStakeHistory_increment(event.params.staker, amount)
     incrementCurrentVoluntarilyStakedSov(amount)
+    setStakeType(event.params.staker.toHexString(), event.params.lockedUntil, 'UserStaked')
   }
-  setStakeType(event.params.staker.toHexString(), event.params.lockedUntil, vestingContract == null ? 'UserStaked' : 'VestingStaked')
 }
 
 export function handleTokensWithdrawn(event: TokensWithdrawnEvent): void {
@@ -157,14 +158,13 @@ class TokensWithdrawnParams {
 function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams, event: ethereum.Event): void {
   const user = User.load(params.staker.toHexString().toLowerCase())
   const vesting = VestingContract.load(params.staker.toHexString())
-  if (user !== null) {
-    /** Check if there was a fee sharing event in this transaction. If there was, this was early unstaking */
-    const feeSharingTokensTransferredEvent = FeeSharingTokensTransferred.load(params.transaction.id)
-    const slashedAmount = feeSharingTokensTransferredEvent == null ? BigDecimal.zero() : feeSharingTokensTransferredEvent.amount
+  if (user != null) {
+    const slashingEvent = FeeSharingTokensTransferred.load(params.transaction.id)
+    const slashedAmount = slashingEvent == null ? BigDecimal.zero() : slashingEvent.amount
     createAndReturnStakeHistoryItem({
       event,
       user: params.receiver.toHexString(),
-      action: feeSharingTokensTransferredEvent == null ? StakeHistoryAction.WithdrawStaked : StakeHistoryAction.Unstake,
+      action: slashingEvent == null ? StakeHistoryAction.WithdrawStaked : StakeHistoryAction.Unstake,
       amount: params.amount,
       token: ZERO_ADDRESS,
       lockedUntil: BigInt.zero(),

@@ -69,7 +69,7 @@ type UserStakeHistory @entity {
 
 type Stake @entity {
   id: ID! # ID is the user address + lockedUntil date. ID can change
-  user: User!
+  user: User
   amount: BigDecimal
   lockedUntil: Int
   stakeType: StakeType

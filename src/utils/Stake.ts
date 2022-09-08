@@ -8,6 +8,7 @@ export function createOrUpdateStake(event: DelegateStakeChanged): void {
   let stake = Stake.load(stakeId)
   if (stake == null) {
     stake = new Stake(stakeId)
+    stake.stakeType = 'VestingStaked'
   }
   stake.user = event.params.delegate.toHexString()
   stake.amount = decimal.fromBigInt(event.params.newBalance, DEFAULT_DECIMALS)
@@ -25,6 +26,7 @@ export function setStakeType(delegate: string, lockedUntil: BigInt, stakeType: s
   if (stake == null) {
     stake = createPartialStake(delegate, lockedUntil)
   }
+  stake.user = delegate
   stake.stakeType = stakeType
   stake.save()
 }
