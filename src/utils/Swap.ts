@@ -1,5 +1,5 @@
 import { Address, BigInt, BigDecimal } from '@graphprotocol/graph-ts'
-import { Swap, Token, User } from '../../generated/schema'
+import { Swap, Token } from '../../generated/schema'
 import { createAndReturnUser } from './User'
 import { WRBTCAddress } from '../contracts/contracts'
 import { updateLastPriceUsdAll } from './Prices'
@@ -20,11 +20,7 @@ export class ConversionEventForSwap {
 }
 
 export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
-  let userEntity: User | null = null
-  /** Check if the trader property on the swap is the same as the caller of the tx. If it is, this is a user-instigated swap */
-  if (event.user.toHexString() == event.trader.toHexString()) {
-    userEntity = createAndReturnUser(event.user, BigInt.fromI32(event.timestamp))
-  }
+  const isUserSwap = event.user.toHexString() == event.trader.toHexString()
   let swapEntity = Swap.load(event.transactionHash)
 
   /** Create swap  */
@@ -36,15 +32,15 @@ export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
     swapEntity.fromAmount = event.fromAmount
     swapEntity.toAmount = event.toAmount
     swapEntity.rate = event.fromAmount.div(event.toAmount)
-    if (userEntity != null) {
-      swapEntity.user = userEntity.id
-      userEntity.save()
-    }
     swapEntity.isMarginTrade = false
     swapEntity.isBorrow = false
     swapEntity.isLimit = false
     swapEntity.timestamp = event.timestamp
     swapEntity.transaction = event.transactionHash
+    if (isUserSwap) {
+      const user = createAndReturnUser(event.user, BigInt.fromI32(event.timestamp))
+      swapEntity.user = user.id
+    }
   } else {
     /** Swap already exists - this means it has multiple conversion events */
     swapEntity.numConversions += 1
