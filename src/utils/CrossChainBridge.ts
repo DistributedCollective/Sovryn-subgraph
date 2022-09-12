@@ -92,7 +92,7 @@ export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEv
     crossTransfer.status = crossTransferEvent.status.toString()
     crossTransfer.receiver = crossTransferEvent.receiver
     crossTransfer.originalTokenAddress = crossTransferEvent.originalTokenAddress
-    crossTransfer.rskUser =
+    crossTransfer.user =
       crossTransferEvent.direction == CrossDirection.Incoming ? crossTransferEvent.receiver.toHexString() : crossTransferEvent.transaction.from
     // TODO: get side token
     // const token = Token.load(crossTransferEvent.tokenAddress.toHex())

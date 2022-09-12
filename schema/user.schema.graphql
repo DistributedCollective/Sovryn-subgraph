@@ -70,7 +70,7 @@ type User @entity {
   """
   EVM Bridge transfers
   """
-  crossChainTransfer: [CrossTransfer!] @derivedFrom(field: "rskUser")
+  crossChainTransfer: [CrossTransfer!] @derivedFrom(field: "user")
   """
   Transactions initiated by this user
   """
