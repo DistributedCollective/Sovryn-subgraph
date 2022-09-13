@@ -93,14 +93,14 @@ export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEv
     crossTransfer.direction = crossTransferEvent.direction.toString()
     crossTransfer.votes = 0
     crossTransfer.status = crossTransferEvent.status.toString()
-    crossTransfer.receiver = crossTransferEvent.receiver
+    crossTransfer.externalUser = crossTransferEvent.receiver
     crossTransfer.originalTokenAddress = crossTransferEvent.originalTokenAddress
     crossTransfer.user =
       crossTransferEvent.direction == CrossDirection.Incoming ? crossTransferEvent.receiver.toHexString() : crossTransferEvent.transaction.from
-    // TODO: get side token
-    // const token = Token.load(crossTransferEvent.tokenAddress.toHex())
+    if (crossTransfer.direction == CrossDirection.Outgoing) {
+      crossTransfer.externalUser = crossTransferEvent.receiver
+    }
     crossTransfer.token = crossTransferEvent.originalTokenAddress.toHex()
-    // const sideToken = SideToken.load(crossTransferEvent.tokenAddress.toHex())
     crossTransfer.sideToken = crossTransferEvent.originalTokenAddress.toHex()
     crossTransfer.amount = decimal.fromBigInt(crossTransferEvent.amount, crossTransferEvent.decimals)
     crossTransfer.createdAtTx = crossTransferEvent.transaction.id
@@ -156,9 +156,7 @@ export const handleFederatorVoted = (event: VotedEvent, transaction: Transaction
   }
   // TODO: if token is native to RSK, then symbol should be from token entity and not side token
   crossTransfer.symbol = event.params.symbol
-  crossTransfer.sender = event.params.sender
   crossTransfer.votes = crossTransfer.votes + 1
-
   const bridgeAddress = federation.bridge
   crossTransfer.destinationChain = BridgeChain.RSK
   crossTransfer.sourceChain = isETHBridge(bridgeAddress) ? BridgeChain.ETH : BridgeChain.BSC
