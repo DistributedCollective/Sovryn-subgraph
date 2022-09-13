@@ -28,19 +28,21 @@ import { createAndReturnVestingHistoryItem } from './utils/VestingHistoryItem'
 
 export function handleDelegateChanged(event: DelegateChangedEvent): void {
   createAndReturnTransaction(event)
-  const user = User.load(event.params.fromDelegate.toHexString())
-  const isUserDelegated = event.params.fromDelegate.toHexString() != ZERO_ADDRESS && user != null
+  const delegator = event.params.delegator.toHexString()
+  const fromDelegate = event.params.fromDelegate.toHexString()
+  const toDelegate = event.params.toDelegate.toHexString()
+  const isUserDelegated = fromDelegate != ZERO_ADDRESS && fromDelegate != toDelegate && delegator == event.transaction.from.toHexString()
   if (isUserDelegated) {
     createAndReturnUser(event.params.toDelegate, event.block.timestamp)
     createAndReturnStakeHistoryItem({
       event,
-      user: event.params.delegator.toHexString(),
+      user: delegator,
       action: StakeHistoryAction.Delegate,
       amount: BigDecimal.zero(),
       token: ZERO_ADDRESS,
       lockedUntil: event.params.lockedUntil,
     })
-    setStakeType(event.params.toDelegate.toHexString(), event.params.lockedUntil, StakeType.Delegated)
+    setStakeType(delegator, toDelegate, event.params.lockedUntil, StakeType.Delegated)
   }
 }
 
@@ -50,16 +52,17 @@ export function handleDelegateStakeChanged(event: DelegateStakeChangedEvent): vo
 }
 
 export function handleExtendedStakingDuration(event: ExtendedStakingDurationEvent): void {
+  const staker = event.params.staker.toHexString()
   createAndReturnTransaction(event)
   createAndReturnStakeHistoryItem({
     event,
-    user: event.params.staker.toHexString(),
+    user: staker,
     action: StakeHistoryAction.ExtendStake,
     amount: BigDecimal.zero(),
     token: ZERO_ADDRESS,
     lockedUntil: event.params.newDate,
   })
-  setStakeType(event.params.staker.toHexString(), event.params.newDate, StakeType.UserStaked)
+  setStakeType(staker, staker, event.params.newDate, StakeType.UserStaked)
 }
 
 export function handleTokensStaked(event: TokensStakedEvent): void {
@@ -99,12 +102,13 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     if (!isGenesisContract) {
       incrementVestingContractBalance(vestingContract, amount)
     }
-    setStakeType(vestingContract.user, event.params.lockedUntil, StakeType.VestingStaked)
+    setStakeType(vestingContract.id, vestingContract.user, event.params.lockedUntil, StakeType.VestingStaked)
   } else {
+    const staker = event.params.staker.toHexString()
     createAndReturnUser(event.params.staker, event.block.timestamp)
     createAndReturnStakeHistoryItem({
       event,
-      user: event.params.staker.toHexString(),
+      user: staker,
       action: event.params.amount < event.params.totalStaked ? StakeHistoryAction.IncreaseStake : StakeHistoryAction.Stake,
       amount: amount,
       token: ZERO_ADDRESS,
@@ -112,7 +116,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     })
     userStakeHistory_increment(event.params.staker, amount)
     incrementCurrentVoluntarilyStakedSov(amount)
-    setStakeType(event.params.staker.toHexString(), event.params.lockedUntil, StakeType.UserStaked)
+    setStakeType(staker, staker, event.params.lockedUntil, StakeType.UserStaked)
   }
 }
 

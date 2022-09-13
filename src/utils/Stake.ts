@@ -22,7 +22,7 @@ function createPartialStake(delegate: string, lockedUntil: BigInt): Stake {
   return new Stake(id)
 }
 
-export function setStakeType(delegate: string, lockedUntil: BigInt, stakeType: string): void {
+export function setStakeType(delegate: string, user: string, lockedUntil: BigInt, stakeType: string): void {
   let stake = Stake.load(getStakeId(delegate, lockedUntil))
   if (stake == null) {
     stake = createPartialStake(delegate, lockedUntil)
