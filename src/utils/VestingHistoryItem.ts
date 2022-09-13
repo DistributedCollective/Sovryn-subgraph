@@ -15,6 +15,7 @@ export function createAndReturnVestingHistoryItem(params: VestingHistoryItemPara
   const vestingHistoryItem = new VestingHistoryItem(id)
   vestingHistoryItem.staker = params.staker
   vestingHistoryItem.action = params.action
+  vestingHistoryItem.amount = params.amount
   vestingHistoryItem.lockedUntil = params.lockedUntil.toI32()
   vestingHistoryItem.totalStaked = params.totalStaked
   vestingHistoryItem.timestamp = params.event.block.timestamp.toI32()
