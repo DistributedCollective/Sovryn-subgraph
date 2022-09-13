@@ -85,6 +85,9 @@ export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEv
   // on cross events (from the bridge) for outgoing transfers we don't have an id and therefor we have to generate it
   const id = crossTransferEvent.id != '' ? crossTransferEvent.id : getCrossTransferId(crossTransferEvent).toHex()
   let crossTransfer = CrossTransfer.load(id)
+  if (crossTransferEvent.direction == CrossDirection.Incoming) {
+    createAndReturnUser(crossTransferEvent.receiver, crossTransferEvent.transaction.timestamp)
+  }
   if (crossTransfer == null) {
     crossTransfer = new CrossTransfer(id)
     crossTransfer.direction = crossTransferEvent.direction.toString()
