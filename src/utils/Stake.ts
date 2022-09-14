@@ -1,7 +1,7 @@
 import { Stake } from '../../generated/schema'
 import { DelegateStakeChanged } from '../../generated/Staking/Staking'
 import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
-import { BigInt } from '@graphprotocol/graph-ts'
+import { BigInt, store } from '@graphprotocol/graph-ts'
 import { StakeType } from './types'
 
 export function createOrUpdateStake(event: DelegateStakeChanged): void {
@@ -9,12 +9,15 @@ export function createOrUpdateStake(event: DelegateStakeChanged): void {
   let stake = Stake.load(stakeId)
   if (stake == null) {
     stake = new Stake(stakeId)
-    stake.stakeType = StakeType.VestingStaked
   }
   stake.user = event.params.delegate.toHexString()
   stake.amount = decimal.fromBigInt(event.params.newBalance, DEFAULT_DECIMALS)
   stake.lockedUntil = event.params.lockedUntil.toI32()
   stake.save()
+
+  if (event.params.newBalance == BigInt.zero()) {
+    store.remove('Stake', stakeId)
+  }
 }
 
 function createPartialStake(delegate: string, lockedUntil: BigInt): Stake {
@@ -27,8 +30,9 @@ export function setStakeType(delegate: string, user: string, lockedUntil: BigInt
   if (stake == null) {
     stake = createPartialStake(delegate, lockedUntil)
   }
-  stake.user = delegate
-  stake.stakeType = stakeType
+  const isMixedType = stake.stakeType != null && stake.stakeType != stakeType
+  stake.stakeType = isMixedType ? StakeType.Mixed : stakeType
+  stake.user = user
   stake.save()
 }
 

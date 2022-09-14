@@ -31,7 +31,8 @@ export function handleDelegateChanged(event: DelegateChangedEvent): void {
   const delegator = event.params.delegator.toHexString()
   const fromDelegate = event.params.fromDelegate.toHexString()
   const toDelegate = event.params.toDelegate.toHexString()
-  const isUserDelegated = fromDelegate != ZERO_ADDRESS && fromDelegate != toDelegate && delegator == event.transaction.from.toHexString()
+  const isUserDelegated =
+    fromDelegate != ZERO_ADDRESS && toDelegate != ZERO_ADDRESS && fromDelegate != toDelegate && delegator == event.transaction.from.toHexString()
   if (isUserDelegated) {
     createAndReturnUser(event.params.toDelegate, event.block.timestamp)
     createAndReturnStakeHistoryItem({
@@ -102,7 +103,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     if (!isGenesisContract) {
       incrementVestingContractBalance(vestingContract, amount)
     }
-    setStakeType(vestingContract.id, vestingContract.user, event.params.lockedUntil, StakeType.VestingStaked)
+    setStakeType(vestingContract.user, vestingContract.user, event.params.lockedUntil, StakeType.VestingStaked)
   } else {
     const staker = event.params.staker.toHexString()
     createAndReturnUser(event.params.staker, event.block.timestamp)
