@@ -22,7 +22,7 @@ import { adminContracts } from './contracts/contracts'
 import { StakeHistoryAction, StakeType, VestingHistoryActionItem, VestingContractType } from './utils/types'
 import { createOrUpdateStake, setStakeType } from './utils/Stake'
 import { createAndReturnVestingContract, decrementVestingContractBalance, incrementVestingContractBalance } from './utils/VestingContract'
-import { userStakeHistory_decrement, userStakeHistory_increment } from './utils/UserStakeHistory'
+import { decrementUserStakeHistory, incrementUserStakeHistory } from './utils/UserStakeHistory'
 import { createAndReturnStakeHistoryItem } from './utils/StakeHistoryItem'
 import { createAndReturnVestingHistoryItem } from './utils/VestingHistoryItem'
 
@@ -115,7 +115,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
       token: ZERO_ADDRESS,
       lockedUntil: event.params.lockedUntil,
     })
-    userStakeHistory_increment(event.params.staker, amount)
+    incrementUserStakeHistory(event.params.staker, amount)
     incrementCurrentVoluntarilyStakedSov(amount)
     setStakeType(staker, staker, event.params.lockedUntil, StakeType.UserStaked)
   }
@@ -174,7 +174,7 @@ function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams, event: et
       token: ZERO_ADDRESS,
       lockedUntil: BigInt.zero(),
     })
-    userStakeHistory_decrement(params.receiver, params.amount, slashedAmount)
+    decrementUserStakeHistory(params.receiver, params.amount, slashedAmount)
     decrementCurrentVoluntarilyStakedSov(params.amount.plus(slashedAmount))
   } else if (vesting != null) {
     const isRevoked = adminContracts.includes(params.receiver.toHexString().toLowerCase()) && vesting.type == VestingContractType.Team

@@ -13,14 +13,14 @@ function loadUserStakeHistory(address: Address): UserStakeHistory {
   return historyEntity
 }
 
-export function userStakeHistory_increment(user: Address, amount: BigDecimal): void {
+export function incrementUserStakeHistory(user: Address, amount: BigDecimal): void {
   const userStakeHistory = loadUserStakeHistory(user)
   userStakeHistory.totalStaked = userStakeHistory.totalStaked.plus(amount)
   userStakeHistory.totalRemaining = userStakeHistory.totalRemaining.plus(amount)
   userStakeHistory.save()
 }
 
-export function userStakeHistory_decrement(user: Address, amount: BigDecimal, slashingFee: BigDecimal): void {
+export function decrementUserStakeHistory(user: Address, amount: BigDecimal, slashingFee: BigDecimal): void {
   const userStakeHistory = loadUserStakeHistory(user)
   userStakeHistory.totalStaked = userStakeHistory.totalWithdrawn.plus(amount)
   userStakeHistory.totalRemaining = userStakeHistory.totalRemaining.minus(amount.plus(slashingFee))
