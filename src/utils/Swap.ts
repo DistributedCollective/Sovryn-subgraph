@@ -4,7 +4,7 @@ import { createAndReturnUser } from './User'
 import { WRBTCAddress } from '../contracts/contracts'
 import { updateLastPriceUsdAll } from './Prices'
 import { decimal } from '@protofire/subgraph-toolkit'
-import { createAndReturnProtocolStats, createAndReturnUserTotals } from './ProtocolStats'
+import { createAndReturnProtocolStats } from './ProtocolStats'
 
 export class ConversionEventForSwap {
   transactionHash: string
@@ -107,28 +107,13 @@ export function updatePricing(event: ConversionEventForSwap): void {
 
       token.prevPriceBtc = token.lastPriceBtc
       token.lastPriceBtc = newPriceBtc
-      const lpFeeUsd = newPriceUsd.times(event.lpFee)
-      const stakerFeeUsd = newPriceUsd.times(event.protocolFee)
 
-      if (token.id.toLowerCase() != USDTAddress.toLowerCase()) {
-        // TODO: handle this case
-      } else {
+      if (token.id.toLowerCase() == USDTAddress.toLowerCase()) {
         token.lastPriceUsd = decimal.ONE
       }
 
-      protocolStatsEntity.totalAmmLpFeesUsd = protocolStatsEntity.totalAmmLpFeesUsd.plus(lpFeeUsd)
-      protocolStatsEntity.totalAmmStakerFeesUsd = protocolStatsEntity.totalAmmStakerFeesUsd.plus(stakerFeeUsd)
-      protocolStatsEntity.save()
-
       token.save()
       BTCToken.save()
-
-      if (event.user.toHexString() == event.trader.toHexString()) {
-        const userTotalsEntity = createAndReturnUserTotals(event.user)
-        userTotalsEntity.totalAmmStakerFeesUsd = userTotalsEntity.totalAmmStakerFeesUsd.plus(stakerFeeUsd)
-        userTotalsEntity.totalAmmLpFeesUsd = userTotalsEntity.totalAmmLpFeesUsd.plus(lpFeeUsd)
-        userTotalsEntity.save()
-      }
     }
   }
 }
