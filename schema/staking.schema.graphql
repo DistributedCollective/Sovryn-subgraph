@@ -71,20 +71,9 @@ type Stake @entity {
   id: ID! # ID is the user address + lockedUntil date. ID can change
   user: User
   amount: BigDecimal
-  vestingStakedAmount: BigDecimal!
+  vestingAmount: BigDecimal!
+  delegatedAmount: BigDecimal!
   lockedUntil: Int
-  stakeType: StakeType
-}
-
-enum StakeType {
-  UserStaked
-  VestingStaked
-  Delegated
-  """
-  Mixed means a single stake is part user-staked and part vesting-staked.
-  This can happen when these two stake types have the same lockedUntil date.
-  """
-  Mixed
 }
 
 enum StakeHistoryAction {

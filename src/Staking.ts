@@ -19,8 +19,8 @@ import {
   incrementCurrentVoluntarilyStakedSov,
 } from './utils/ProtocolStats'
 import { adminContracts } from './contracts/contracts'
-import { StakeHistoryAction, StakeType, VestingHistoryActionItem, VestingContractType } from './utils/types'
-import { createOrUpdateStake, setStakeType } from './utils/Stake'
+import { StakeHistoryAction, VestingHistoryActionItem, VestingContractType } from './utils/types'
+import { createOrUpdateStake, incrementDelegatedAmount, incrementVestingStakedAmount } from './utils/Stake'
 import { createAndReturnVestingContract, decrementVestingContractBalance, incrementVestingContractBalance } from './utils/VestingContract'
 import { decrementUserStakeHistory, incrementUserStakeHistory } from './utils/UserStakeHistory'
 import { createAndReturnStakeHistoryItem } from './utils/StakeHistoryItem'
@@ -43,7 +43,7 @@ export function handleDelegateChanged(event: DelegateChangedEvent): void {
       token: ZERO_ADDRESS,
       lockedUntil: event.params.lockedUntil,
     })
-    setStakeType(delegator, toDelegate, event.params.lockedUntil, StakeType.Delegated)
+    incrementDelegatedAmount(fromDelegate, toDelegate, event.params.lockedUntil)
   }
 }
 
@@ -63,7 +63,6 @@ export function handleExtendedStakingDuration(event: ExtendedStakingDurationEven
     token: ZERO_ADDRESS,
     lockedUntil: event.params.newDate,
   })
-  setStakeType(staker, staker, event.params.newDate, StakeType.UserStaked)
 }
 
 export function handleTokensStaked(event: TokensStakedEvent): void {
@@ -103,7 +102,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     if (!isGenesisContract) {
       incrementVestingContractBalance(vestingContract, amount)
     }
-    setStakeType(vestingContract.user, vestingContract.user, event.params.lockedUntil, StakeType.VestingStaked)
+    incrementVestingStakedAmount(vestingContract.user, event.params.lockedUntil, amount)
   } else {
     const staker = event.params.staker.toHexString()
     createAndReturnUser(event.params.staker, event.block.timestamp)
@@ -117,7 +116,6 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     })
     incrementUserStakeHistory(event.params.staker, amount)
     incrementCurrentVoluntarilyStakedSov(amount)
-    setStakeType(staker, staker, event.params.lockedUntil, StakeType.UserStaked)
   }
 }
 

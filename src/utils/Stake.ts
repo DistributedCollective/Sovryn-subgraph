@@ -1,43 +1,52 @@
 import { Stake } from '../../generated/schema'
 import { DelegateStakeChanged } from '../../generated/Staking/Staking'
 import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
-import { BigDecimal, BigInt, store } from '@graphprotocol/graph-ts'
-import { StakeType } from './types'
+import { BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 
 export function createOrUpdateStake(event: DelegateStakeChanged): void {
   const stakeId = getStakeId(event.params.delegate.toHexString(), event.params.lockedUntil)
   let stake = Stake.load(stakeId)
   if (stake == null) {
     stake = new Stake(stakeId)
-    stake.stakeType = StakeType.VestingStaked
-    stake.vestingStakedAmount = BigDecimal.zero()
+    stake.vestingAmount = BigDecimal.zero()
+    stake.delegatedAmount = BigDecimal.zero()
   }
   stake.user = event.params.delegate.toHexString()
   stake.amount = decimal.fromBigInt(event.params.newBalance, DEFAULT_DECIMALS)
   stake.lockedUntil = event.params.lockedUntil.toI32()
   stake.save()
-
-  if (event.params.newBalance == BigInt.zero()) {
-    store.remove('Stake', stakeId)
-  }
 }
 
 function createPartialStake(delegate: string, lockedUntil: BigInt): Stake {
   const id = getStakeId(delegate, lockedUntil)
   const stake = new Stake(id)
-  stake.vestingStakedAmount = BigDecimal.zero()
+  stake.vestingAmount = BigDecimal.zero()
+  stake.delegatedAmount = BigDecimal.zero()
+  stake.user = delegate
   return stake
 }
 
-export function setStakeType(delegate: string, user: string, lockedUntil: BigInt, stakeType: string): void {
-  let stake = Stake.load(getStakeId(delegate, lockedUntil))
+export function incrementVestingStakedAmount(user: string, lockedUntil: BigInt, amount: BigDecimal): void {
+  let stake = Stake.load(getStakeId(user, lockedUntil))
   if (stake == null) {
-    stake = createPartialStake(delegate, lockedUntil)
+    stake = createPartialStake(user, lockedUntil)
   }
-  const isMixedType = stake.stakeType != null && stake.stakeType != stakeType
-  stake.stakeType = isMixedType ? StakeType.Mixed : stakeType
-  stake.user = user
+  stake.vestingAmount = stake.vestingAmount.plus(amount)
   stake.save()
+}
+
+export function incrementDelegatedAmount(fromDelegate: string, toDelegate: string, lockedUntil: BigInt): void {
+  const oldStake = Stake.load(getStakeId(fromDelegate, lockedUntil))
+  if (oldStake != null) {
+    let newStake = Stake.load(getStakeId(toDelegate, lockedUntil))
+    if (newStake == null) {
+      newStake = createPartialStake(toDelegate, lockedUntil)
+    }
+    newStake.delegatedAmount = newStake.delegatedAmount.plus(oldStake.delegatedAmount)
+    oldStake.delegatedAmount = BigDecimal.zero()
+    newStake.save()
+    oldStake.save()
+  }
 }
 
 function getStakeId(delegate: string, lockedUntil: BigInt): string {
