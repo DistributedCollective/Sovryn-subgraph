@@ -71,6 +71,7 @@ type Stake @entity {
   id: ID! # ID is the user address + lockedUntil date. ID can change
   user: User
   amount: BigDecimal
+  vestingStakedAmount: BigDecimal!
   lockedUntil: Int
   stakeType: StakeType
 }
@@ -127,7 +128,7 @@ type StakeHistoryItem @entity {
   timestamp: Int!
   transaction: Transaction!
   amount: BigDecimal
-  token: Token
+  token: String
   lockedUntil: Int
 }
 
