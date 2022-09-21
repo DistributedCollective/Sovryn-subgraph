@@ -12,8 +12,8 @@ import {
 } from '../generated/templates/LiquidityPoolV2Converter/LiquidityPoolV2Converter'
 import { Conversion as ConversionEventV1WithProtocol } from '../generated/templates/LiquidityPoolV1ConverterProtocolFee/LiquidityPoolV1ConverterProtocolFee'
 import { Conversion, LiquidityPool, LiquidityPoolToken, Token, Transaction } from '../generated/schema'
-import { ConversionEventForSwap, createAndReturnSwap, updatePricing } from './utils/Swap'
 import { createAndReturnToken, decimalizeFromToken } from './utils/Token'
+import { ConversionEventForSwap, createAndReturnSwap, swapFunctionSigs, updatePricing } from './utils/Swap'
 import { createAndReturnTransaction } from './utils/Transaction'
 import { BigInt, dataSource, Address } from '@graphprotocol/graph-ts'
 import { createAndReturnSmartToken } from './utils/SmartToken'
@@ -226,23 +226,21 @@ function handleConversion(event: IConversionEvent): void {
   entity.save()
 
   const parsedEvent: ConversionEventForSwap = {
-    transactionHash: event.transaction.id,
+    transaction: event.transaction,
     fromToken: event.fromToken,
     toToken: event.toToken,
     fromAmount: fromAmount,
     toAmount: toAmount,
-    timestamp: event.transaction.timestamp,
-    user: event.user,
-    trader: event.trader,
     lpFee: conversionFee,
     protocolFee: protocolFee,
   }
-
-  createAndReturnSwap(parsedEvent)
+  if (swapFunctionSigs.has(event.transaction.functionSignature)) {
+    createAndReturnSwap(parsedEvent)
+  }
   updatePricing(parsedEvent)
   updateVolumes(parsedEvent, dataSource.address())
   updateCandleSticks(parsedEvent)
-  if (liquidityPool != null) {
+  if (liquidityPool !== null) {
     liquidityPool = incrementPoolBalance(liquidityPool, event.fromToken, fromAmount)
     decrementPoolBalance(liquidityPool, event.toToken, toAmount)
   }

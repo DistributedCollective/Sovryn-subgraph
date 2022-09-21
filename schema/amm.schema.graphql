@@ -133,15 +133,6 @@ type Swap @entity {
   Otherwise, this is the user that initiated the transaction.
   """
   user: User
-  """
-  Was this swap part of a margin trade?
-  """
-  isMarginTrade: Boolean!
-  isBorrow: Boolean!
-  """
-  Was this swap a limit order?
-  """
-  isLimit: Boolean!
   timestamp: Int!
   transaction: Transaction!
 }
