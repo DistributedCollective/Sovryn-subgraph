@@ -47,7 +47,7 @@ import { createAndReturnProtocolStats, createAndReturnUserTotals } from './utils
 import { convertToUsd } from './utils/Prices'
 import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
 import { createAndReturnLendingPool } from './utils/LendingPool'
-import { RewardsEarnedAction } from './utils/types'
+import { RewardsEarnedAction, ProtocolFeeType } from './utils/types'
 import { createOrIncrementRewardItem } from './utils/RewardsEarnedHistoryItem'
 import { incrementAvailableTradingRewards, incrementTotalFeesAndRewardsEarned, incrementTotalTradingRewards } from './utils/UserRewardsEarnedHistory'
 import { SOVAddress } from './contracts/contracts'
@@ -519,9 +519,9 @@ export function handleWithdrawFees(event: WithdrawFeesEvent): void {
   }
   const token = Token.load(event.params.token.toHexString())
   if (token != null) {
-    createWithdrawFees(decimal.fromBigInt(event.params.tradingAmount, DEFAULT_DECIMALS), token, 'Trading', event)
-    createWithdrawFees(decimal.fromBigInt(event.params.borrowingAmount, DEFAULT_DECIMALS), token, 'Borrowing', event)
-    createWithdrawFees(decimal.fromBigInt(event.params.lendingAmount, DEFAULT_DECIMALS), token, 'Lending', event)
+    createWithdrawFees(decimal.fromBigInt(event.params.tradingAmount, DEFAULT_DECIMALS), token, ProtocolFeeType.Trading, event)
+    createWithdrawFees(decimal.fromBigInt(event.params.borrowingAmount, DEFAULT_DECIMALS), token, ProtocolFeeType.Borrowing, event)
+    createWithdrawFees(decimal.fromBigInt(event.params.lendingAmount, DEFAULT_DECIMALS), token, ProtocolFeeType.Lending, event)
   }
 }
 
