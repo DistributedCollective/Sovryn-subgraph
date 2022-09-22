@@ -1,0 +1,2249 @@
+schema {
+  query: Query
+  subscription: Subscription
+}
+scalar String
+scalar String
+scalar String
+
+type Query {
+  converterRegistry(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): ConverterRegistry
+  converterRegistries(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: ConverterRegistry_orderBy
+    orderDirection: OrderDirection
+    where: ConverterRegistry_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [ConverterRegistry!]!
+  smartToken(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): SmartToken
+  smartTokens(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: SmartToken_orderBy
+    orderDirection: OrderDirection
+    where: SmartToken_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [SmartToken!]!
+  tokenSmartToken(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): TokenSmartToken
+  tokenSmartTokens(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: TokenSmartToken_orderBy
+    orderDirection: OrderDirection
+    where: TokenSmartToken_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [TokenSmartToken!]!
+  poolToken(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): PoolToken
+  poolTokens(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: PoolToken_orderBy
+    orderDirection: OrderDirection
+    where: PoolToken_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [PoolToken!]!
+  swap(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Swap
+  swaps(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Swap_orderBy
+    orderDirection: OrderDirection
+    where: Swap_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Swap!]!
+  conversion(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Conversion
+  conversions(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Conversion_orderBy
+    orderDirection: OrderDirection
+    where: Conversion_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Conversion!]!
+  liquidityPool(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): LiquidityPool
+  liquidityPools(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: LiquidityPool_orderBy
+    orderDirection: OrderDirection
+    where: LiquidityPool_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [LiquidityPool!]!
+  liquidityPoolToken(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): LiquidityPoolToken
+  liquidityPoolTokens(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: LiquidityPoolToken_orderBy
+    orderDirection: OrderDirection
+    where: LiquidityPoolToken_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [LiquidityPoolToken!]!
+  bridge(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Bridge
+  bridges(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Bridge_orderBy
+    orderDirection: OrderDirection
+    where: Bridge_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Bridge!]!
+  federation(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Federation
+  federations(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Federation_orderBy
+    orderDirection: OrderDirection
+    where: Federation_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Federation!]!
+  crossTransfer(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): CrossTransfer
+  crossTransfers(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: CrossTransfer_orderBy
+    orderDirection: OrderDirection
+    where: CrossTransfer_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [CrossTransfer!]!
+  sideToken(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): SideToken
+  sideTokens(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: SideToken_orderBy
+    orderDirection: OrderDirection
+    where: SideToken_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [SideToken!]!
+  candleStickMinute(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): CandleStickMinute
+  candleStickMinutes(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: CandleStickMinute_orderBy
+    orderDirection: OrderDirection
+    where: CandleStickMinute_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [CandleStickMinute!]!
+  candleStickFifteenMinute(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): CandleStickFifteenMinute
+  candleStickFifteenMinutes(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: CandleStickFifteenMinute_orderBy
+    orderDirection: OrderDirection
+    where: CandleStickFifteenMinute_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [CandleStickFifteenMinute!]!
+  candleStickHour(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): CandleStickHour
+  candleStickHours(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: CandleStickHour_orderBy
+    orderDirection: OrderDirection
+    where: CandleStickHour_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [CandleStickHour!]!
+  candleStickFourHour(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): CandleStickFourHour
+  candleStickFourHours(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: CandleStickFourHour_orderBy
+    orderDirection: OrderDirection
+    where: CandleStickFourHour_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [CandleStickFourHour!]!
+  candleStickDay(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): CandleStickDay
+  candleStickDays(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: CandleStickDay_orderBy
+    orderDirection: OrderDirection
+    where: CandleStickDay_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [CandleStickDay!]!
+  bitcoinTransferBatchSending(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): BitcoinTransferBatchSending
+  bitcoinTransferBatchSendings(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: BitcoinTransferBatchSending_orderBy
+    orderDirection: OrderDirection
+    where: BitcoinTransferBatchSending_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [BitcoinTransferBatchSending!]!
+  bitcoinTransfer(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): BitcoinTransfer
+  bitcoinTransfers(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: BitcoinTransfer_orderBy
+    orderDirection: OrderDirection
+    where: BitcoinTransfer_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [BitcoinTransfer!]!
+  fastBTCBridgeStat(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): FastBTCBridgeStat
+  fastBTCBridgeStats(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: FastBTCBridgeStat_orderBy
+    orderDirection: OrderDirection
+    where: FastBTCBridgeStat_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [FastBTCBridgeStat!]!
+  proposal(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Proposal
+  proposals(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Proposal_orderBy
+    orderDirection: OrderDirection
+    where: Proposal_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Proposal!]!
+  voteCast(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): VoteCast
+  voteCasts(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: VoteCast_orderBy
+    orderDirection: OrderDirection
+    where: VoteCast_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [VoteCast!]!
+  lendingPool(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): LendingPool
+  lendingPools(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: LendingPool_orderBy
+    orderDirection: OrderDirection
+    where: LendingPool_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [LendingPool!]!
+  userLendingHistory(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): UserLendingHistory
+  userLendingHistories(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: UserLendingHistory_orderBy
+    orderDirection: OrderDirection
+    where: UserLendingHistory_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [UserLendingHistory!]!
+  lendingHistoryItem(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): LendingHistoryItem
+  lendingHistoryItems(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: LendingHistoryItem_orderBy
+    orderDirection: OrderDirection
+    where: LendingHistoryItem_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [LendingHistoryItem!]!
+  userLiquidityHistory(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): UserLiquidityHistory
+  userLiquidityHistories(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: UserLiquidityHistory_orderBy
+    orderDirection: OrderDirection
+    where: UserLiquidityHistory_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [UserLiquidityHistory!]!
+  liquidityHistoryItem(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): LiquidityHistoryItem
+  liquidityHistoryItems(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: LiquidityHistoryItem_orderBy
+    orderDirection: OrderDirection
+    where: LiquidityHistoryItem_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [LiquidityHistoryItem!]!
+  loan(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Loan
+  loans(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Loan_orderBy
+    orderDirection: OrderDirection
+    where: Loan_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Loan!]!
+  borrow(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Borrow
+  borrows(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Borrow_orderBy
+    orderDirection: OrderDirection
+    where: Borrow_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Borrow!]!
+  closeWithDeposit(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): CloseWithDeposit
+  closeWithDeposits(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: CloseWithDeposit_orderBy
+    orderDirection: OrderDirection
+    where: CloseWithDeposit_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [CloseWithDeposit!]!
+  closeWithSwap(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): CloseWithSwap
+  closeWithSwaps(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: CloseWithSwap_orderBy
+    orderDirection: OrderDirection
+    where: CloseWithSwap_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [CloseWithSwap!]!
+  depositCollateral(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): DepositCollateral
+  depositCollaterals(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: DepositCollateral_orderBy
+    orderDirection: OrderDirection
+    where: DepositCollateral_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [DepositCollateral!]!
+  liquidate(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Liquidate
+  liquidates(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Liquidate_orderBy
+    orderDirection: OrderDirection
+    where: Liquidate_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Liquidate!]!
+  payBorrowingFee(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): PayBorrowingFee
+  payBorrowingFees(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: PayBorrowingFee_orderBy
+    orderDirection: OrderDirection
+    where: PayBorrowingFee_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [PayBorrowingFee!]!
+  payLendingFee(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): PayLendingFee
+  payLendingFees(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: PayLendingFee_orderBy
+    orderDirection: OrderDirection
+    where: PayLendingFee_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [PayLendingFee!]!
+  payTradingFee(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): PayTradingFee
+  payTradingFees(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: PayTradingFee_orderBy
+    orderDirection: OrderDirection
+    where: PayTradingFee_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [PayTradingFee!]!
+  trade(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Trade
+  trades(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Trade_orderBy
+    orderDirection: OrderDirection
+    where: Trade_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Trade!]!
+  rollover(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Rollover
+  rollovers(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Rollover_orderBy
+    orderDirection: OrderDirection
+    where: Rollover_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Rollover!]!
+  orderCreated(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): OrderCreated
+  orderCreateds(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: OrderCreated_orderBy
+    orderDirection: OrderDirection
+    where: OrderCreated_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [OrderCreated!]!
+  protocolStats(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): ProtocolStats
+  protocolStats(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: ProtocolStats_orderBy
+    orderDirection: OrderDirection
+    where: ProtocolStats_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [ProtocolStats!]!
+  transaction(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Transaction
+  transactions(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Transaction_orderBy
+    orderDirection: OrderDirection
+    where: Transaction_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Transaction!]!
+  token(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Token
+  tokens(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Token_orderBy
+    orderDirection: OrderDirection
+    where: Token_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Token!]!
+  ownerUpdate(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): OwnerUpdate
+  ownerUpdates(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: OwnerUpdate_orderBy
+    orderDirection: OrderDirection
+    where: OwnerUpdate_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [OwnerUpdate!]!
+  userRewardsEarnedHistory(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): UserRewardsEarnedHistory
+  userRewardsEarnedHistories(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: UserRewardsEarnedHistory_orderBy
+    orderDirection: OrderDirection
+    where: UserRewardsEarnedHistory_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [UserRewardsEarnedHistory!]!
+  rewardsEarnedHistoryItem(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): RewardsEarnedHistoryItem
+  rewardsEarnedHistoryItems(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: RewardsEarnedHistoryItem_orderBy
+    orderDirection: OrderDirection
+    where: RewardsEarnedHistoryItem_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [RewardsEarnedHistoryItem!]!
+  liquidityMiningGlobal(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): LiquidityMiningGlobal
+  liquidityMiningGlobals(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: LiquidityMiningGlobal_orderBy
+    orderDirection: OrderDirection
+    where: LiquidityMiningGlobal_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [LiquidityMiningGlobal!]!
+  liquidityMiningAllocationPoint(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): LiquidityMiningAllocationPoint
+  liquidityMiningAllocationPoints(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: LiquidityMiningAllocationPoint_orderBy
+    orderDirection: OrderDirection
+    where: LiquidityMiningAllocationPoint_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [LiquidityMiningAllocationPoint!]!
+  deposit(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Deposit
+  deposits(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Deposit_orderBy
+    orderDirection: OrderDirection
+    where: Deposit_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Deposit!]!
+  marginOrderCanceled(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): MarginOrderCanceled
+  marginOrderCanceleds(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: MarginOrderCanceled_orderBy
+    orderDirection: OrderDirection
+    where: MarginOrderCanceled_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [MarginOrderCanceled!]!
+  marginOrderFilled(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): MarginOrderFilled
+  marginOrderFilleds(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: MarginOrderFilled_orderBy
+    orderDirection: OrderDirection
+    where: MarginOrderFilled_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [MarginOrderFilled!]!
+  orderCanceled(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): OrderCanceled
+  orderCanceleds(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: OrderCanceled_orderBy
+    orderDirection: OrderDirection
+    where: OrderCanceled_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [OrderCanceled!]!
+  orderFilled(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): OrderFilled
+  orderFilleds(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: OrderFilled_orderBy
+    orderDirection: OrderDirection
+    where: OrderFilled_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [OrderFilled!]!
+  withdrawal(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Withdrawal
+  withdrawals(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Withdrawal_orderBy
+    orderDirection: OrderDirection
+    where: Withdrawal_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Withdrawal!]!
+  tokensStaked(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): TokensStaked
+  tokensStakeds(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: TokensStaked_orderBy
+    orderDirection: OrderDirection
+    where: TokensStaked_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [TokensStaked!]!
+  userStakeHistory(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): UserStakeHistory
+  userStakeHistories(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: UserStakeHistory_orderBy
+    orderDirection: OrderDirection
+    where: UserStakeHistory_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [UserStakeHistory!]!
+  stakeHistoryItem(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): StakeHistoryItem
+  stakeHistoryItems(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: StakeHistoryItem_orderBy
+    orderDirection: OrderDirection
+    where: StakeHistoryItem_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [StakeHistoryItem!]!
+  feeSharingTokensTransferred(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): FeeSharingTokensTransferred
+  feeSharingTokensTransferreds(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: FeeSharingTokensTransferred_orderBy
+    orderDirection: OrderDirection
+    where: FeeSharingTokensTransferred_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [FeeSharingTokensTransferred!]!
+  user(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): User
+  users(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: User_orderBy
+    orderDirection: OrderDirection
+    where: User_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [User!]!
+  userTotal(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): UserTotal
+  userTotals(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: UserTotal_orderBy
+    orderDirection: OrderDirection
+    where: UserTotal_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [UserTotal!]!
+  vestingContract(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): VestingContract
+  vestingContracts(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: VestingContract_orderBy
+    orderDirection: OrderDirection
+    where: VestingContract_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [VestingContract!]!
+  vestingHistoryItem(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): VestingHistoryItem
+  vestingHistoryItems(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: VestingHistoryItem_orderBy
+    orderDirection: OrderDirection
+    where: VestingHistoryItem_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [VestingHistoryItem!]!
+  icandleStick(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): ICandleStick
+  icandleSticks(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: ICandleStick_orderBy
+    orderDirection: OrderDirection
+    where: ICandleStick_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [ICandleStick!]!
+  "Access to subgraph metadata"
+  _meta(block: Block_height): _Meta_
+}
+
+type Subscription {
+  converterRegistry(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): ConverterRegistry
+  converterRegistries(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: ConverterRegistry_orderBy
+    orderDirection: OrderDirection
+    where: ConverterRegistry_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [ConverterRegistry!]!
+  smartToken(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): SmartToken
+  smartTokens(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: SmartToken_orderBy
+    orderDirection: OrderDirection
+    where: SmartToken_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [SmartToken!]!
+  tokenSmartToken(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): TokenSmartToken
+  tokenSmartTokens(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: TokenSmartToken_orderBy
+    orderDirection: OrderDirection
+    where: TokenSmartToken_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [TokenSmartToken!]!
+  poolToken(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): PoolToken
+  poolTokens(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: PoolToken_orderBy
+    orderDirection: OrderDirection
+    where: PoolToken_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [PoolToken!]!
+  swap(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Swap
+  swaps(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Swap_orderBy
+    orderDirection: OrderDirection
+    where: Swap_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Swap!]!
+  conversion(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Conversion
+  conversions(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Conversion_orderBy
+    orderDirection: OrderDirection
+    where: Conversion_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Conversion!]!
+  liquidityPool(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): LiquidityPool
+  liquidityPools(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: LiquidityPool_orderBy
+    orderDirection: OrderDirection
+    where: LiquidityPool_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [LiquidityPool!]!
+  liquidityPoolToken(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): LiquidityPoolToken
+  liquidityPoolTokens(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: LiquidityPoolToken_orderBy
+    orderDirection: OrderDirection
+    where: LiquidityPoolToken_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [LiquidityPoolToken!]!
+  bridge(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Bridge
+  bridges(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Bridge_orderBy
+    orderDirection: OrderDirection
+    where: Bridge_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Bridge!]!
+  federation(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Federation
+  federations(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Federation_orderBy
+    orderDirection: OrderDirection
+    where: Federation_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Federation!]!
+  crossTransfer(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): CrossTransfer
+  crossTransfers(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: CrossTransfer_orderBy
+    orderDirection: OrderDirection
+    where: CrossTransfer_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [CrossTransfer!]!
+  sideToken(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): SideToken
+  sideTokens(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: SideToken_orderBy
+    orderDirection: OrderDirection
+    where: SideToken_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [SideToken!]!
+  candleStickMinute(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): CandleStickMinute
+  candleStickMinutes(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: CandleStickMinute_orderBy
+    orderDirection: OrderDirection
+    where: CandleStickMinute_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [CandleStickMinute!]!
+  candleStickFifteenMinute(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): CandleStickFifteenMinute
+  candleStickFifteenMinutes(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: CandleStickFifteenMinute_orderBy
+    orderDirection: OrderDirection
+    where: CandleStickFifteenMinute_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [CandleStickFifteenMinute!]!
+  candleStickHour(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): CandleStickHour
+  candleStickHours(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: CandleStickHour_orderBy
+    orderDirection: OrderDirection
+    where: CandleStickHour_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [CandleStickHour!]!
+  candleStickFourHour(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): CandleStickFourHour
+  candleStickFourHours(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: CandleStickFourHour_orderBy
+    orderDirection: OrderDirection
+    where: CandleStickFourHour_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [CandleStickFourHour!]!
+  candleStickDay(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): CandleStickDay
+  candleStickDays(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: CandleStickDay_orderBy
+    orderDirection: OrderDirection
+    where: CandleStickDay_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [CandleStickDay!]!
+  bitcoinTransferBatchSending(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): BitcoinTransferBatchSending
+  bitcoinTransferBatchSendings(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: BitcoinTransferBatchSending_orderBy
+    orderDirection: OrderDirection
+    where: BitcoinTransferBatchSending_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [BitcoinTransferBatchSending!]!
+  bitcoinTransfer(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): BitcoinTransfer
+  bitcoinTransfers(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: BitcoinTransfer_orderBy
+    orderDirection: OrderDirection
+    where: BitcoinTransfer_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [BitcoinTransfer!]!
+  fastBTCBridgeStat(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): FastBTCBridgeStat
+  fastBTCBridgeStats(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: FastBTCBridgeStat_orderBy
+    orderDirection: OrderDirection
+    where: FastBTCBridgeStat_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [FastBTCBridgeStat!]!
+  proposal(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Proposal
+  proposals(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Proposal_orderBy
+    orderDirection: OrderDirection
+    where: Proposal_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Proposal!]!
+  voteCast(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): VoteCast
+  voteCasts(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: VoteCast_orderBy
+    orderDirection: OrderDirection
+    where: VoteCast_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [VoteCast!]!
+  lendingPool(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): LendingPool
+  lendingPools(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: LendingPool_orderBy
+    orderDirection: OrderDirection
+    where: LendingPool_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [LendingPool!]!
+  userLendingHistory(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): UserLendingHistory
+  userLendingHistories(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: UserLendingHistory_orderBy
+    orderDirection: OrderDirection
+    where: UserLendingHistory_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [UserLendingHistory!]!
+  lendingHistoryItem(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): LendingHistoryItem
+  lendingHistoryItems(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: LendingHistoryItem_orderBy
+    orderDirection: OrderDirection
+    where: LendingHistoryItem_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [LendingHistoryItem!]!
+  userLiquidityHistory(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): UserLiquidityHistory
+  userLiquidityHistories(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: UserLiquidityHistory_orderBy
+    orderDirection: OrderDirection
+    where: UserLiquidityHistory_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [UserLiquidityHistory!]!
+  liquidityHistoryItem(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): LiquidityHistoryItem
+  liquidityHistoryItems(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: LiquidityHistoryItem_orderBy
+    orderDirection: OrderDirection
+    where: LiquidityHistoryItem_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [LiquidityHistoryItem!]!
+  loan(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Loan
+  loans(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Loan_orderBy
+    orderDirection: OrderDirection
+    where: Loan_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Loan!]!
+  borrow(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Borrow
+  borrows(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Borrow_orderBy
+    orderDirection: OrderDirection
+    where: Borrow_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Borrow!]!
+  closeWithDeposit(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): CloseWithDeposit
+  closeWithDeposits(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: CloseWithDeposit_orderBy
+    orderDirection: OrderDirection
+    where: CloseWithDeposit_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [CloseWithDeposit!]!
+  closeWithSwap(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): CloseWithSwap
+  closeWithSwaps(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: CloseWithSwap_orderBy
+    orderDirection: OrderDirection
+    where: CloseWithSwap_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [CloseWithSwap!]!
+  depositCollateral(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): DepositCollateral
+  depositCollaterals(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: DepositCollateral_orderBy
+    orderDirection: OrderDirection
+    where: DepositCollateral_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [DepositCollateral!]!
+  liquidate(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Liquidate
+  liquidates(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Liquidate_orderBy
+    orderDirection: OrderDirection
+    where: Liquidate_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Liquidate!]!
+  payBorrowingFee(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): PayBorrowingFee
+  payBorrowingFees(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: PayBorrowingFee_orderBy
+    orderDirection: OrderDirection
+    where: PayBorrowingFee_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [PayBorrowingFee!]!
+  payLendingFee(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): PayLendingFee
+  payLendingFees(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: PayLendingFee_orderBy
+    orderDirection: OrderDirection
+    where: PayLendingFee_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [PayLendingFee!]!
+  payTradingFee(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): PayTradingFee
+  payTradingFees(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: PayTradingFee_orderBy
+    orderDirection: OrderDirection
+    where: PayTradingFee_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [PayTradingFee!]!
+  trade(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Trade
+  trades(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Trade_orderBy
+    orderDirection: OrderDirection
+    where: Trade_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Trade!]!
+  rollover(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Rollover
+  rollovers(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Rollover_orderBy
+    orderDirection: OrderDirection
+    where: Rollover_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Rollover!]!
+  orderCreated(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): OrderCreated
+  orderCreateds(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: OrderCreated_orderBy
+    orderDirection: OrderDirection
+    where: OrderCreated_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [OrderCreated!]!
+  protocolStats(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): ProtocolStats
+  protocolStats(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: ProtocolStats_orderBy
+    orderDirection: OrderDirection
+    where: ProtocolStats_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [ProtocolStats!]!
+  transaction(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Transaction
+  transactions(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Transaction_orderBy
+    orderDirection: OrderDirection
+    where: Transaction_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Transaction!]!
+  token(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Token
+  tokens(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Token_orderBy
+    orderDirection: OrderDirection
+    where: Token_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Token!]!
+  ownerUpdate(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): OwnerUpdate
+  ownerUpdates(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: OwnerUpdate_orderBy
+    orderDirection: OrderDirection
+    where: OwnerUpdate_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [OwnerUpdate!]!
+  userRewardsEarnedHistory(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): UserRewardsEarnedHistory
+  userRewardsEarnedHistories(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: UserRewardsEarnedHistory_orderBy
+    orderDirection: OrderDirection
+    where: UserRewardsEarnedHistory_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [UserRewardsEarnedHistory!]!
+  rewardsEarnedHistoryItem(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): RewardsEarnedHistoryItem
+  rewardsEarnedHistoryItems(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: RewardsEarnedHistoryItem_orderBy
+    orderDirection: OrderDirection
+    where: RewardsEarnedHistoryItem_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [RewardsEarnedHistoryItem!]!
+  liquidityMiningGlobal(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): LiquidityMiningGlobal
+  liquidityMiningGlobals(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: LiquidityMiningGlobal_orderBy
+    orderDirection: OrderDirection
+    where: LiquidityMiningGlobal_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [LiquidityMiningGlobal!]!
+  liquidityMiningAllocationPoint(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): LiquidityMiningAllocationPoint
+  liquidityMiningAllocationPoints(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: LiquidityMiningAllocationPoint_orderBy
+    orderDirection: OrderDirection
+    where: LiquidityMiningAllocationPoint_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [LiquidityMiningAllocationPoint!]!
+  deposit(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Deposit
+  deposits(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Deposit_orderBy
+    orderDirection: OrderDirection
+    where: Deposit_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Deposit!]!
+  marginOrderCanceled(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): MarginOrderCanceled
+  marginOrderCanceleds(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: MarginOrderCanceled_orderBy
+    orderDirection: OrderDirection
+    where: MarginOrderCanceled_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [MarginOrderCanceled!]!
+  marginOrderFilled(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): MarginOrderFilled
+  marginOrderFilleds(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: MarginOrderFilled_orderBy
+    orderDirection: OrderDirection
+    where: MarginOrderFilled_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [MarginOrderFilled!]!
+  orderCanceled(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): OrderCanceled
+  orderCanceleds(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: OrderCanceled_orderBy
+    orderDirection: OrderDirection
+    where: OrderCanceled_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [OrderCanceled!]!
+  orderFilled(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): OrderFilled
+  orderFilleds(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: OrderFilled_orderBy
+    orderDirection: OrderDirection
+    where: OrderFilled_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [OrderFilled!]!
+  withdrawal(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): Withdrawal
+  withdrawals(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: Withdrawal_orderBy
+    orderDirection: OrderDirection
+    where: Withdrawal_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [Withdrawal!]!
+  tokensStaked(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): TokensStaked
+  tokensStakeds(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: TokensStaked_orderBy
+    orderDirection: OrderDirection
+    where: TokensStaked_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [TokensStaked!]!
+  userStakeHistory(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): UserStakeHistory
+  userStakeHistories(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: UserStakeHistory_orderBy
+    orderDirection: OrderDirection
+    where: UserStakeHistory_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [UserStakeHistory!]!
+  stakeHistoryItem(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): StakeHistoryItem
+  stakeHistoryItems(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: StakeHistoryItem_orderBy
+    orderDirection: OrderDirection
+    where: StakeHistoryItem_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [StakeHistoryItem!]!
+  feeSharingTokensTransferred(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): FeeSharingTokensTransferred
+  feeSharingTokensTransferreds(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: FeeSharingTokensTransferred_orderBy
+    orderDirection: OrderDirection
+    where: FeeSharingTokensTransferred_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [FeeSharingTokensTransferred!]!
+  user(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): User
+  users(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: User_orderBy
+    orderDirection: OrderDirection
+    where: User_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [User!]!
+  userTotal(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): UserTotal
+  userTotals(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: UserTotal_orderBy
+    orderDirection: OrderDirection
+    where: UserTotal_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [UserTotal!]!
+  vestingContract(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): VestingContract
+  vestingContracts(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: VestingContract_orderBy
+    orderDirection: OrderDirection
+    where: VestingContract_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [VestingContract!]!
+  vestingHistoryItem(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): VestingHistoryItem
+  vestingHistoryItems(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: VestingHistoryItem_orderBy
+    orderDirection: OrderDirection
+    where: VestingHistoryItem_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [VestingHistoryItem!]!
+  icandleStick(
+    id: ID!
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): ICandleStick
+  icandleSticks(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: ICandleStick_orderBy
+    orderDirection: OrderDirection
+    where: ICandleStick_filter
+    "The block at which the query should be executed. Can either be a `{ hash: String }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted."
+    block: Block_height
+    "Set to `allow` to receive data even if the subgraph has skipped over errors while syncing."
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [ICandleStick!]!
+  "Access to subgraph metadata"
+  _meta(block: Block_height): _Meta_
+}
