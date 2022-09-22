@@ -36,7 +36,7 @@ import {
   Loan,
   Rollover,
   Token,
-  ProtocolWithdrawFees,
+  ProtocolWithdrawFee,
   PayInterestTransfer,
 } from '../generated/schema'
 import { LoanTokenLogicStandard as LoanTokenTemplate } from '../generated/templates'
@@ -507,7 +507,7 @@ export function handleRollover(event: RolloverEvent): void {
 export function handleWithdrawFees(event: WithdrawFeesEvent): void {
   createAndReturnTransaction(event)
   function createWithdrawFees(amount: BigDecimal, token: Token, feeType: string, event: ethereum.Event): void {
-    const withdrawFees = new ProtocolWithdrawFees(event.transaction.hash.toHexString() + '-' + event.logIndex.toHexString() + '-' + feeType)
+    const withdrawFees = new ProtocolWithdrawFee(event.transaction.hash.toHexString() + '-' + event.logIndex.toHexString() + '-' + feeType)
     withdrawFees.amount = amount
     withdrawFees.amountUsd = amount.times(token.lastPriceUsd)
     withdrawFees.token = token.id
