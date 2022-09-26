@@ -519,9 +519,9 @@ export function handleWithdrawFees(event: WithdrawFeesEvent): void {
   }
   const token = Token.load(event.params.token.toHexString())
   if (token != null) {
-    createWithdrawFees(decimal.fromBigInt(event.params.tradingAmount, DEFAULT_DECIMALS), token, ProtocolFeeType.Trading, event)
-    createWithdrawFees(decimal.fromBigInt(event.params.borrowingAmount, DEFAULT_DECIMALS), token, ProtocolFeeType.Borrowing, event)
-    createWithdrawFees(decimal.fromBigInt(event.params.lendingAmount, DEFAULT_DECIMALS), token, ProtocolFeeType.Lending, event)
+    createWithdrawFees(decimal.fromBigInt(event.params.tradingAmount, token.decimals), token, ProtocolFeeType.Trading, event)
+    createWithdrawFees(decimal.fromBigInt(event.params.borrowingAmount, token.decimals), token, ProtocolFeeType.Borrowing, event)
+    createWithdrawFees(decimal.fromBigInt(event.params.lendingAmount, token.decimals), token, ProtocolFeeType.Lending, event)
   }
 }
 
