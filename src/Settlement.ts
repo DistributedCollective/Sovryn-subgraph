@@ -6,10 +6,9 @@ import {
   OrderFilled as OrderFilledEvent,
   Withdrawal as WithdrawalEvent,
 } from '../generated/Settlement/Settlement'
-import { MarginOrderCanceled, MarginOrderFilled, OrderCanceled, OrderFilled, Withdrawal, Swap, Deposit } from '../generated/schema'
+import { MarginOrderCanceled, MarginOrderFilled, OrderCanceled, OrderFilled, Withdrawal, Deposit } from '../generated/schema'
 import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
 import { decimalize } from './utils/Token'
-
 import { createAndReturnTransaction } from './utils/Transaction'
 import { createAndReturnUser } from './utils/User'
 
@@ -85,14 +84,6 @@ export function handleOrderFilled(event: OrderFilledEvent): void {
   entity.timestamp = transaction.timestamp
   entity.emittedBy = event.address
   entity.save()
-
-  /** Load Swap entity and set isLimit to true */
-  const swapEntity = Swap.load(event.transaction.hash.toHex())
-  if (swapEntity != null) {
-    swapEntity.user = event.params.maker.toHexString()
-    swapEntity.isLimit = true
-    swapEntity.save()
-  }
 }
 
 export function handleWithdrawal(event: WithdrawalEvent): void {

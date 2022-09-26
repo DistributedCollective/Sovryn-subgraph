@@ -234,7 +234,8 @@ function handleConversion(event: IConversionEvent): void {
     lpFee: conversionFee,
     protocolFee: protocolFee,
   }
-  if (swapFunctionSigs.has(event.transaction.functionSignature)) {
+  const isUserSwap = swapFunctionSigs.has(event.transaction.functionSignature) || event.transaction.from == event.trader.toHexString()
+  if (isUserSwap) {
     createAndReturnSwap(parsedEvent)
   }
   updatePricing(parsedEvent)

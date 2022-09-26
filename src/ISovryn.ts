@@ -441,12 +441,6 @@ export function handleTrade(event: TradeEvent): void {
     startRate: entryPrice,
   }
   createAndReturnLoan(loanParams)
-  const swapEntity = Swap.load(event.transaction.hash.toHexString())
-  if (swapEntity != null) {
-    swapEntity.isMarginTrade = true
-    swapEntity.user = null
-    swapEntity.save()
-  }
   entity.user = event.params.user.toHexString()
   entity.lender = event.params.lender
   entity.loanId = event.params.loanId.toHexString()
