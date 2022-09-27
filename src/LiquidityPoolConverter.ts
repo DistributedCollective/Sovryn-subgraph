@@ -206,11 +206,14 @@ class IConversionEvent {
 
 function handleConversion(event: IConversionEvent): void {
   const toToken = Token.load(event.toToken.toHexString())
-  const fromAmount = decimal.fromBigInt(event.fromAmount, DEFAULT_DECIMALS)
-  const toAmount = decimal.fromBigInt(event.toAmount, DEFAULT_DECIMALS)
-  const conversionFee = decimal.fromBigInt(event.conversionFee, DEFAULT_DECIMALS)
-  const protocolFee = decimal.fromBigInt(event.protocolFee, DEFAULT_DECIMALS)
+  const fromToken = Token.load(event.fromToken.toHexString())
+  const toDecimals = toToken !== null ? toToken.decimals : DEFAULT_DECIMALS
+  const fromAmount = decimal.fromBigInt(event.fromAmount, fromToken !== null ? fromToken.decimals : DEFAULT_DECIMALS)
+  const toAmount = decimal.fromBigInt(event.toAmount, toDecimals)
+  const conversionFee = decimal.fromBigInt(event.conversionFee, toDecimals)
+  const protocolFee = decimal.fromBigInt(event.protocolFee, toDecimals)
   let liquidityPool = LiquidityPool.load(event.liquidityPool.toHexString())
+
   const entity = new Conversion(event.transaction.id + '-' + event.logIndex.toString())
   entity._fromToken = event.fromToken.toHexString()
   entity._toToken = event.toToken.toHexString()
