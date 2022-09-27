@@ -125,7 +125,6 @@ type Transaction @entity {
   to: Bytes
   value: BigInt!
   gasLimit: BigInt!
-  functionSignature: String!
 }
 
 """
