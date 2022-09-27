@@ -12,8 +12,8 @@ import {
 } from '../generated/templates/LiquidityPoolV2Converter/LiquidityPoolV2Converter'
 import { Conversion as ConversionEventV1WithProtocol } from '../generated/templates/LiquidityPoolV1ConverterProtocolFee/LiquidityPoolV1ConverterProtocolFee'
 import { Conversion, LiquidityPool, LiquidityPoolToken, Token, Transaction } from '../generated/schema'
-import { createAndReturnToken, decimalizeFromToken } from './utils/Token'
 import { ConversionEventForSwap, createAndReturnSwap, updatePricing } from './utils/Swap'
+import { createAndReturnToken, decimalizeFromToken } from './utils/Token'
 import { createAndReturnTransaction } from './utils/Transaction'
 import { BigInt, dataSource, Address } from '@graphprotocol/graph-ts'
 import { createAndReturnSmartToken } from './utils/SmartToken'
@@ -206,10 +206,12 @@ class IConversionEvent {
 
 function handleConversion(event: IConversionEvent): void {
   const toToken = Token.load(event.toToken.toHexString())
-  const fromAmount = decimal.fromBigInt(event.fromAmount, DEFAULT_DECIMALS)
-  const toAmount = decimal.fromBigInt(event.toAmount, DEFAULT_DECIMALS)
-  const conversionFee = decimal.fromBigInt(event.conversionFee, DEFAULT_DECIMALS)
-  const protocolFee = decimal.fromBigInt(event.protocolFee, DEFAULT_DECIMALS)
+  const fromToken = Token.load(event.fromToken.toHexString())
+  const toDecimals = toToken !== null ? toToken.decimals : DEFAULT_DECIMALS
+  const fromAmount = decimal.fromBigInt(event.fromAmount, fromToken !== null ? fromToken.decimals : DEFAULT_DECIMALS)
+  const toAmount = decimal.fromBigInt(event.toAmount, toDecimals)
+  const conversionFee = decimal.fromBigInt(event.conversionFee, toDecimals)
+  const protocolFee = decimal.fromBigInt(event.protocolFee, toDecimals)
   let liquidityPool = LiquidityPool.load(event.liquidityPool.toHexString())
   const entity = new Conversion(event.transaction.id + '-' + event.logIndex.toString())
   entity._fromToken = event.fromToken.toHexString()
@@ -240,7 +242,7 @@ function handleConversion(event: IConversionEvent): void {
   updatePricing(parsedEvent)
   updateVolumes(parsedEvent, dataSource.address())
   updateCandleSticks(parsedEvent)
-  if (liquidityPool !== null) {
+  if (liquidityPool != null) {
     liquidityPool = incrementPoolBalance(liquidityPool, event.fromToken, fromAmount)
     decrementPoolBalance(liquidityPool, event.toToken, toAmount)
   }

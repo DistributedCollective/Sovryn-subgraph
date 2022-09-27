@@ -34,7 +34,7 @@ import {
   Loan,
   Rollover,
   Token,
-  ProtocolWithdrawFees,
+  ProtocolWithdrawFee,
   PayInterestTransfer,
 } from '../generated/schema'
 import { LoanTokenLogicStandard as LoanTokenTemplate } from '../generated/templates'
@@ -45,7 +45,7 @@ import { createAndReturnProtocolStats, createAndReturnUserTotals } from './utils
 import { convertToUsd } from './utils/Prices'
 import { decimal, DEFAULT_DECIMALS } from '@protofire/subgraph-toolkit'
 import { createAndReturnLendingPool } from './utils/LendingPool'
-import { RewardsEarnedAction } from './utils/types'
+import { RewardsEarnedAction, ProtocolFeeType } from './utils/types'
 import { createOrIncrementRewardItem } from './utils/RewardsEarnedHistoryItem'
 import { incrementAvailableTradingRewards, incrementTotalFeesAndRewardsEarned, incrementTotalTradingRewards } from './utils/UserRewardsEarnedHistory'
 import { SOVAddress } from './contracts/contracts'
@@ -490,7 +490,7 @@ export function handleRollover(event: RolloverEvent): void {
 export function handleWithdrawFees(event: WithdrawFeesEvent): void {
   createAndReturnTransaction(event)
   function createWithdrawFees(amount: BigDecimal, token: Token, feeType: string, event: ethereum.Event): void {
-    const withdrawFees = new ProtocolWithdrawFees(event.transaction.hash.toHexString() + '-' + event.logIndex.toHexString() + '-' + feeType)
+    const withdrawFees = new ProtocolWithdrawFee(event.transaction.hash.toHexString() + '-' + event.logIndex.toHexString() + '-' + feeType)
     withdrawFees.amount = amount
     withdrawFees.amountUsd = amount.times(token.lastPriceUsd)
     withdrawFees.token = token.id
@@ -502,9 +502,9 @@ export function handleWithdrawFees(event: WithdrawFeesEvent): void {
   }
   const token = Token.load(event.params.token.toHexString())
   if (token != null) {
-    createWithdrawFees(decimal.fromBigInt(event.params.tradingAmount, DEFAULT_DECIMALS), token, 'Trading', event)
-    createWithdrawFees(decimal.fromBigInt(event.params.borrowingAmount, DEFAULT_DECIMALS), token, 'Borrowing', event)
-    createWithdrawFees(decimal.fromBigInt(event.params.lendingAmount, DEFAULT_DECIMALS), token, 'Lending', event)
+    createWithdrawFees(decimal.fromBigInt(event.params.tradingAmount, token.decimals), token, ProtocolFeeType.Trading, event)
+    createWithdrawFees(decimal.fromBigInt(event.params.borrowingAmount, token.decimals), token, ProtocolFeeType.Borrowing, event)
+    createWithdrawFees(decimal.fromBigInt(event.params.lendingAmount, token.decimals), token, ProtocolFeeType.Lending, event)
   }
 }
 

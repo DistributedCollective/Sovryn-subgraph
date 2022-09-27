@@ -111,18 +111,10 @@ export function updatePricing(event: ConversionEventForSwap): void {
 
       token.prevPriceBtc = token.lastPriceBtc
       token.lastPriceBtc = newPriceBtc
-      const lpFeeUsd = newPriceUsd.times(event.lpFee)
-      const stakerFeeUsd = newPriceUsd.times(event.protocolFee)
 
-      if (token.id.toLowerCase() != USDTAddress.toLowerCase()) {
-        // TODO: handle this case
-      } else {
+      if (token.id.toLowerCase() == USDTAddress.toLowerCase()) {
         token.lastPriceUsd = decimal.ONE
       }
-
-      protocolStatsEntity.totalAmmLpFeesUsd = protocolStatsEntity.totalAmmLpFeesUsd.plus(lpFeeUsd)
-      protocolStatsEntity.totalAmmStakerFeesUsd = protocolStatsEntity.totalAmmStakerFeesUsd.plus(stakerFeeUsd)
-      protocolStatsEntity.save()
 
       token.save()
       BTCToken.save()
