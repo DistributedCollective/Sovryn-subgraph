@@ -13,7 +13,7 @@ import {
 import { Conversion as ConversionEventV1WithProtocol } from '../generated/templates/LiquidityPoolV1ConverterProtocolFee/LiquidityPoolV1ConverterProtocolFee'
 import { Conversion, LiquidityPool, LiquidityPoolToken, Token, Transaction } from '../generated/schema'
 import { createAndReturnToken, decimalizeFromToken } from './utils/Token'
-import { ConversionEventForSwap, createAndReturnSwap, swapFunctionSigs, updatePricing } from './utils/Swap'
+import { ConversionEventForSwap, createAndReturnSwap, updatePricing } from './utils/Swap'
 import { createAndReturnTransaction } from './utils/Transaction'
 import { BigInt, dataSource, Address } from '@graphprotocol/graph-ts'
 import { createAndReturnSmartToken } from './utils/SmartToken'
@@ -227,6 +227,7 @@ function handleConversion(event: IConversionEvent): void {
 
   const parsedEvent: ConversionEventForSwap = {
     transaction: event.transaction,
+    trader: event.trader,
     fromToken: event.fromToken,
     toToken: event.toToken,
     fromAmount: fromAmount,
@@ -234,10 +235,8 @@ function handleConversion(event: IConversionEvent): void {
     lpFee: conversionFee,
     protocolFee: protocolFee,
   }
-  const isUserSwap = swapFunctionSigs.has(event.transaction.functionSignature) || event.transaction.from == event.trader.toHexString()
-  if (isUserSwap) {
-    createAndReturnSwap(parsedEvent)
-  }
+
+  createAndReturnSwap(parsedEvent)
   updatePricing(parsedEvent)
   updateVolumes(parsedEvent, dataSource.address())
   updateCandleSticks(parsedEvent)

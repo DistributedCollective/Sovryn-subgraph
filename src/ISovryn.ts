@@ -9,7 +9,6 @@ import {
   CloseWithSwap as CloseWithSwapEvent, // User event
   DepositCollateral as DepositCollateralEvent, // User event
   EarnReward as EarnRewardEvent, // User event
-  ExternalSwap as ExternalSwapEvent,
   Liquidate as LiquidateEvent, // User event
   PayBorrowingFee as PayBorrowingFeeEvent,
   PayLendingFee as PayLendingFeeEvent,
@@ -32,7 +31,6 @@ import {
   PayLendingFee,
   PayTradingFee,
   Trade,
-  Swap,
   Loan,
   Rollover,
   Token,
@@ -292,15 +290,6 @@ export function handleEarnReward(event: EarnRewardEvent): void {
     transactionHash: event.transaction.hash,
     token: SOVAddress,
   })
-}
-
-export function handleExternalSwap(event: ExternalSwapEvent): void {
-  createAndReturnTransaction(event)
-  const swapEntity = Swap.load(event.transaction.hash.toHexString())
-  if (swapEntity != null) {
-    swapEntity.user = event.transaction.from.toHexString()
-    swapEntity.save()
-  }
 }
 
 export function handleLiquidate(event: LiquidateEvent): void {

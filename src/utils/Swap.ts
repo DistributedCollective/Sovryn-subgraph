@@ -1,4 +1,4 @@
-import { Address, BigInt, BigDecimal } from '@graphprotocol/graph-ts'
+import { Address, BigInt, BigDecimal, store } from '@graphprotocol/graph-ts'
 import { Swap, Token, Transaction } from '../../generated/schema'
 import { createAndReturnUser } from './User'
 import { WRBTCAddress } from '../contracts/contracts'
@@ -8,6 +8,7 @@ import { createAndReturnProtocolStats } from './ProtocolStats'
 
 export class ConversionEventForSwap {
   transaction: Transaction
+  trader: Address
   fromToken: Address
   toToken: Address
   fromAmount: BigDecimal
@@ -21,27 +22,38 @@ swapFunctionSigs.add('0xb37a4831') //convertByPath
 swapFunctionSigs.add('0xb77d239b') //convertByPath
 swapFunctionSigs.add('0xe321b540') //swapExternal
 
+function getSwapId(txHash: string, token: Address, amount: BigDecimal): string {
+  return txHash + '-' + token.toHexString() + '-' + amount.toString()
+}
+
 export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
-  createAndReturnUser(Address.fromString(event.transaction.from), BigInt.fromI32(event.transaction.timestamp))
-  let swapEntity = Swap.load(event.transaction.id)
+  const oldSwapId = getSwapId(event.transaction.id, event.fromToken, event.fromAmount)
+  const newSwapId = getSwapId(event.transaction.id, event.toToken, event.toAmount)
+  let swapEntity = Swap.load(oldSwapId)
   if (swapEntity == null) {
-    swapEntity = new Swap(event.transaction.id)
+    swapEntity = new Swap(newSwapId)
     swapEntity.numConversions = 1
     swapEntity.fromToken = event.fromToken.toHexString()
     swapEntity.toToken = event.toToken.toHexString()
     swapEntity.fromAmount = event.fromAmount
     swapEntity.toAmount = event.toAmount
     swapEntity.rate = event.fromAmount.div(event.toAmount)
-    swapEntity.user = event.transaction.from
     swapEntity.timestamp = event.transaction.timestamp
     swapEntity.transaction = event.transaction.id
+    const isUserSwap = swapFunctionSigs.has(event.transaction.functionSignature) || event.transaction.from == event.trader.toHexString()
+    if (isUserSwap) {
+      createAndReturnUser(Address.fromString(event.transaction.from), BigInt.fromI32(event.transaction.timestamp))
+      swapEntity.user = event.transaction.from
+    }
   } else {
+    swapEntity.id = newSwapId
     swapEntity.numConversions += 1
     swapEntity.toToken = event.toToken.toHexString()
     swapEntity.toAmount = event.toAmount
     swapEntity.rate = swapEntity.fromAmount.div(event.toAmount)
   }
   swapEntity.save()
+  store.remove('Swap', oldSwapId)
   return swapEntity
 }
 
