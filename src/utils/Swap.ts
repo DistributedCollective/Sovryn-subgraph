@@ -5,6 +5,7 @@ import { WRBTCAddress } from '../contracts/contracts'
 import { updateLastPriceUsdAll } from './Prices'
 import { decimal } from '@protofire/subgraph-toolkit'
 import { createAndReturnProtocolStats } from './ProtocolStats'
+import { SwapType } from './types'
 
 export class ConversionEventForSwap {
   transaction: Transaction
@@ -40,10 +41,14 @@ export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
     swapEntity.rate = event.fromAmount.div(event.toAmount)
     swapEntity.timestamp = event.transaction.timestamp
     swapEntity.transaction = event.transaction.id
+    swapEntity.isLimit = false
     const isUserSwap = swapFunctionSigs.has(event.transaction.functionSignature) || event.transaction.from == event.trader.toHexString()
     if (isUserSwap) {
       createAndReturnUser(Address.fromString(event.transaction.from), BigInt.fromI32(event.transaction.timestamp))
       swapEntity.user = event.transaction.from
+      swapEntity.swapType = SwapType.Market
+    } else {
+      swapEntity.swapType = SwapType.Other
     }
   } else {
     swapEntity.id = newSwapId
@@ -55,6 +60,17 @@ export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
   swapEntity.save()
   store.remove('Swap', oldSwapId)
   return swapEntity
+}
+
+export function updateLimitSwap(txHash: string, toToken: Address, toAmount: BigDecimal, user: Address): void {
+  const id = getSwapId(txHash, toToken, toAmount)
+  const swap = Swap.load(id)
+  if (swap !== null) {
+    swap.isLimit = true
+    swap.swapType = SwapType.Limit
+    swap.user = user.toHexString()
+    swap.save()
+  }
 }
 
 export function updatePricing(event: ConversionEventForSwap): void {
