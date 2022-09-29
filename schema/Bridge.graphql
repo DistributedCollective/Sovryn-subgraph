@@ -128,6 +128,10 @@ type CrossTransfer @entity {
   """
   votes: Int # uint8
   """
+  IsSigned - is this transfer signed by the federation contract (only relevant for the new federation contracts)
+  """
+  isSigned: Boolean!
+  """
   Status - transfer status - Voting, Executed, Revoked
   """
   status: CrossStatus! # CrossStatus

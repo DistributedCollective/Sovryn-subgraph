@@ -6,7 +6,7 @@ import { NewSideToken as NewSideTokenEvent } from '../../generated/BridgeETH/Bri
 import { Voted as VotedEvent } from '../../generated/templates/Federation/Federation'
 import { BridgeChain, BridgeType, CrossDirection, CrossStatus } from './types'
 import { createAndReturnUser } from './User'
-import { bridgeBSC, bridgeETH } from '../contracts/contracts'
+import { bridgeBSC, bridgeETH, signaturesFederationBSC, signaturesFederationETH } from '../contracts/contracts'
 
 export class CrossTransferEvent {
   id: string = ''
@@ -95,6 +95,7 @@ export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEv
     crossTransfer = new CrossTransfer(id)
     crossTransfer.direction = crossTransferEvent.direction.toString()
     crossTransfer.votes = 0
+    crossTransfer.isSigned = false
     crossTransfer.status = crossTransferEvent.status.toString()
     crossTransfer.receiver = crossTransferEvent.receiver
     crossTransfer.originalTokenAddress = crossTransferEvent.originalTokenAddress
@@ -165,7 +166,16 @@ export const handleFederatorVoted = (event: VotedEvent, transaction: Transaction
   // TODO: if token is native to RSK, then symbol should be from token entity and not side token
   crossTransfer.symbol = event.params.symbol
   crossTransfer.sender = event.params.sender
-  crossTransfer.votes = crossTransfer.votes + 1
+  if (
+    event.address.toHex().toLowerCase() == signaturesFederationBSC.toLowerCase() ||
+    event.address.toHex().toLowerCase() == signaturesFederationETH.toLowerCase()
+  ) {
+    crossTransfer.votes = crossTransfer.votes = 3
+    crossTransfer.isSigned = true
+  } else {
+    crossTransfer.votes = crossTransfer.votes + 1
+    crossTransfer.isSigned = false
+  }
 
   const bridgeAddress = federation.bridge
   crossTransfer.destinationChain = BridgeChain.RSK
