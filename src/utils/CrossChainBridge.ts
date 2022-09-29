@@ -61,7 +61,9 @@ export const createAndReturnBridge = (bridgeAddress: Address, event: ethereum.Ev
     bridge.isUpgrading = false
     bridge.isPaused = false
     bridge.federation = ZERO_ADDRESS
+    bridge.pausers = []
     const tx = createAndReturnTransaction(event)
+    bridge.updatedAtTx = tx.id
     bridge.createdAtTx = tx.id
     bridge.save()
   }
@@ -72,11 +74,13 @@ export const createAndReturnFederation = (federationAddress: Address, event: eth
   let federation = Federation.load(federationAddress.toHex())
   if (federation == null) {
     federation = new Federation(federationAddress.toHex())
+    federation.members = []
     federation.totalExecuted = 0
     federation.totalVotes = 0
     federation.isActive = true
     const tx = createAndReturnTransaction(event)
     federation.createdAtTx = tx.id
+    federation.updatedAtTx = tx.id
     federation.save()
   }
   return federation
@@ -102,6 +106,7 @@ export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEv
     crossTransfer.amount = decimal.fromBigInt(crossTransferEvent.amount, crossTransferEvent.decimals)
     crossTransfer.createdAtTx = crossTransferEvent.transaction.id
     crossTransfer.createdAtTimestamp = crossTransferEvent.transaction.timestamp
+    crossTransfer.updatedAtTx = crossTransferEvent.transaction.id
     crossTransfer.save()
   }
   return crossTransfer
