@@ -1017,8 +1017,6 @@ templates:
           handler: handleMemberRemoval
         - event: RevokeTxAndVote(bytes32)
           handler: handleRevokeTxAndVote
-        - event: Signed(indexed bytes32,address)
-          handler: handleSigned
         - event: Voted(indexed address,indexed bytes32,address,address,uint256,string,bytes32,indexed bytes32,uint32,uint8,uint256,bytes)
           handler: handleVoted
         - event: Voted(indexed address,indexed bytes32)

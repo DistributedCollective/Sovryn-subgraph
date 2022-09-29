@@ -135,7 +135,12 @@ export const createAndReturnSideToken = (sideTokenAddress: Address, event: NewSi
 
 export const handleFederatorVoted = (event: VotedEvent, transaction: Transaction): void => {
   const federation = createAndReturnFederation(event.address, event)
-  federation.totalVotes = federation.totalVotes + 1
+  if(isSignatureFederation(event.address.toHex().toLowerCase())) {
+    // if the signatureFederation the Voted event is called only once, so we count all 3 votes
+    federation.totalVotes = federation.totalVotes + 3
+  } else {
+    federation.totalVotes = federation.totalVotes + 1
+  }
   federation.updatedAtTx = transaction.id
   federation.save()
 
@@ -175,10 +180,7 @@ export const handleFederatorVoted = (event: VotedEvent, transaction: Transaction
   // TODO: if token is native to RSK, then symbol should be from token entity and not side token
   crossTransfer.symbol = event.params.symbol
   crossTransfer.sender = event.params.sender
-  if (
-    event.address.toHex().toLowerCase() == signaturesFederationBSC.toLowerCase() ||
-    event.address.toHex().toLowerCase() == signaturesFederationETH.toLowerCase()
-  ) {
+  if (isSignatureFederation(event.address.toHex().toLowerCase())) {
     crossTransfer.votes = crossTransfer.votes = 3
     crossTransfer.isSigned = true
   } else {
@@ -197,4 +199,8 @@ export function isETHBridge(address: string): boolean {
 
 export function isBSCBridge(address: string): boolean {
   return address.toLowerCase() == bridgeBSC.toLowerCase()
+}
+
+function isSignatureFederation(address: string): boolean {
+  return address.toLowerCase() == signaturesFederationETH.toLowerCase() || address.toLowerCase() == signaturesFederationBSC.toLowerCase()
 }

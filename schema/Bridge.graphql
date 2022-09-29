@@ -5,6 +5,7 @@ enum BridgeType {
   RSK_BSC
   RSK_ETH
 }
+
 """
 Cross Chain Bridge
 """
