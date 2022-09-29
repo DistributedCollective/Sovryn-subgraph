@@ -17,6 +17,8 @@ export class CrossTransferEvent {
   // symbol?: string
   decimals: i32
   granularity: BigInt
+  sourceChain: string
+  destinationChain: string
   // userData: Bytes
   status: string
   direction: string
@@ -104,10 +106,13 @@ export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEv
     crossTransfer.token = crossTransferEvent.originalTokenAddress.toHex()
     // const sideToken = SideToken.load(crossTransferEvent.tokenAddress.toHex())
     crossTransfer.sideToken = crossTransferEvent.originalTokenAddress.toHex()
+    crossTransfer.sourceChain = crossTransferEvent.sourceChain
+    crossTransfer.destinationChain = crossTransferEvent.destinationChain
     crossTransfer.amount = decimal.fromBigInt(crossTransferEvent.amount, crossTransferEvent.decimals)
     crossTransfer.createdAtTx = crossTransferEvent.transaction.id
     crossTransfer.createdAtTimestamp = crossTransferEvent.transaction.timestamp
     crossTransfer.updatedAtTx = crossTransferEvent.transaction.id
+    crossTransfer.updatedAtTimestamp = crossTransferEvent.transaction.timestamp
     crossTransfer.save()
   }
   return crossTransfer
@@ -134,6 +139,8 @@ export const handleFederatorVoted = (event: VotedEvent, transaction: Transaction
   federation.updatedAtTx = transaction.id
   federation.save()
 
+  const bridgeAddress = federation.bridge
+  const sourceChain = isETHBridge(bridgeAddress) ? BridgeChain.ETH : BridgeChain.BSC
   const crossTransferEvent: CrossTransferEvent = {
     id: event.params.transactionId.toHex(),
     bridgeAddress: federation.bridge,
@@ -142,6 +149,8 @@ export const handleFederatorVoted = (event: VotedEvent, transaction: Transaction
     amount: event.params.amount,
     decimals: event.params.decimals,
     granularity: event.params.granularity,
+    sourceChain: sourceChain,
+    destinationChain: BridgeChain.RSK,
     // userData: event.params.userData,
     status: CrossStatus.Voting,
     direction: CrossDirection.Incoming,
@@ -177,9 +186,6 @@ export const handleFederatorVoted = (event: VotedEvent, transaction: Transaction
     crossTransfer.isSigned = false
   }
 
-  const bridgeAddress = federation.bridge
-  crossTransfer.destinationChain = BridgeChain.RSK
-  crossTransfer.sourceChain = isETHBridge(bridgeAddress) ? BridgeChain.ETH : BridgeChain.BSC
   crossTransfer.updatedAtTx = transaction.id
   crossTransfer.updatedAtTimestamp = transaction.timestamp
   crossTransfer.save()
