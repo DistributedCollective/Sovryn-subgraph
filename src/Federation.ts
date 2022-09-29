@@ -4,9 +4,13 @@ import {
   MemberAddition as MemberAdditionEvent,
   MemberRemoval as MemberRemovalEvent,
   RevokeTxAndVote as RevokeTxAndVoteEvent,
+  Signed as SignedEvent,
   Voted as VotedEvent,
 } from '../generated/templates/Federation/Federation'
-import { CrossTransfer } from '../generated/schema'
+import {
+  CrossTransfer,
+  Signed,
+} from '../generated/schema'
 
 import { createAndReturnTransaction } from './utils/Transaction'
 import { createAndReturnFederation, handleFederatorVoted } from './utils/CrossChainBridge'
@@ -75,6 +79,9 @@ export function handleRevokeTxAndVote(event: RevokeTxAndVoteEvent): void {
     crossTransfer.updatedAtTimestamp = transaction.timestamp
     crossTransfer.save()
   }
+}
+
+export function handleSigned(event: SignedEvent): void {
 }
 
 export function handleVoted(event: VotedEvent): void {
