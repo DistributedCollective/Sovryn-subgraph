@@ -17,8 +17,7 @@ export class CrossTransferEvent {
   // symbol?: string
   decimals: i32
   granularity: BigInt
-  sourceChain: string
-  destinationChain: string
+  externalChain: string
   // userData: Bytes
   status: string
   direction: string
@@ -80,6 +79,7 @@ export const createAndReturnFederation = (federationAddress: Address, event: eth
     federation.totalExecuted = 0
     federation.totalVotes = 0
     federation.isActive = true
+    federation.bridge = ZERO_ADDRESS
     const tx = createAndReturnTransaction(event)
     federation.createdAtTx = tx.id
     federation.updatedAtTx = tx.id
@@ -106,8 +106,7 @@ export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEv
     crossTransfer.token = crossTransferEvent.originalTokenAddress.toHex()
     // const sideToken = SideToken.load(crossTransferEvent.tokenAddress.toHex())
     crossTransfer.sideToken = crossTransferEvent.originalTokenAddress.toHex()
-    crossTransfer.sourceChain = crossTransferEvent.sourceChain
-    crossTransfer.destinationChain = crossTransferEvent.destinationChain
+    crossTransfer.externalChain = crossTransferEvent.externalChain
     crossTransfer.amount = decimal.fromBigInt(crossTransferEvent.amount, crossTransferEvent.decimals)
     crossTransfer.createdAtTx = crossTransferEvent.transaction.id
     crossTransfer.createdAtTimestamp = crossTransferEvent.transaction.timestamp
@@ -154,8 +153,7 @@ export const handleFederatorVoted = (event: VotedEvent, transaction: Transaction
     amount: event.params.amount,
     decimals: event.params.decimals,
     granularity: event.params.granularity,
-    sourceChain: sourceChain,
-    destinationChain: BridgeChain.RSK,
+    externalChain: sourceChain,
     // userData: event.params.userData,
     status: CrossStatus.Voting,
     direction: CrossDirection.Incoming,

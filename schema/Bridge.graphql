@@ -119,11 +119,7 @@ type CrossTransfer @entity {
   """
   sourceChain - the source chain - for outgoing it is RSK and for incoming it is BSC/ETH
   """
-  sourceChain: BridgeChain!
-  """
-  DestinationChain - the destination chain - for outgoing it is BSC/ETH and for incoming it is RSK
-  """
-  destinationChain: BridgeChain!
+  externalChain: BridgeChain!
   """
   Votes - Number of votes cast for this transfer
   """
