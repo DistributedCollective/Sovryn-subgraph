@@ -179,7 +179,7 @@ export const handleFederatorVoted = (event: VotedEvent, transaction: Transaction
   crossTransfer.symbol = event.params.symbol
   crossTransfer.sender = event.params.sender
   if (isSignatureFederation(event.address.toHex().toLowerCase())) {
-    crossTransfer.votes = crossTransfer.votes = 3
+    crossTransfer.votes = 3
     crossTransfer.isSigned = true
   } else {
     crossTransfer.votes = crossTransfer.votes + 1
