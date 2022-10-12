@@ -132,7 +132,7 @@ export const createAndReturnSideToken = (sideTokenAddress: Address, event: NewSi
   return sideToken
 }
 
-export const handleFederatorVoted = (event: VotedEvent, transaction: Transaction): void => {
+export const federatorVoted = (event: VotedEvent, transaction: Transaction): void => {
   const federation = createAndReturnFederation(event.address, event)
   if (isSignatureFederation(event.address.toHex().toLowerCase())) {
     // if the signatureFederation the Voted event is called only once, so we count all 3 votes
