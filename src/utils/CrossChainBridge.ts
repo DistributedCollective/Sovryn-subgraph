@@ -14,7 +14,6 @@ export class CrossTransferEvent {
   receiver: Address
   originalTokenAddress: Address
   amount: BigInt
-  // symbol?: string
   decimals: i32
   granularity: BigInt
   externalChain: string
@@ -93,18 +92,23 @@ export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEv
   // on cross events (from the bridge) for outgoing transfers we don't have an id and therefor we have to generate it
   const id = crossTransferEvent.id != '' ? crossTransferEvent.id : getCrossTransferId(crossTransferEvent).toHex()
   let crossTransfer = CrossTransfer.load(id)
+  if (crossTransferEvent.direction == CrossDirection.Incoming) {
+    createAndReturnUser(crossTransferEvent.receiver, BigInt.fromI32(crossTransferEvent.transaction.timestamp))
+  }
   if (crossTransfer == null) {
     crossTransfer = new CrossTransfer(id)
     crossTransfer.direction = crossTransferEvent.direction.toString()
     crossTransfer.votes = 0
     crossTransfer.isSigned = false
     crossTransfer.status = crossTransferEvent.status.toString()
-    crossTransfer.receiver = crossTransferEvent.receiver
+    crossTransfer.externalUser = crossTransferEvent.receiver
     crossTransfer.originalTokenAddress = crossTransferEvent.originalTokenAddress
-    // TODO: get side token
-    // const token = Token.load(crossTransferEvent.tokenAddress.toHex())
+    crossTransfer.user =
+      crossTransferEvent.direction == CrossDirection.Incoming ? crossTransferEvent.receiver.toHexString() : crossTransferEvent.transaction.from
+    if (crossTransfer.direction == CrossDirection.Outgoing) {
+      crossTransfer.externalUser = crossTransferEvent.receiver
+    }
     crossTransfer.token = crossTransferEvent.originalTokenAddress.toHex()
-    // const sideToken = SideToken.load(crossTransferEvent.tokenAddress.toHex())
     crossTransfer.sideToken = crossTransferEvent.originalTokenAddress.toHex()
     crossTransfer.externalChain = crossTransferEvent.externalChain
     crossTransfer.amount = decimal.fromBigInt(crossTransferEvent.amount, crossTransferEvent.decimals)
@@ -161,13 +165,7 @@ export const federatorVoted = (event: VotedEvent, transaction: Transaction): voi
     transaction,
   }
   const crossTransfer = createAndReturnCrossTransfer(crossTransferEvent)
-  const receiver = createAndReturnUser(event.params.receiver, event.block.timestamp)
-  if (receiver != null) {
-    const receivedCrossChainTransfers = receiver.receivedCrossChainTransfers
-    receivedCrossChainTransfers.push(crossTransfer.id)
-    receiver.receivedCrossChainTransfers = receivedCrossChainTransfers
-    receiver.save()
-  }
+  createAndReturnUser(event.transaction.from, event.block.timestamp)
   crossTransfer.sourceChainTransactionHash = event.params.transactionHash
   crossTransfer.sourceChainBlockHash = event.params.blockHash
   // TODO: tokenAddress might not be a side token but rather a token that is "native" to RSK (WRBTC, SOV etc.) need to check
@@ -177,7 +175,6 @@ export const federatorVoted = (event: VotedEvent, transaction: Transaction): voi
   }
   // TODO: if token is native to RSK, then symbol should be from token entity and not side token
   crossTransfer.symbol = event.params.symbol
-  crossTransfer.sender = event.params.sender
   if (isSignatureFederation(event.address.toHex().toLowerCase())) {
     crossTransfer.votes = 3
     crossTransfer.isSigned = true

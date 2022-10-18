@@ -150,8 +150,6 @@ dataSources:
           handler: handleDepositCollateral
         - event: EarnReward(indexed address,indexed address,indexed bytes32,uint256,uint256,uint256)
           handler: handleEarnReward
-        - event: ExternalSwap(indexed address,indexed address,indexed address,uint256,uint256)
-          handler: handleExternalSwap
         - event: Liquidate(indexed address,indexed address,indexed bytes32,address,address,address,uint256,uint256,uint256,uint256)
           handler: handleLiquidate
         - event: PayBorrowingFee(indexed address,indexed address,indexed bytes32,uint256)
@@ -166,6 +164,10 @@ dataSources:
           handler: handleTrade
         - event: Rollover(indexed address,indexed address,indexed bytes32,uint256,uint256,uint256,address,uint256)
           handler: handleRollover
+        - event: WithdrawFees(indexed address,indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdrawFees
+        - event: PayInterestTransfer(indexed address,indexed address,uint256)
+          handler: handlePayInterestTransfer
       file: ./src/ISovryn.ts
   
   - kind: ethereum/contract
@@ -451,6 +453,8 @@ dataSources:
           handler: handleTokensWithdrawn
         - event: StakingWithdrawn(indexed address,uint256,uint256,indexed address,bool)
           handler: handleStakingWithdrawn
+        - event: DelegateStakeChanged(indexed address,uint256,uint256,uint256)
+          handler: handleDelegateStakeChanged
       file: ./src/Staking.ts
 
   - kind: ethereum/contract
@@ -574,30 +578,6 @@ dataSources:
         - event: RewardWithdrawn(indexed address,uint256)
           handler: handleRewardWithdrawn
       file: ./src/StakingReward.ts
-
-  # rBTCWrapperProxy
-  - kind: ethereum/contract
-    name: rbtcWrapperProxyTokenConverted
-    network: {{network}}
-    source:
-      address: '{{rbtcWrapperProxyTokenConverted.address}}'
-      abi: rbtcWrapperProxyTokenConverted
-      startBlock: {{rbtcWrapperProxyTokenConverted.startBlock}}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - TokenConverted
-      abis:
-        - name: rbtcWrapperProxyTokenConverted
-          file: ./abis/rbtcWrapperProxyTokenConverted.json
-      eventHandlers:
-        - event: TokenConverted(indexed address,indexed uint256,indexed uint256,address[])
-          handler: handleTokenConverted
-      # blockHandlers:
-      #   - handler: handleBlock
-      file: ./src/rbtcWrapperProxyTokenConverted.ts
 
   - kind: ethereum/contract
     name: OrderbookTestnet

@@ -1,10 +1,10 @@
 import { BigDecimal, log } from '@graphprotocol/graph-ts'
 import { CandleStickDay, CandleStickFifteenMinute, CandleStickFourHour, CandleStickHour, CandleStickMinute, Token } from '../../generated/schema'
-
 import { createAndReturnProtocolStats } from './ProtocolStats'
 import { ConversionEventForSwap } from './Swap'
 import { WRBTCAddress } from '../contracts/contracts'
 
+/* eslint-disable no-unused-vars */
 enum Interval {
   MinuteInterval = 60,
   FifteenMinutesInterval = 60 * 15,
@@ -20,7 +20,7 @@ export function updateCandleSticks(event: ConversionEventForSwap): void {
   let oldPrice = BigDecimal.zero()
   let newPrice = BigDecimal.zero()
   let volume = BigDecimal.zero()
-  const blockTimestamp = event.timestamp
+  const blockTimestamp = event.transaction.timestamp
 
   const protocolStats = createAndReturnProtocolStats()
   const usdStablecoin = protocolStats.usdStablecoin.toLowerCase()

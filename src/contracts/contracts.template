@@ -15,3 +15,5 @@ export const bridgeETH = '{{BridgeETH.address}}'
 export const bridgeBSC = '{{BridgeBSC.address}}'
 export const signaturesFederationETH = '{{SignaturesFederationETH.address}}'
 export const signaturesFederationBSC = '{{SignaturesFederationBSC.address}}'
+export const SOVAddress = '{{SOV.address}}'.toLowerCase()
+export const BTCLoanToken = '{{BTCLoanToken.address}}'.toLowerCase()
