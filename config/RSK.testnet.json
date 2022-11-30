@@ -3,7 +3,12 @@
     "node": {
         "network": "testnet",
         "address": "https://testnet.sovryn.app/rpc",
-        "log_level": "debug"
+        "log_level": "debug",
+        "graph_graphql_query_timeout": 10,
+        "graph_sql_statement_timeout": 10,
+        "graph_graphql_max_depth": 16,
+        "graph_graphql_max_complexity": 1500000,
+        "restart": "always"
     },
     "SOV": {
         "network": "testnet",
@@ -22,6 +27,9 @@
     },
     "WRBTCToken": {
         "address": "0x69FE5cEC81D5eF92600c1A0dB1F11986AB3758Ab"
+    },
+    "BTCLoanToken": {
+        "address": "0x6b41566353d6C7B8C2a7931d498F11489DacAc29"
     },
     "USDTToken": {
         "address": "0x4D5a316D23eBE168d8f887b4447bf8DbFA4901CC"
@@ -97,11 +105,6 @@
         "address": "0x7662E1cC98c9CB50eBc286ce8b124D61C7e2247E",
         "startBlock": 2195830
     },
-    "rbtcWrapperProxyTokenConverted": {
-        "network": "testnet",
-        "address": "0x55684391E3d0Cf69f41c40ddF736BD1C6D3D538c",
-        "startBlock": 1376051
-    },
     "GovernorAlphaEvents": {
         "network": "testnet",
         "address": "0x2ed3014C631F249BEf8f2930dD9833AECe0798DC",
@@ -111,7 +114,7 @@
     "adminContracts": "[0x924f5ad34698Fd20c90Fe5D5A8A0abd3b42dc711, 0x05f4f068DF59a5aA7911f57cE4f41ebFBcB8E247, 0x51C754330c6cD04B810014E769Dab0343E31409E]",
     "Settlement": {
         "network": "testnet",
-        "address": "0x5d1da2342a2128f56498c5267ecf1d718000a142",
+        "address": "0x4dfb9ab1653Eb5A295109E02e37fc222D85fdA74",
         "startBlock": 2672298
     },
     "OrderbookTestnet": {
@@ -138,5 +141,11 @@
         "network": "testnet",
         "address": "0xC0E7A7FfF4aBa5e7286D5d67dD016B719DCc9156",
         "startBlock": 1745576
+    },
+    "SignaturesFederationETH": {
+        "address": "0xe9FDf7CF757eb5A418B01d8862dF177A20fbBF76"
+    },
+    "SignaturesFederationBSC": {
+        "address": "0x07081144a97B58f08Ab8BaAF8B05d87f5D31E5DF"
     }
 }

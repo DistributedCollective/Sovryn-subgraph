@@ -16,14 +16,10 @@ type ConverterRegistry @entity {
   All smart tokens in this registry
   """
   smartTokens: [SmartToken!] @derivedFrom(field: "currentConverterRegistry")
-    """
+  """
   All ERC20 tokens in this registry
   """
   connectorTokens: [Token!] @derivedFrom(field: "currentConverterRegistry")
-  """
-  The contract/account that owns the registry
-  """
-  owner: Bytes! # address
   """
   The number of active converters (AMM pools) in this registry
   """
@@ -31,7 +27,7 @@ type ConverterRegistry @entity {
 }
 
 """
-The smart token represents a single reserve asset on a single pool. 
+The smart token represents a single reserve asset on a single pool.
 For V1 pools, there is 1 smart token representing both reserve assets. For V2 pools, there are 2 smart tokens, one for each reserve asset.
 """
 type SmartToken @entity {
@@ -105,6 +101,12 @@ type PoolToken @entity {
   underlyingAssets: [Token!]!
 }
 
+enum SwapType {
+  Market
+  Limit
+  Other
+}
+
 """
 The Swap entity is an aggregated entity of the individual Conversion events in a transaction.
 For example, if a User swaps XUSD to SOV, there will be 2 Conversion events through 2 AMMs (XUSD-BTC and BTC-SOV) in one transaction. These two Conversions are aggregated here.
@@ -114,10 +116,6 @@ type Swap @entity {
   Transaction hash of this swap
   """
   id: ID!
-  """
-  The AMM Conversion events involved in this swap
-  """
-  conversions: [Conversion!] @derivedFrom(field: "swapTransaction")
   """
   The number of AMM Conversions involved in this swap (this is primarily for debugging purposes)
   """
@@ -141,17 +139,13 @@ type Swap @entity {
   Otherwise, this is the user that initiated the transaction.
   """
   user: User
-  """
-  Was this swap part of a margin trade?
-  """
-  isMarginTrade: Boolean!
-  isBorrow: Boolean!
-  """
-  Was this swap a limit order?
-  """
-  isLimit: Boolean!
+  swapType: SwapType
   timestamp: Int!
   transaction: Transaction!
+  """
+  Not in use - this property is always false. It is kept for backwards compatibility and will be deprecated
+  """
+  isLimit: Boolean!
 }
 
 """
@@ -170,7 +164,6 @@ type Conversion @entity {
   timestamp: Int!
   emittedBy: LiquidityPool! #address
   transaction: Transaction!
-  swapTransaction: Swap!
   blockNumber: Int!
 }
 
