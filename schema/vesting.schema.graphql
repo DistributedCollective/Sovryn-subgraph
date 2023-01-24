@@ -120,7 +120,12 @@ type VestingHistoryItem @entity {
   """
   The date when the tokens become unlocked
   """
-  lockedUntil: Int # uint256
+  lockedUntil: Int! # uint256
+  """
+  Total number of tokens staked until this lockedUntil date
+  """
+  totalStaked: BigDecimal! # uint256
   timestamp: Int!
+  emittedBy: Bytes! #address
   transaction: Transaction!
 }

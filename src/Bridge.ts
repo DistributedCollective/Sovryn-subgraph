@@ -11,11 +11,12 @@ import {
   Upgrading as UpgradingEvent,
 } from '../generated/BridgeETH/Bridge'
 import { Federation as FederationTemplate } from '../generated/templates'
-import { createAndReturnBridge, createAndReturnFederation, createAndReturnSideToken, getBridgeChain, isETHBridge } from './utils/CrossChainBridge'
+import { createAndReturnBridge, createAndReturnFederation, createAndReturnSideToken, isETHBridge } from './utils/CrossChainBridge'
 import { createAndReturnCrossTransfer, CrossTransferEvent } from './utils/CrossTransfer'
 import { createAndReturnTransaction } from './utils/Transaction'
 import { BridgeChain, CrossDirection, CrossStatus } from './utils/types'
 import { Federation, Bridge } from '../generated/schema'
+import { createAndReturnUser } from './utils/User'
 
 export function handleCross(event: CrossEvent): void {
   createAndReturnBridge(event.address, event, [])
@@ -35,7 +36,6 @@ export function handleCross(event: CrossEvent): void {
     // userData: event.params._userData,
     status: CrossStatus.Executed,
     direction: CrossDirection.Outgoing,
-    externalChain: getBridgeChain(event.address.toHexString()),
     sender: event.transaction.from.toHexString(),
     symbol: event.params._symbol,
     sourceChainTransactionHash: event.transaction.hash.toHexString(),
@@ -44,8 +44,6 @@ export function handleCross(event: CrossEvent): void {
   const crossTransfer = createAndReturnCrossTransfer(crossTransferEvent)
   crossTransfer.symbol = event.params._symbol
   createAndReturnUser(event.transaction.from, event.block.timestamp)
-
-  crossTransfer.sourceChainBlockHash = event.block.hash
   crossTransfer.sourceChainTransactionHash = event.transaction.hash
   crossTransfer.updatedAtTx = transaction.id
   crossTransfer.updatedAtTimestamp = transaction.timestamp

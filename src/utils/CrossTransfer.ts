@@ -54,19 +54,16 @@ export const createAndReturnCrossTransfer = (crossTransferEvent: CrossTransferEv
     crossTransfer.direction = crossTransferEvent.direction.toString()
     crossTransfer.votes = 0
     crossTransfer.status = crossTransferEvent.status.toString()
-    crossTransfer.receiver = crossTransferEvent.receiver.toHexString()
-    crossTransfer.originalTokenAddress = crossTransferEvent.originalTokenAddress
-    if (token != null) {
-      crossTransfer.rskToken = crossTransferEvent.originalTokenAddress
+    if (token !== null) {
+      crossTransfer.token = token.id
     }
+    crossTransfer.originalAddress = crossTransferEvent.originalTokenAddress
     crossTransfer.amount = decimal.fromBigInt(crossTransferEvent.amount, crossTransferEvent.decimals)
     crossTransfer.createdAtTx = crossTransferEvent.transaction.id
     crossTransfer.createdAtTimestamp = crossTransferEvent.transaction.timestamp
-    crossTransfer.rskUser = crossTransferEvent.transaction.from
-    crossTransfer.sourceChainTransactionHash = crossTransferEvent.sourceChainTransactionHash
+    crossTransfer.user = crossTransferEvent.transaction.from
     // TODO: if token is native to RSK, then symbol should be from token entity and not side token
     crossTransfer.symbol = crossTransferEvent.symbol
-    crossTransfer.sender = crossTransferEvent.sender
     crossTransfer.externalChain = crossTransferEvent.externalChain
   }
   if (crossTransferEvent.status == CrossStatus.Voting) {

@@ -189,11 +189,6 @@ type Token @entity {
   Does this token have an AMM pool with the protocol stablecoin as the other reserve asset?
   """
   hasStablecoinPool: Boolean
-
-  """
-  CrossTransfers: cross transfers list (currently only relevant to SOV)
-  """
-  crossTransfers: [CrossTransfer!] @derivedFrom(field: "rskToken")
 }
 
 type OwnerUpdate @entity {
