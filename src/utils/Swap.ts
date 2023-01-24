@@ -1,60 +1,76 @@
-import { Address, BigInt, BigDecimal } from '@graphprotocol/graph-ts'
-import { Swap, Token, User } from '../../generated/schema'
+import { Address, BigInt, BigDecimal, store } from '@graphprotocol/graph-ts'
+import { Swap, Token, Transaction } from '../../generated/schema'
 import { createAndReturnUser } from './User'
 import { WRBTCAddress } from '../contracts/contracts'
 import { updateLastPriceUsdAll } from './Prices'
 import { decimal } from '@protofire/subgraph-toolkit'
-import { createAndReturnProtocolStats, createAndReturnUserTotals } from './ProtocolStats'
+import { createAndReturnProtocolStats } from './ProtocolStats'
+import { SwapType } from './types'
 
 export class ConversionEventForSwap {
-  transactionHash: string
+  transaction: Transaction
+  trader: Address
   fromToken: Address
   toToken: Address
   fromAmount: BigDecimal
   toAmount: BigDecimal
-  timestamp: i32
-  user: Address
-  trader: Address
   lpFee: BigDecimal
   protocolFee: BigDecimal
 }
 
-export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
-  let userEntity: User | null = null
-  /** Check if the trader property on the swap is the same as the caller of the tx. If it is, this is a user-instigated swap */
-  if (event.user.toHexString() == event.trader.toHexString()) {
-    userEntity = createAndReturnUser(event.user, BigInt.fromI32(event.timestamp))
-  }
-  let swapEntity = Swap.load(event.transactionHash)
+export const swapFunctionSigs = new Set<string>()
+swapFunctionSigs.add('0xb37a4831') //convertByPath
+swapFunctionSigs.add('0xb77d239b') //convertByPath
+swapFunctionSigs.add('0xe321b540') //swapExternal
 
-  /** Create swap  */
+function getSwapId(txHash: string, token: Address, amount: BigDecimal): string {
+  return txHash + '-' + token.toHexString() + '-' + amount.toString()
+}
+
+export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
+  const oldSwapId = getSwapId(event.transaction.id, event.fromToken, event.fromAmount)
+  const newSwapId = getSwapId(event.transaction.id, event.toToken, event.toAmount)
+  let swapEntity = Swap.load(oldSwapId)
   if (swapEntity == null) {
-    swapEntity = new Swap(event.transactionHash)
+    swapEntity = new Swap(newSwapId)
     swapEntity.numConversions = 1
     swapEntity.fromToken = event.fromToken.toHexString()
     swapEntity.toToken = event.toToken.toHexString()
     swapEntity.fromAmount = event.fromAmount
     swapEntity.toAmount = event.toAmount
     swapEntity.rate = event.fromAmount.div(event.toAmount)
-    if (userEntity != null) {
-      swapEntity.user = userEntity.id
-      userEntity.save()
-    }
-    swapEntity.isMarginTrade = false
-    swapEntity.isBorrow = false
+    swapEntity.timestamp = event.transaction.timestamp
+    swapEntity.transaction = event.transaction.id
     swapEntity.isLimit = false
-    swapEntity.timestamp = event.timestamp
-    swapEntity.transaction = event.transactionHash
+    const isUserSwap = swapFunctionSigs.has(event.transaction.functionSignature) || event.transaction.from == event.trader.toHexString()
+    if (isUserSwap) {
+      createAndReturnUser(Address.fromString(event.transaction.from), BigInt.fromI32(event.transaction.timestamp))
+      swapEntity.user = event.transaction.from
+      swapEntity.swapType = SwapType.Market
+    } else {
+      swapEntity.swapType = SwapType.Other
+    }
   } else {
-    /** Swap already exists - this means it has multiple conversion events */
+    swapEntity.id = newSwapId
     swapEntity.numConversions += 1
     swapEntity.toToken = event.toToken.toHexString()
     swapEntity.toAmount = event.toAmount
     swapEntity.rate = swapEntity.fromAmount.div(event.toAmount)
   }
   swapEntity.save()
-
+  store.remove('Swap', oldSwapId)
   return swapEntity
+}
+
+export function updateLimitSwap(txHash: string, toToken: Address, toAmount: BigDecimal, user: Address): void {
+  const id = getSwapId(txHash, toToken, toAmount)
+  const swap = Swap.load(id)
+  if (swap !== null) {
+    swap.isLimit = true
+    swap.swapType = SwapType.Limit
+    swap.user = user.toHexString()
+    swap.save()
+  }
 }
 
 export function updatePricing(event: ConversionEventForSwap): void {
@@ -111,28 +127,13 @@ export function updatePricing(event: ConversionEventForSwap): void {
 
       token.prevPriceBtc = token.lastPriceBtc
       token.lastPriceBtc = newPriceBtc
-      const lpFeeUsd = newPriceUsd.times(event.lpFee)
-      const stakerFeeUsd = newPriceUsd.times(event.protocolFee)
 
-      if (token.id.toLowerCase() != USDTAddress.toLowerCase()) {
-        // TODO: handle this case
-      } else {
+      if (token.id.toLowerCase() == USDTAddress.toLowerCase()) {
         token.lastPriceUsd = decimal.ONE
       }
 
-      protocolStatsEntity.totalAmmLpFeesUsd = protocolStatsEntity.totalAmmLpFeesUsd.plus(lpFeeUsd)
-      protocolStatsEntity.totalAmmStakerFeesUsd = protocolStatsEntity.totalAmmStakerFeesUsd.plus(stakerFeeUsd)
-      protocolStatsEntity.save()
-
       token.save()
       BTCToken.save()
-
-      if (event.user.toHexString() == event.trader.toHexString()) {
-        const userTotalsEntity = createAndReturnUserTotals(event.user)
-        userTotalsEntity.totalAmmStakerFeesUsd = userTotalsEntity.totalAmmStakerFeesUsd.plus(stakerFeeUsd)
-        userTotalsEntity.totalAmmLpFeesUsd = userTotalsEntity.totalAmmLpFeesUsd.plus(lpFeeUsd)
-        userTotalsEntity.save()
-      }
     }
   }
 }

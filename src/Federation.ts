@@ -8,8 +8,8 @@ import {
 } from '../generated/templates/Federation/Federation'
 import { CrossTransfer, Federation } from '../generated/schema'
 import { createAndReturnTransaction } from './utils/Transaction'
-import { handleFederatorVoted } from './utils/CrossChainBridge'
 import { CrossStatus } from './utils/types'
+import { handleFederatorVoted } from './utils/CrossChainBridge'
 
 export function handleBridgeChanged(event: BridgeChangedEvent): void {
   const transaction = createAndReturnTransaction(event)

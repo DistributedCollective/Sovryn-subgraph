@@ -6,6 +6,7 @@ enum BridgeType {
   RSK_ETH
   Unknown
 }
+
 """
 Cross Chain Bridge
 """
@@ -115,12 +116,19 @@ type CrossTransfer @entity {
   """
   Direction - the direction of the cross transfer (Incoming or Outgoing)
   """
-  direction: CrossDirection!
+  direction: CrossDirection! # CrossDirection
+  """
+  sourceChain - the source chain - for outgoing it is RSK and for incoming it is BSC/ETH
+  """
   externalChain: BridgeChain!
   """
   Votes - Number of votes cast for this transfer
   """
   votes: Int # uint8
+  """
+  IsSigned - is this transfer signed by the federation contract (only relevant for the new federation contracts)
+  """
+  isSigned: Boolean!
   """
   Status - transfer status - Voting, Executed, Revoked
   """
@@ -138,13 +146,13 @@ type CrossTransfer @entity {
   """
   rskUser: User!
   """
-  Receiver - The receiver of funds (can be a wallet or contract)
+  Address of the user on RSK chain
   """
-  receiver: String # address
+  user: User!
   """
-  Sender - The sender of funds (can be a wallet or contracts)
+  Address of the user on the external chain (eg Ethereum, BSC etc.)
   """
-  sender: String
+  externalUser: Bytes
   """
   Amount - the amount of originalToken transferred across the bridge
   """

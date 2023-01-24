@@ -30,6 +30,7 @@ export class ChangeLoanState {
   timestamp: BigInt
 }
 
+/* eslint-disable no-unused-vars */
 export enum LoanActionType {
   LIQUIDATE,
   CLOSE_WITH_SWAP,

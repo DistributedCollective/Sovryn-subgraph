@@ -11,15 +11,18 @@ import {
   Upgrading as UpgradingEvent,
 } from '../generated/BridgeETH/Bridge'
 import { Federation as FederationTemplate } from '../generated/templates'
-import { createAndReturnBridge, createAndReturnFederation, createAndReturnSideToken, getBridgeChain } from './utils/CrossChainBridge'
+import { createAndReturnBridge, createAndReturnFederation, createAndReturnSideToken, getBridgeChain, isETHBridge } from './utils/CrossChainBridge'
 import { createAndReturnCrossTransfer, CrossTransferEvent } from './utils/CrossTransfer'
 import { createAndReturnTransaction } from './utils/Transaction'
-import { CrossDirection, CrossStatus } from './utils/types'
+import { BridgeChain, CrossDirection, CrossStatus } from './utils/types'
 import { Federation, Bridge } from '../generated/schema'
 
 export function handleCross(event: CrossEvent): void {
   createAndReturnBridge(event.address, event, [])
   const transaction = createAndReturnTransaction(event)
+
+  const destinationChain = isETHBridge(event.address.toHex()) ? BridgeChain.ETH : BridgeChain.BSC
+
   const crossTransferEvent: CrossTransferEvent = {
     id: '',
     receiver: event.params._to,
@@ -28,6 +31,8 @@ export function handleCross(event: CrossEvent): void {
     amount: event.params._amount,
     decimals: event.params._decimals,
     granularity: event.params._granularity,
+    externalChain: destinationChain,
+    // userData: event.params._userData,
     status: CrossStatus.Executed,
     direction: CrossDirection.Outgoing,
     externalChain: getBridgeChain(event.address.toHexString()),
@@ -37,6 +42,13 @@ export function handleCross(event: CrossEvent): void {
     transaction,
   }
   const crossTransfer = createAndReturnCrossTransfer(crossTransferEvent)
+  crossTransfer.symbol = event.params._symbol
+  createAndReturnUser(event.transaction.from, event.block.timestamp)
+
+  crossTransfer.sourceChainBlockHash = event.block.hash
+  crossTransfer.sourceChainTransactionHash = event.transaction.hash
+  crossTransfer.updatedAtTx = transaction.id
+  crossTransfer.updatedAtTimestamp = transaction.timestamp
   crossTransfer.save()
 }
 

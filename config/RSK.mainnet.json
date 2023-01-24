@@ -2,11 +2,12 @@
     "network": "mainnet",
     "node": {
         "network": "mainnet",
-        "address": "https://rsk-graph1.sovryn.app/rpc",
+        "address": "https://rsk-internal.sovryn.app/rpc",
         "log_level": "info",
         "graph_graphql_query_timeout": 10,
         "graph_sql_statement_timeout": 10,
-        "graph_graphql_max_depth": 4,
+        "graph_graphql_max_depth": 16,
+        "graph_graphql_max_complexity": 1500000,
         "restart": "always"
     },
     "SOV": {
@@ -26,6 +27,9 @@
     },
     "WRBTCToken": {
         "address": "0x542fDA317318eBF1d3DEAf76E0b632741A7e677d"
+    },
+    "BTCLoanToken": {
+        "address": "0xa9dcdc63eabb8a2b6f39d7ff9429d88340044a7a"
     },
     "USDTToken": {
         "address": "0xEf213441a85DF4d7acBdAe0Cf78004E1e486BB96"
@@ -101,11 +105,6 @@
         "address": "0x8304FB3614c728B712e94F9D4DF6719fede6517F",
         "startBlock": 3627767
     },
-    "rbtcWrapperProxyTokenConverted": {
-        "network": "mainnet",
-        "address": "0x78E7e79F1acc1f57a3291d5BfA8436A0771C1800",
-        "startBlock": 2838500
-    },
     "GovernorAlphaEvents": {
         "network": "mainnet",
         "address": "0xCe3a21a69c05CfE638B722f53593A047bdd6E9De",
@@ -115,8 +114,8 @@
     "adminContracts": "[0x924f5ad34698Fd20c90Fe5D5A8A0abd3b42dc711, 0x05f4f068DF59a5aA7911f57cE4f41ebFBcB8E247, 0x51C754330c6cD04B810014E769Dab0343E31409E]",
     "Settlement": {
         "network": "mainnet",
-        "address": "0x5d1da2342a2128f56498c5267ecf1d718000a142",
-        "startBlock": 2672298
+        "address": "0x823e55322a395516ac3930F4C1ad9C7c2Fe2EACd",
+        "startBlock": 4208688
     },
     "OrderbookTestnet": {
         "network": "mainnet",
@@ -147,5 +146,11 @@
         "network": "mainnet",
         "address": "0x1CcAd820B6d031B41C54f1F3dA11c0d48b399581",
         "startBlock": 3257444
+    },
+    "SignaturesFederationETH": {
+        "address": "0x32593e4F7A4991C2fe17459DaE9920Fd612855B4"
+    },
+    "SignaturesFederationBSC": {
+        "address": "0xD1E45F51C8f09B139218FC75D26409096316971C"
     }
 }

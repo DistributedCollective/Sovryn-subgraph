@@ -1,6 +1,6 @@
 import { Address, BigDecimal } from '@graphprotocol/graph-ts'
 import { LiquidityMiningAllocationPoint, Token, UserRewardsEarnedHistory } from '../../generated/schema'
-import { WRBTCAddress } from '../contracts/contracts'
+import { BTCLoanToken } from '../contracts/contracts'
 import { PoolTokenType } from './types'
 
 function getUserRewardsEarnedHistory(user: Address): UserRewardsEarnedHistory {
@@ -39,12 +39,14 @@ export function incrementTotalStakingRewards(user: Address, amount: BigDecimal):
 
 export function incrementTotalFeeWithdrawn(user: Address, amount: BigDecimal, token: Address): void {
   const userRewardsEarnedHistory = getUserRewardsEarnedHistory(user)
-  let rbtcAmount = amount
-  if (token.toHexString() != WRBTCAddress) {
+  let rbtcAmount = BigDecimal.zero()
+  if (token.toHexString() != BTCLoanToken) {
     const tokenEntity = Token.load(token.toHexString())
     if (tokenEntity != null) {
       rbtcAmount = amount.times(tokenEntity.lastPriceBtc)
     }
+  } else {
+    rbtcAmount = amount
   }
   userRewardsEarnedHistory.totalFeeWithdrawn = userRewardsEarnedHistory.totalFeeWithdrawn.plus(rbtcAmount)
   userRewardsEarnedHistory.save()

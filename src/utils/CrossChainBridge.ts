@@ -32,6 +32,7 @@ export const createAndReturnFederation = (federationAddress: Address, event: eth
   let federation = Federation.load(federationAddress.toHex())
   if (federation == null) {
     federation = new Federation(federationAddress.toHex())
+    federation.members = []
     federation.totalExecuted = 0
     federation.totalVotes = 0
     federation.isActive = true

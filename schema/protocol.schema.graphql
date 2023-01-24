@@ -125,6 +125,7 @@ type Transaction @entity {
   to: Bytes
   value: BigInt!
   gasLimit: BigInt!
+  functionSignature: String!
 }
 
 """
@@ -200,5 +201,36 @@ type OwnerUpdate @entity {
   prevOwner: String!
   newOwner: String!
   timestamp: BigInt!
+  emittedBy: String!
+}
+
+enum FeeType {
+  Trading
+  Lending
+  Borrowing
+  AMM
+}
+
+type ProtocolWithdrawFee @entity {
+  """
+  ID is txHash-logIndex-tokenSymbol
+  """
+  id: ID!
+  feeType: FeeType!
+  token: Token!
+  amount: BigDecimal!
+  amountUsd: BigDecimal!
+  transaction: Transaction!
+  timestamp: Int!
+  emittedBy: String!
+}
+
+type PayInterestTransfer @entity {
+  id: ID!
+  interestToken: Token!
+  lender: LendingPool!
+  effectiveInterest: BigDecimal!
+  transaction: Transaction!
+  timestamp: Int!
   emittedBy: String!
 }
