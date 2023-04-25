@@ -27,6 +27,20 @@ import { decimal } from '@protofire/subgraph-toolkit'
 import { incrementProtocolAmmTotals, incrementUserAmmTotals } from './utils/ProtocolStats'
 import { createAndReturnConversion } from './utils/Conversion'
 
+export class IConversionEvent {
+  transaction!: Transaction
+  logIndex!: BigInt
+  liquidityPool!: LiquidityPool
+  fromToken!: Token
+  toToken!: Token
+  fromAmount!: BigDecimal
+  toAmount!: BigDecimal
+  trader!: Address
+  user!: Address
+  conversionFee!: BigDecimal
+  protocolFee!: BigDecimal
+}
+
 export function handleLiquidityAdded(event: LiquidityAddedEvent): void {
   createAndReturnTransaction(event)
   const liquidityPool = LiquidityPool.load(event.address.toHexString())
@@ -204,20 +218,6 @@ export function handleConversionV1_2(event: ConversionEventV1WithProtocol): void
       protocolFee: decimal.fromBigInt(event.params._protocolFee, toToken.decimals),
     })
   }
-}
-
-export class IConversionEvent {
-  transaction: Transaction
-  logIndex: BigInt
-  liquidityPool: LiquidityPool
-  fromToken: Token
-  toToken: Token
-  fromAmount: BigDecimal
-  toAmount: BigDecimal
-  trader: Address
-  user: Address
-  conversionFee: BigDecimal
-  protocolFee: BigDecimal
 }
 
 function handleConversion(event: IConversionEvent): void {

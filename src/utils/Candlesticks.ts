@@ -35,17 +35,17 @@ export function updateCandleSticks(event: ConversionEventForSwap): void {
   const protocolStats = createAndReturnProtocolStats()
   const usdStablecoin = protocolStats.usdStablecoin.toLowerCase()
 
-  if (event.fromToken.toHex().toLowerCase() == WRBTCAddress.toLowerCase()) {
-    baseToken = Token.load(event.toToken.toHex()) as Token
-    quoteToken = Token.load(event.fromToken.toHex()) as Token
+  if (event.fromToken.id == WRBTCAddress.toLowerCase()) {
+    baseToken = event.toToken
+    quoteToken = event.fromToken
     volume = event.toAmount
-  } else if (event.toToken.toHex().toLowerCase() == WRBTCAddress.toLowerCase()) {
-    baseToken = Token.load(event.fromToken.toHex()) as Token
-    quoteToken = Token.load(event.toToken.toHex()) as Token
+  } else if (event.toToken.id == WRBTCAddress.toLowerCase()) {
+    baseToken = event.fromToken
+    quoteToken = event.toToken
     volume = event.fromAmount
   } else {
     // TODO: handle a case where neither side of the conversion is WRBTC
-    log.warning('Candlesticks unHandled Conversion - fromToken: {}, toToken {}', [event.fromToken.toHex(), event.toToken.toHex()])
+    log.warning('Candlesticks unHandled Conversion - fromToken: {}, toToken {}', [event.fromToken.id, event.toToken.id])
     return
   }
 
@@ -80,10 +80,10 @@ export function updateCandleSticks(event: ConversionEventForSwap): void {
         quoteToken = Token.load(usdStablecoin) as Token
         volume = BigDecimal.zero()
         let txCount = 0
-        if (event.fromToken.toHex().toLowerCase() == tokenAddress.toLowerCase()) {
+        if (event.fromToken.id == tokenAddress.toLowerCase()) {
           txCount = 1
           volume = event.fromAmount
-        } else if (event.toToken.toHex().toLowerCase() == tokenAddress.toLowerCase()) {
+        } else if (event.toToken.id == tokenAddress.toLowerCase()) {
           txCount = 1
           volume = event.toAmount
         }

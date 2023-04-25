@@ -62,8 +62,8 @@ export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
   return swapEntity
 }
 
-export function updateLimitSwap(txHash: string, toToken: Token, toAmount: BigDecimal, user: Address): void {
-  const id = getSwapId(txHash, toToken.id, toAmount)
+export function updateLimitSwap(txHash: string, toTokenAddress: string, toAmount: BigDecimal, user: Address): void {
+  const id = getSwapId(txHash, toTokenAddress, toAmount)
   const swap = Swap.load(id)
   if (swap !== null) {
     swap.isLimit = true
