@@ -10,8 +10,8 @@ import { SwapType } from './types'
 export class ConversionEventForSwap {
   transaction: Transaction
   trader: Address
-  fromToken: Address
-  toToken: Address
+  fromToken: Token
+  toToken: Token
   fromAmount: BigDecimal
   toAmount: BigDecimal
   lpFee: BigDecimal
@@ -23,19 +23,19 @@ swapFunctionSigs.add('0xb37a4831') //convertByPath
 swapFunctionSigs.add('0xb77d239b') //convertByPath
 swapFunctionSigs.add('0xe321b540') //swapExternal
 
-function getSwapId(txHash: string, token: Address, amount: BigDecimal): string {
-  return txHash + '-' + token.toHexString() + '-' + amount.toString()
+function getSwapId(txHash: string, token: string, amount: BigDecimal): string {
+  return txHash + '-' + token + '-' + amount.toString()
 }
 
 export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
-  const oldSwapId = getSwapId(event.transaction.id, event.fromToken, event.fromAmount)
-  const newSwapId = getSwapId(event.transaction.id, event.toToken, event.toAmount)
+  const oldSwapId = getSwapId(event.transaction.id, event.fromToken.id, event.fromAmount)
+  const newSwapId = getSwapId(event.transaction.id, event.toToken.id, event.toAmount)
   let swapEntity = Swap.load(oldSwapId)
   if (swapEntity == null) {
     swapEntity = new Swap(newSwapId)
     swapEntity.numConversions = 1
-    swapEntity.fromToken = event.fromToken.toHexString()
-    swapEntity.toToken = event.toToken.toHexString()
+    swapEntity.fromToken = event.fromToken.id
+    swapEntity.toToken = event.toToken.id
     swapEntity.fromAmount = event.fromAmount
     swapEntity.toAmount = event.toAmount
     swapEntity.rate = event.fromAmount.div(event.toAmount)
@@ -53,7 +53,7 @@ export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
   } else {
     swapEntity.id = newSwapId
     swapEntity.numConversions += 1
-    swapEntity.toToken = event.toToken.toHexString()
+    swapEntity.toToken = event.toToken.id
     swapEntity.toAmount = event.toAmount
     swapEntity.rate = swapEntity.fromAmount.div(event.toAmount)
   }
@@ -62,8 +62,8 @@ export function createAndReturnSwap(event: ConversionEventForSwap): Swap {
   return swapEntity
 }
 
-export function updateLimitSwap(txHash: string, toToken: Address, toAmount: BigDecimal, user: Address): void {
-  const id = getSwapId(txHash, toToken, toAmount)
+export function updateLimitSwap(txHash: string, toToken: Token, toAmount: BigDecimal, user: Address): void {
+  const id = getSwapId(txHash, toToken.id, toAmount)
   const swap = Swap.load(id)
   if (swap !== null) {
     swap.isLimit = true
@@ -90,12 +90,12 @@ export function updatePricing(event: ConversionEventForSwap): void {
     let tokenAmount: BigDecimal
     let btcAmount: BigDecimal
 
-    if (event.fromToken.toHexString().toLowerCase() == WRBTCAddress.toLowerCase()) {
-      token = Token.load(event.toToken.toHexString())
+    if (event.fromToken.id == WRBTCAddress.toLowerCase()) {
+      token = event.toToken
       tokenAmount = event.toAmount
       btcAmount = event.fromAmount
-    } else if (event.toToken.toHexString().toLowerCase() == WRBTCAddress.toLowerCase()) {
-      token = Token.load(event.fromToken.toHexString())
+    } else if (event.toToken.id == WRBTCAddress.toLowerCase()) {
+      token = event.fromToken
       tokenAmount = event.fromAmount
       btcAmount = event.toAmount
     } else {
@@ -105,7 +105,7 @@ export function updatePricing(event: ConversionEventForSwap): void {
 
     /** IF SWAP IS BTC/USDT: Update lastPriceUsd on BTC */
 
-    if (event.fromToken.toHexString().toLowerCase() == USDTAddress.toLowerCase() || event.toToken.toHexString().toLowerCase() == USDTAddress.toLowerCase()) {
+    if (event.fromToken.id == USDTAddress.toLowerCase() || event.toToken.id == USDTAddress.toLowerCase()) {
       btcUsdPrice = tokenAmount.div(btcAmount)
       protocolStatsEntity.btcUsdPrice = btcUsdPrice
       protocolStatsEntity.save()
