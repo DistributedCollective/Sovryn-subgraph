@@ -83,57 +83,56 @@ export function updatePricing(event: ConversionEventForSwap): void {
   const USDTAddress = protocolStatsEntity.usdStablecoin.toLowerCase()
   let btcUsdPrice = protocolStatsEntity.btcUsdPrice
 
-  const BTCToken = Token.load(WRBTCAddress.toLowerCase())
+  let btcToken: Token | null
+  let token: Token | null
+  let tokenAmount: BigDecimal
+  let btcAmount: BigDecimal
 
-  if (BTCToken != null) {
-    let token: Token | null
-    let tokenAmount: BigDecimal
-    let btcAmount: BigDecimal
+  if (event.fromToken.id == WRBTCAddress.toLowerCase()) {
+    btcToken = event.fromToken
+    token = event.toToken
+    tokenAmount = event.toAmount
+    btcAmount = event.fromAmount
+  } else if (event.toToken.id == WRBTCAddress.toLowerCase()) {
+    btcToken = event.toToken
+    token = event.fromToken
+    tokenAmount = event.fromAmount
+    btcAmount = event.toAmount
+  } else {
+    /** TODO: Handle case where neither token is rBTC for when AMM pools with non-rBTC tokens are introduced */
+    return
+  }
 
-    if (event.fromToken.id == WRBTCAddress.toLowerCase()) {
-      token = event.toToken
-      tokenAmount = event.toAmount
-      btcAmount = event.fromAmount
-    } else if (event.toToken.id == WRBTCAddress.toLowerCase()) {
-      token = event.fromToken
-      tokenAmount = event.fromAmount
-      btcAmount = event.toAmount
-    } else {
-      /** TODO: Handle case where neither token is rBTC for when AMM pools with non-rBTC tokens are introduced */
-      return
+  /** IF SWAP IS BTC/USDT: Update lastPriceUsd on BTC */
+
+  if (event.fromToken.id == USDTAddress.toLowerCase() || event.toToken.id == USDTAddress.toLowerCase()) {
+    btcUsdPrice = tokenAmount.div(btcAmount)
+    protocolStatsEntity.btcUsdPrice = btcUsdPrice
+    protocolStatsEntity.save()
+    btcToken.prevPriceUsd = btcToken.lastPriceUsd
+    btcToken.lastPriceUsd = btcUsdPrice
+    btcToken.prevPriceBtc = decimal.ONE
+    btcToken.lastPriceBtc = decimal.ONE
+
+    updateLastPriceUsdAll()
+  }
+
+  if (token != null) {
+    const newPriceBtc = btcAmount.div(tokenAmount)
+    const newPriceUsd = newPriceBtc.times(btcUsdPrice)
+
+    if (token.lastPriceUsd.gt(BigDecimal.zero())) {
+      token.lastPriceUsd = newPriceUsd
     }
 
-    /** IF SWAP IS BTC/USDT: Update lastPriceUsd on BTC */
+    token.prevPriceBtc = token.lastPriceBtc
+    token.lastPriceBtc = newPriceBtc
 
-    if (event.fromToken.id == USDTAddress.toLowerCase() || event.toToken.id == USDTAddress.toLowerCase()) {
-      btcUsdPrice = tokenAmount.div(btcAmount)
-      protocolStatsEntity.btcUsdPrice = btcUsdPrice
-      protocolStatsEntity.save()
-      BTCToken.prevPriceUsd = BTCToken.lastPriceUsd
-      BTCToken.lastPriceUsd = btcUsdPrice
-      BTCToken.prevPriceBtc = decimal.ONE
-      BTCToken.lastPriceBtc = decimal.ONE
-
-      updateLastPriceUsdAll()
+    if (token.id.toLowerCase() == USDTAddress.toLowerCase()) {
+      token.lastPriceUsd = decimal.ONE
     }
 
-    if (token != null) {
-      const newPriceBtc = btcAmount.div(tokenAmount)
-      const newPriceUsd = newPriceBtc.times(btcUsdPrice)
-
-      if (token.lastPriceUsd.gt(BigDecimal.zero())) {
-        token.lastPriceUsd = newPriceUsd
-      }
-
-      token.prevPriceBtc = token.lastPriceBtc
-      token.lastPriceBtc = newPriceBtc
-
-      if (token.id.toLowerCase() == USDTAddress.toLowerCase()) {
-        token.lastPriceUsd = decimal.ONE
-      }
-
-      token.save()
-      BTCToken.save()
-    }
+    token.save()
+    btcToken.save()
   }
 }
