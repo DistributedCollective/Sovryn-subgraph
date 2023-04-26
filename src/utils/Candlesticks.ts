@@ -53,15 +53,7 @@ export function updateCandleSticks(event: ConversionEventForSwap): void {
   newPrice = baseToken.lastPriceBtc
 
   // update baseToken candlesticks with quoteToken=WRBTC
-  updateAllIntervals({
-    baseToken,
-    quoteToken,
-    oldPrice,
-    newPrice,
-    volume,
-    txCount: 1,
-    blockTimestamp,
-  })
+  updateAllIntervals({ baseToken, quoteToken, oldPrice, newPrice, volume, txCount: 1, blockTimestamp })
 
   const usdToken = Token.load(usdStablecoin) as Token
 
@@ -71,12 +63,10 @@ export function updateCandleSticks(event: ConversionEventForSwap): void {
   updateAllIntervals({ baseToken, quoteToken: usdToken, oldPrice: oldPriceUsd, newPrice: newPriceUsd, volume, txCount: 1, blockTimestamp })
 
   if (baseToken.id == usdStablecoin) {
-    log.info('Base token is USD Stablecoin', [])
     const tokens = protocolStats.tokens
     for (let index = 0; index < tokens.length; index++) {
       const tokenAddress = tokens[index]
       if (tokenAddress.toLowerCase() != usdStablecoin.toLowerCase()) {
-        log.info('HERE1 for {}', [tokenAddress]) // Not running
         baseToken = Token.load(tokenAddress) as Token
         quoteToken = Token.load(usdStablecoin) as Token
         volume = BigDecimal.zero()
@@ -91,10 +81,6 @@ export function updateCandleSticks(event: ConversionEventForSwap): void {
 
         oldPrice = baseToken.prevPriceUsd
         newPrice = baseToken.lastPriceUsd
-        /** BUG - old price and new price and 0 */
-        // update all tokens candleSticks with quoteToken=USD
-        log.info('Interval OLD PRICE: {}', [oldPrice.toString()])
-        log.info('Interval NEW PRICE: {}', [newPrice.toString()])
         updateAllIntervals({ baseToken, quoteToken, oldPrice, newPrice, volume, txCount, blockTimestamp })
       }
     }
