@@ -3,7 +3,6 @@ import {
   LiquidityRemoved as LiquidityRemovedEvent,
   Activation as ActivationEvent,
   Conversion as ConversionEventV1,
-  LiquidityPoolV1Converter as LiquidityPoolV1Contract,
   WithdrawFees as WithdrawFeesEvent,
 } from '../generated/templates/LiquidityPoolV1Converter/LiquidityPoolV1Converter'
 import {
@@ -99,7 +98,8 @@ export function handleLiquidityRemoved(event: LiquidityRemovedEvent): void {
 export function handleActivation(event: ActivationEvent): void {
   createAndReturnTransaction(event)
   const liquidityPool = LiquidityPool.load(dataSource.address().toHex())
-
+  const contract = LiquidityPoolV2Contract.bind(event.address)
+  const reserveTokenCountResult = contract.try_reserveTokenCount()
   if (liquidityPool != null) {
     liquidityPool.activated = event.params._activated
 
@@ -108,41 +108,24 @@ export function handleActivation(event: ActivationEvent): void {
       liquidityPool.smartToken = smartToken.smartToken.id
     }
 
-    if (event.params._type == 1) {
-      const contract = LiquidityPoolV1Contract.bind(event.address)
-      const reserveTokenCountResult = contract.try_reserveTokenCount()
-      if (!reserveTokenCountResult.reverted) {
-        for (let i = 0; i < reserveTokenCountResult.value; i++) {
-          const reserveTokenResult = contract.try_reserveTokens(BigInt.fromI32(i))
-          if (!reserveTokenResult.reverted) {
-            createAndReturnToken(reserveTokenResult.value, event.address, event.params._anchor)
+    if (!reserveTokenCountResult.reverted) {
+      for (let i = 0; i < reserveTokenCountResult.value; i++) {
+        const reserveTokenResult = contract.try_reserveTokens(BigInt.fromI32(i))
+        if (!reserveTokenResult.reverted) {
+          createAndReturnToken(reserveTokenResult.value, event.address, event.params._anchor)
+          if (event.params._type == 1) {
             createAndReturnPoolToken(event.params._anchor, event.address, reserveTokenResult.value)
-          }
-          if (i == 0) {
-            liquidityPool.token0 = reserveTokenResult.value.toHexString()
-          } else if (i == 1) {
-            liquidityPool.token1 = reserveTokenResult.value.toHexString()
-          }
-        }
-      }
-    } else if (event.params._type == 2) {
-      const contract = LiquidityPoolV2Contract.bind(event.address)
-      const reserveTokenCountResult = contract.try_reserveTokenCount()
-      if (!reserveTokenCountResult.reverted) {
-        for (let i = 0; i < reserveTokenCountResult.value; i++) {
-          const reserveTokenResult = contract.try_reserveTokens(BigInt.fromI32(i))
-          if (!reserveTokenResult.reverted) {
-            createAndReturnToken(reserveTokenResult.value, event.address, event.params._anchor)
+          } else if (event.params._type == 2) {
             const poolTokenResult = contract.try_poolToken(reserveTokenResult.value)
             if (!poolTokenResult.reverted) {
               createAndReturnPoolToken(poolTokenResult.value, event.address, reserveTokenResult.value)
             }
           }
-          if (i == 0) {
-            liquidityPool.token0 = reserveTokenResult.value.toHexString()
-          } else if (i == 1) {
-            liquidityPool.token1 = reserveTokenResult.value.toHexString()
-          }
+        }
+        if (i == 0) {
+          liquidityPool.token0 = reserveTokenResult.value.toHexString()
+        } else if (i == 1) {
+          liquidityPool.token1 = reserveTokenResult.value.toHexString()
         }
       }
     }
