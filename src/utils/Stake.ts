@@ -20,7 +20,7 @@ export function createOrUpdateStake(event: DelegateStakeChanged): Stake {
 }
 
 export function removeStakeIfEmpty(stake: Stake): void {
-  if (stake != null && (!stake.amount || (stake.amount as BigDecimal).le(BigDecimal.zero()))) {
+  if (!stake.amount || (stake.amount as BigDecimal).le(BigDecimal.zero())) {
     store.remove('Stake', stake.id)
   }
 }
