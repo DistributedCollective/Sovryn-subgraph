@@ -55,33 +55,35 @@ export function updateCandleSticks(event: ConversionEventForSwap): void {
   // update baseToken candlesticks with quoteToken=WRBTC
   updateAllIntervals({ baseToken, quoteToken, oldPrice, newPrice, volume, txCount: 1, blockTimestamp })
 
-  const usdToken = Token.load(usdStablecoin) as Token
+  const usdToken = Token.load(usdStablecoin)
 
-  const oldPriceUsd = baseToken.prevPriceUsd
-  const newPriceUsd = baseToken.lastPriceUsd
-  // update baseToken candlesticks with quoteToken=USD
-  updateAllIntervals({ baseToken, quoteToken: usdToken, oldPrice: oldPriceUsd, newPrice: newPriceUsd, volume, txCount: 1, blockTimestamp })
+  if (usdToken !== null) {
+    const oldPriceUsd = baseToken.prevPriceUsd
+    const newPriceUsd = baseToken.lastPriceUsd
+    // update baseToken candlesticks with quoteToken=USD
+    updateAllIntervals({ baseToken, quoteToken: usdToken, oldPrice: oldPriceUsd, newPrice: newPriceUsd, volume, txCount: 1, blockTimestamp })
 
-  if (baseToken.id == usdStablecoin) {
-    const tokens = protocolStats.tokens
-    for (let index = 0; index < tokens.length; index++) {
-      const tokenAddress = tokens[index]
-      if (tokenAddress.toLowerCase() != usdStablecoin.toLowerCase()) {
-        baseToken = Token.load(tokenAddress) as Token
-        quoteToken = Token.load(usdStablecoin) as Token
-        volume = BigDecimal.zero()
-        let txCount = 0
-        if (event.fromToken.id == tokenAddress.toLowerCase()) {
-          txCount = 1
-          volume = event.fromAmount
-        } else if (event.toToken.id == tokenAddress.toLowerCase()) {
-          txCount = 1
-          volume = event.toAmount
+    if (baseToken.id == usdStablecoin) {
+      const tokens = protocolStats.tokens
+      for (let index = 0; index < tokens.length; index++) {
+        const tokenAddress = tokens[index]
+        if (tokenAddress.toLowerCase() != usdStablecoin.toLowerCase()) {
+          baseToken = Token.load(tokenAddress) as Token
+          quoteToken = Token.load(usdStablecoin) as Token
+          volume = BigDecimal.zero()
+          let txCount = 0
+          if (event.fromToken.id == tokenAddress.toLowerCase()) {
+            txCount = 1
+            volume = event.fromAmount
+          } else if (event.toToken.id == tokenAddress.toLowerCase()) {
+            txCount = 1
+            volume = event.toAmount
+          }
+
+          oldPrice = baseToken.prevPriceUsd
+          newPrice = baseToken.lastPriceUsd
+          updateAllIntervals({ baseToken, quoteToken, oldPrice, newPrice, volume, txCount, blockTimestamp })
         }
-
-        oldPrice = baseToken.prevPriceUsd
-        newPrice = baseToken.lastPriceUsd
-        updateAllIntervals({ baseToken, quoteToken, oldPrice, newPrice, volume, txCount, blockTimestamp })
       }
     }
   }
