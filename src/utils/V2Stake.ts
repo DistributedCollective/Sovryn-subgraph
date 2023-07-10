@@ -102,7 +102,7 @@ export function createAndReturnV2StakingWithdrawn(event: StakingWithdrawn): V2St
 }
 
 export function createAndReturnV2DelegateChanged(event: DelegateChanged): void {
-  log.info('createAndReturnV2DelegateChanged {}', [event.params.lockedUntil.toString()]);
+  log.info('createAndReturnV2DelegateChanged {}', [event.params.lockedUntil.toString()])
 
   const id = event.transaction.hash.toHexString() + '-' + event.logIndex.toString()
 
@@ -124,7 +124,7 @@ export function createAndReturnV2DelegateChanged(event: DelegateChanged): void {
     }
 
     // on testnet, one of the lockedUntil values is 1614429908000, which is too big for i32
-    delegate.lockedUntil = event.params.lockedUntil.toString() == "1614429908000" ? 1614429908 : event.params.lockedUntil.toI32();
+    delegate.lockedUntil = event.params.lockedUntil.toString() == '1614429908000' ? 1614429908 : event.params.lockedUntil.toI32()
     delegate.timestamp = event.block.timestamp.toI32()
 
     delegate.save()
