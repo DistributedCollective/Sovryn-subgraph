@@ -1,8 +1,9 @@
 import { V2Stake, V2TokensStaked, V2ExtendedStakingDuration, V2StakingWithdrawn, V2DelegateChanged } from '../../generated/schema'
 import { DelegateChanged, ExtendedStakingDuration, StakingWithdrawn, TokensStaked } from '../../generated/Staking/Staking'
 import { decimal, DEFAULT_DECIMALS, ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
-import { BigDecimal } from '@graphprotocol/graph-ts'
+import { BigDecimal, log } from '@graphprotocol/graph-ts'
 import { createAndReturnUser } from './User'
+import { getStakeId } from './Stake'
 
 function createAndReturnV2Stake(event: TokensStaked): V2Stake {
   const id = event.params.staker.toHexString() + '-' + event.params.lockedUntil.toI32().toString()
@@ -100,8 +101,9 @@ export function createAndReturnV2StakingWithdrawn(event: StakingWithdrawn): V2St
   return withdrawn
 }
 
-// todo: delegate stake changed
-export function createAndReturnV2DelegateChanged(event: DelegateChanged): V2DelegateChanged {
+export function createAndReturnV2DelegateChanged(event: DelegateChanged): void {
+  log.info('createAndReturnV2DelegateChanged {}', [event.params.lockedUntil.toString()]);
+
   const id = event.transaction.hash.toHexString() + '-' + event.logIndex.toString()
 
   let delegate = V2DelegateChanged.load(id)
@@ -109,29 +111,28 @@ export function createAndReturnV2DelegateChanged(event: DelegateChanged): V2Dele
     delegate = new V2DelegateChanged(id)
     delegate.user = createAndReturnUser(event.params.delegator, event.block.timestamp).id
 
-    if (event.params.toDelegate.toString() != ZERO_ADDRESS) {
+    if (event.params.toDelegate.toHexString() != ZERO_ADDRESS) {
       delegate.delegate = createAndReturnUser(event.params.toDelegate, event.block.timestamp).id
     } else {
       delegate.delegate = null
     }
 
-    if (event.params.fromDelegate.toString() != ZERO_ADDRESS) {
+    if (event.params.fromDelegate.toHexString() != ZERO_ADDRESS) {
       delegate.previousDelegate = createAndReturnUser(event.params.fromDelegate, event.block.timestamp).id
     } else {
       delegate.previousDelegate = null
     }
 
-    delegate.lockedUntil = event.params.lockedUntil.toI32()
+    // on testnet, one of the lockedUntil values is 1614429908000, which is too big for i32
+    delegate.lockedUntil = event.params.lockedUntil.toString() == "1614429908000" ? 1614429908 : event.params.lockedUntil.toI32();
     delegate.timestamp = event.block.timestamp.toI32()
+
     delegate.save()
   }
 
-  const stakeId = event.params.delegator.toHexString() + '-' + event.params.lockedUntil.toI32().toString()
-  const stake = V2Stake.load(stakeId)
+  const stake = V2Stake.load(getStakeId(event.params.delegator.toHexString(), event.params.lockedUntil))
   if (stake != null) {
-    stake.delegate = event.params.toDelegate.toString() === ZERO_ADDRESS ? null : createAndReturnUser(event.params.toDelegate, event.block.timestamp).id
+    stake.delegate = event.params.toDelegate.toHexString() === ZERO_ADDRESS ? null : createAndReturnUser(event.params.toDelegate, event.block.timestamp).id
     stake.save()
   }
-
-  return delegate
 }
