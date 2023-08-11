@@ -42,16 +42,18 @@ export function handleDelegateChanged(event: DelegateChangedEvent): void {
     fromDelegate != ZERO_ADDRESS && toDelegate != ZERO_ADDRESS && fromDelegate != toDelegate && delegator == event.transaction.from.toHexString()
   if (isUserDelegated) {
     createAndReturnUser(event.params.toDelegate, event.block.timestamp)
-    createAndReturnStakeHistoryItem({
-      event,
-      user: delegator,
-      action: StakeHistoryAction.Delegate,
-      amount: BigDecimal.zero(),
-      token: ZERO_ADDRESS,
-      lockedUntil: event.params.lockedUntil,
-    })
     incrementDelegatedAmount(fromDelegate, toDelegate, event.params.lockedUntil)
   }
+
+  createAndReturnStakeHistoryItem({
+    event,
+    user: delegator,
+    action: StakeHistoryAction.Delegate,
+    amount: BigDecimal.zero(),
+    token: ZERO_ADDRESS,
+    lockedUntil: event.params.lockedUntil,
+    delegatee: toDelegate,
+  })
 }
 
 export function handleDelegateStakeChanged(event: DelegateStakeChangedEvent): void {
@@ -71,6 +73,7 @@ export function handleExtendedStakingDuration(event: ExtendedStakingDurationEven
     amount: BigDecimal.zero(),
     token: ZERO_ADDRESS,
     lockedUntil: event.params.newDate,
+    delegatee: ZERO_ADDRESS,
   })
 }
 
@@ -106,6 +109,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
       amount: amount,
       lockedUntil: event.params.lockedUntil,
       totalStaked: totalStaked,
+      delegatee: null,
       event,
     })
     incrementCurrentStakedByVestingSov(amount)
@@ -123,6 +127,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
       amount: amount,
       token: ZERO_ADDRESS,
       lockedUntil: event.params.lockedUntil,
+      delegatee: ZERO_ADDRESS,
     })
     incrementUserStakeHistory(event.params.staker, amount)
     incrementCurrentVoluntarilyStakedSov(amount)
@@ -190,6 +195,7 @@ function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams): void {
       amount: params.amount,
       token: ZERO_ADDRESS,
       lockedUntil: BigInt.zero(),
+      delegatee: ZERO_ADDRESS,
     })
     decrementUserStakeHistory(params.receiver, params.amount, slashedAmount)
     decrementCurrentVoluntarilyStakedSov(params.amount.plus(slashedAmount))
@@ -202,6 +208,7 @@ function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams): void {
       amount: params.amount,
       lockedUntil: BigInt.zero(),
       totalStaked: BigDecimal.zero(),
+      delegatee: null,
       event: params.event,
     })
     decrementVestingContractBalance(params.staker.toHexString(), params.amount)
