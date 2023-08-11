@@ -132,16 +132,18 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
 export function handleTokensWithdrawn(event: TokensWithdrawnEvent): void {
   const transaction = createAndReturnTransaction(event)
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
-  handleStakingOrTokensWithdrawn(
-    {
-      transaction: transaction,
-      stakingContract: event.address,
-      staker: event.params.staker,
-      receiver: event.params.receiver,
-      amount: amount,
-    },
-    event,
-  )
+  const id = event.transaction.hash.toHex() + event.logIndex.toHex()
+  handleStakingOrTokensWithdrawn({
+    id,
+    transaction: transaction,
+    stakingContract: event.address,
+    staker: event.params.staker,
+    receiver: event.params.receiver,
+    lockedUntil: BigInt.zero(),
+    totalStaked: BigDecimal.zero(),
+    amount: amount,
+    event: event,
+  })
 }
 
 /** This is a copy of handleTokensWithdrawn. The event was renamed but params remained the same. */
@@ -149,34 +151,40 @@ export function handleStakingWithdrawn(event: StakingWithdrawnEvent): void {
   createAndReturnV2StakingWithdrawn(event)
   const transaction = createAndReturnTransaction(event)
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
-  handleStakingOrTokensWithdrawn(
-    {
-      transaction: transaction,
-      stakingContract: event.address,
-      staker: event.params.staker,
-      receiver: event.params.receiver,
-      amount: amount,
-    },
-    event,
-  )
+  const id = event.transaction.hash.toHex() + event.logIndex.toHex()
+  handleStakingOrTokensWithdrawn({
+    id: id,
+    transaction: transaction,
+    stakingContract: event.address,
+    staker: event.params.staker,
+    receiver: event.params.receiver,
+    amount: amount,
+    lockedUntil: event.params.until,
+    totalStaked: BigDecimal.zero(),
+    event: event,
+  })
 }
 
 class TokensWithdrawnParams {
+  id: string
   transaction: Transaction
   stakingContract: Address
   staker: Address
   receiver: Address
   amount: BigDecimal
+  lockedUntil: BigInt
+  totalStaked: BigDecimal
+  event: ethereum.Event
 }
 
-function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams, event: ethereum.Event): void {
+function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams): void {
   const user = User.load(params.staker.toHexString().toLowerCase())
   const vesting = VestingContract.load(params.staker.toHexString())
   if (user != null) {
     const slashingEvent = FeeSharingTokensTransferred.load(params.transaction.id)
     const slashedAmount = slashingEvent == null ? BigDecimal.zero() : slashingEvent.amount
     createAndReturnStakeHistoryItem({
-      event,
+      event: params.event,
       user: params.receiver.toHexString(),
       action: slashingEvent == null ? StakeHistoryAction.WithdrawStaked : StakeHistoryAction.Unstake,
       amount: params.amount,
@@ -185,7 +193,8 @@ function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams, event: et
     })
     decrementUserStakeHistory(params.receiver, params.amount, slashedAmount)
     decrementCurrentVoluntarilyStakedSov(params.amount.plus(slashedAmount))
-  } else if (vesting != null) {
+  }
+  if (vesting != null) {
     const isRevoked = adminContracts.includes(params.receiver.toHexString().toLowerCase()) && vesting.type == VestingContractType.Team
     createAndReturnVestingHistoryItem({
       staker: params.staker.toHexString(),
@@ -193,7 +202,7 @@ function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams, event: et
       amount: params.amount,
       lockedUntil: BigInt.zero(),
       totalStaked: BigDecimal.zero(),
-      event,
+      event: params.event,
     })
     decrementVestingContractBalance(params.staker.toHexString(), params.amount)
     decrementCurrentStakedByVestingSov(params.amount)
