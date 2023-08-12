@@ -91,7 +91,7 @@ type VestingContract @entity {
   """
   Token staked in this vesting contract
   """
-  token: Token!
+  token: Bytes! #address
 }
 
 enum VestingHistoryItemAction {

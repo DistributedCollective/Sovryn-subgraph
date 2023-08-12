@@ -34,7 +34,7 @@ export function createAndReturnVestingContract(params: VestingContractParams): V
     const staking = contract.try_staking()
 
     if (!token.reverted) {
-      vestingContract.token = token.value.toHexString()
+      vestingContract.token = token.value
     }
 
     if (!staking.reverted) {

@@ -35,7 +35,7 @@ export function handleTeamVestingCreated(event: TeamVestingCreatedEvent): void {
     const staking = contract.try_staking()
 
     if (!token.reverted) {
-      entity.token = token.value.toHexString()
+      entity.token = token.value
     }
 
     if (!staking.reverted) {
@@ -72,7 +72,7 @@ export function handleTeamVestingCreatedProxy(event: TeamVestingCreatedProxyEven
     const staking = contract.try_staking()
 
     if (!token.reverted) {
-      entity.token = token.value.toHexString()
+      entity.token = token.value
     }
 
     if (!staking.reverted) {
@@ -106,7 +106,7 @@ export function handleVestingCreated(event: VestingCreatedEvent): void {
     const staking = contract.try_staking()
 
     if (!token.reverted) {
-      entity.token = token.value.toHexString()
+      entity.token = token.value
     }
 
     if (!staking.reverted) {
@@ -140,7 +140,7 @@ export function handleVestingCreatedProxy(event: VestingCreatedProxyEvent): void
     const staking = contract.try_staking()
 
     if (!token.reverted) {
-      entity.token = token.value.toHexString()
+      entity.token = token.value
     }
 
     if (!staking.reverted) {

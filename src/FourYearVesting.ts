@@ -31,7 +31,7 @@ export function handleFourYearVestingCreated(event: FourYearVestingCreatedEvent)
   const staking = contract.try_staking()
 
   if (!token.reverted) {
-    newVestingContract.token = token.value.toHexString()
+    newVestingContract.token = token.value
   }
 
   if (!staking.reverted) {

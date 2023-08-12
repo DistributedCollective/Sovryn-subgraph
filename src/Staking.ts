@@ -51,7 +51,8 @@ export function handleDelegateChanged(event: DelegateChangedEvent): void {
     action: StakeHistoryAction.Delegate,
     amount: BigDecimal.zero(),
     token: ZERO_ADDRESS,
-    lockedUntil: event.params.lockedUntil,
+    // on testnet, one of the lockedUntil values is 1614429908000, which is too big for i32
+    lockedUntil: event.params.lockedUntil.toString() == '1614429908000' ? BigInt.fromString('1614429908') : event.params.lockedUntil,
     delegatee: toDelegate,
   })
 }
