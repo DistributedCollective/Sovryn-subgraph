@@ -11,6 +11,7 @@ import { VoteCast, Proposal, GovernorContract, ProposalStateChange } from '../ge
 
 import { createAndReturnTransaction } from './utils/Transaction'
 import { ProposalState } from './utils/types'
+import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
 
 function createAndReturnGovernorContract(address: Address): GovernorContract {
   let governor = GovernorContract.load(address.toHexString())
@@ -21,11 +22,21 @@ function createAndReturnGovernorContract(address: Address): GovernorContract {
     governor.proposalMaxOperations = contract.proposalMaxOperations().toI32()
     governor.votingDelay = contract.votingDelay().toI32()
     governor.votingPeriod = contract.votingPeriod().toI32()
-    governor.timelock = contract.timelock()
-    governor.staking = contract.staking()
-    governor.guardian = contract.guardian()
     governor.quorumPercentageVotes = contract.quorumPercentageVotes().toI32()
     governor.majorityPercentageVotes = contract.majorityPercentageVotes().toI32()
+    governor.timelock = contract.timelock()
+    const staking = contract.try_staking()
+    if (!staking.reverted) {
+      governor.staking = staking.value
+    } else {
+      governor.staking = Address.fromString(ZERO_ADDRESS)
+    }
+    const guardian = contract.try_guardian()
+    if (!guardian.reverted) {
+      governor.guardian = guardian.value
+    } else {
+      governor.guardian = Address.fromString(ZERO_ADDRESS)
+    }
     governor.save()
   }
   return governor
