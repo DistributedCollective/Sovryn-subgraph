@@ -19,12 +19,48 @@ function createAndReturnGovernorContract(address: Address): GovernorContract {
     governor = new GovernorContract(address.toHexString())
     const contract = GovernorAlphaEvents.bind(address)
 
-    governor.proposalMaxOperations = contract.proposalMaxOperations().toI32()
-    governor.votingDelay = contract.votingDelay().toI32()
-    governor.votingPeriod = contract.votingPeriod().toI32()
-    governor.quorumPercentageVotes = contract.quorumPercentageVotes().toI32()
-    governor.majorityPercentageVotes = contract.majorityPercentageVotes().toI32()
-    governor.timelock = contract.timelock()
+    const proposalMaxOperations = contract.try_proposalMaxOperations()
+    if (!proposalMaxOperations.reverted) {
+      governor.proposalMaxOperations = proposalMaxOperations.value.toI32()
+    } else {
+      governor.proposalMaxOperations = 0
+    }
+
+    const votingDelay = contract.try_votingDelay()
+    if (!votingDelay.reverted) {
+      governor.votingDelay = votingDelay.value.toI32()
+    } else {
+      governor.votingDelay = 0
+    }
+
+    const votingPeriod = contract.try_votingPeriod()
+    if (!votingPeriod.reverted) {
+      governor.votingPeriod = votingPeriod.value.toI32()
+    } else {
+      governor.votingPeriod = 0
+    }
+
+    const quorumPercentageVotes = contract.try_quorumPercentageVotes()
+    if (!quorumPercentageVotes.reverted) {
+      governor.quorumPercentageVotes = quorumPercentageVotes.value.toI32()
+    } else {
+      governor.quorumPercentageVotes = 0
+    }
+
+    const majorityPercentageVotes = contract.try_majorityPercentageVotes()
+    if (!majorityPercentageVotes.reverted) {
+      governor.majorityPercentageVotes = majorityPercentageVotes.value.toI32()
+    } else {
+      governor.majorityPercentageVotes = 0
+    }
+
+    const timelock = contract.try_timelock()
+    if (!timelock.reverted) {
+      governor.timelock = timelock.value
+    } else {
+      governor.timelock = Address.fromString(ZERO_ADDRESS)
+    }
+
     const staking = contract.try_staking()
     if (!staking.reverted) {
       governor.staking = staking.value
@@ -86,10 +122,15 @@ export function handleProposalCreated(event: ProposalCreatedEvent): void {
   proposalEntity.emittedBy = governor.id
 
   const contract = GovernorAlphaEvents.bind(event.address)
-  const proposal = contract.proposals(event.params.id)
+  const proposal = contract.try_proposals(event.params.id)
+  if (!proposal.reverted) {
+    proposalEntity.quorum = proposal.value.getQuorum()
+    proposalEntity.majorityPercentage = proposal.value.getMajorityPercentage()
+  } else {
+    proposalEntity.quorum = BigInt.zero()
+    proposalEntity.majorityPercentage = BigInt.zero()
+  }
 
-  proposalEntity.quorum = proposal.getQuorum()
-  proposalEntity.majorityPercentage = proposal.getMajorityPercentage()
   proposalEntity.eta = 0
 
   proposalEntity.save()
@@ -148,6 +189,19 @@ export function handleVoteCast(event: VoteCastEvent): void {
       proposalEntity.votesAgainst = proposalEntity.votesAgainst.plus(event.params.votes)
       proposalEntity.countVotersAgainst++
     }
+
+    if (proposalEntity.quorum == BigInt.zero() || proposalEntity.majorityPercentage == BigInt.zero()) {
+      const contract = GovernorAlphaEvents.bind(event.address)
+      const proposal = contract.try_proposals(proposalEntity.proposalId)
+      if (!proposal.reverted) {
+        proposalEntity.quorum = proposal.value.getQuorum()
+        proposalEntity.majorityPercentage = proposal.value.getMajorityPercentage()
+      } else {
+        proposalEntity.quorum = BigInt.zero()
+        proposalEntity.majorityPercentage = BigInt.zero()
+      }
+    }
+
     proposalEntity.save()
   }
 }
