@@ -191,8 +191,8 @@ export function handleVoteCast(event: VoteCastEvent): void {
     }
 
     if (proposalEntity.quorum == BigInt.zero() || proposalEntity.majorityPercentage == BigInt.zero()) {
-      const contract = GovernorAlphaEvents.bind(event.address)
-      const proposal = contract.try_proposals(proposalEntity.proposalId)
+      const contract = GovernorAlphaEvents.bind(Address.fromString(proposalEntity.emittedBy))
+      const proposal = contract.try_proposals(event.params.proposalId)
       if (!proposal.reverted) {
         proposalEntity.quorum = proposal.value.getQuorum()
         proposalEntity.majorityPercentage = proposal.value.getMajorityPercentage()
