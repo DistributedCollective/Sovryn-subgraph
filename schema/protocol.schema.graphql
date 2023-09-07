@@ -226,3 +226,13 @@ type PayInterestTransfer @entity {
   timestamp: Int!
   emittedBy: String!
 }
+
+type LoanParamsSetup @entity {
+  id: ID!
+  owner: Bytes!
+  loanToken: Token!
+  collateralToken: Token!
+  minInitialMargin: BigDecimal!
+  maintenanceMargin: BigDecimal!
+  maxLoanTerm: Int!
+}
