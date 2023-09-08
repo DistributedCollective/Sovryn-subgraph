@@ -541,5 +541,8 @@ export function handleLoanParamsSetup(event: LoanParamsSetupEvent): void {
   loanParamsSetup.minInitialMargin = minInitialMargin
   loanParamsSetup.maintenanceMargin = maintenanceMargin
   loanParamsSetup.maxLoanTerm = maxLoanTerm
+  const transaction = createAndReturnTransaction(event)
+  loanParamsSetup.transaction = transaction.id
+  loanParamsSetup.timestamp = event.block.timestamp.toI32()
   loanParamsSetup.save()
 }

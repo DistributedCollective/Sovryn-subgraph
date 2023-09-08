@@ -235,4 +235,6 @@ type LoanParamsSetup @entity {
   minInitialMargin: BigDecimal!
   maintenanceMargin: BigDecimal!
   maxLoanTerm: Int!
+  transaction: Transaction!
+  timestamp: Int!
 }
