@@ -44,7 +44,7 @@ function updatePoolVolume(parsedEvent: ConversionEventForSwap, liquidityPoolAddr
 
     const item = new PoolVolumeItem(id)
     item.pool = pool.id
-    item.amount = parsedEvent.fromAmount.times(parsedEvent.fromToken.lastPriceBtc).truncate(18)
+    item.btcAmount = parsedEvent.fromAmount.times(parsedEvent.fromToken.lastPriceBtc).truncate(18)
     item.conversion = id
     item.timestamp = event.block.timestamp.toI32()
     item.transaction = event.transaction.hash.toHexString()

@@ -247,8 +247,15 @@ type LiquidityPoolToken @entity {
 type PoolVolumeItem @entity {
   id: ID!
   pool: LiquidityPool!
-  amount: BigDecimal!
+  btcAmount: BigDecimal!
   conversion: Conversion!
   timestamp: Int!
   transaction: Transaction!
+}
+
+
+type SwapSettings @entity {
+  id: ID!
+  protocolFee: Int!
+  timestamp: Int!
 }
