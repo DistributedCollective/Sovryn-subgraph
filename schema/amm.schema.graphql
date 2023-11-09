@@ -254,7 +254,7 @@ type PoolVolumeItem @entity {
 }
 
 
-type SwapSettings @entity {
+type SwapSetting @entity {
   id: ID!
   protocolFee: Int!
   timestamp: Int!

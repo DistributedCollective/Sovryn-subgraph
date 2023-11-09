@@ -880,7 +880,7 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - SwapSettings
+        - SwapSetting
       abis:
         - name: SwapSettings
           file: ./abis/SwapSettings.json
