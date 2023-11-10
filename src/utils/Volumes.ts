@@ -38,7 +38,7 @@ function updatePoolVolume(parsedEvent: ConversionEventForSwap, liquidityPoolAddr
     toTokenEntity.save()
   }
 
-  const pool = LiquidityPool.load(liquidityPoolAddress.toString())
+  const pool = LiquidityPool.load(liquidityPoolAddress.toHexString())
   if (pool != null) {
     const id = event.transaction.hash.toHexString() + '-' + event.logIndex.toString()
 
