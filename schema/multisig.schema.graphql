@@ -3,7 +3,7 @@
 type MultisigContract @entity {
   id: ID!
   owners: [User!]!
-  transactions: [MultisigTransaction!]!
+  transactions: [MultisigTransaction!]! @derivedFrom(field: "multisigContract")
   required: Int!
   timestamp: Int!
   transaction: Transaction!
@@ -20,7 +20,7 @@ type MultisigTransaction @entity {
   transactionId: Int!
   multisigContract: MultisigContract!
   status: MultisigTransactionStatus!
-  confirmations: [MultisigConfirmation!]!
+  confirmations: [MultisigConfirmation!]! @derivedFrom(field: "multisigTransaction")
   submitter: User!
   destination: Bytes!
   data: Bytes!

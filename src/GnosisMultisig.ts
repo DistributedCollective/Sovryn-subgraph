@@ -1,4 +1,4 @@
-import { Bytes, ethereum, BigInt, Address, dataSource } from '@graphprotocol/graph-ts'
+import { Bytes, ethereum, BigInt, Address, dataSource, store } from '@graphprotocol/graph-ts'
 import { MultisigConfirmation, MultisigContract, MultisigTransaction } from '../generated/schema'
 import {
   Confirmation,
@@ -21,7 +21,6 @@ function createAndReturnMultisigContract(event: ethereum.Event): MultisigContrac
     multisig.timestamp = event.block.timestamp.toI32()
     multisig.transaction = createAndReturnTransaction(event).id
     multisig.owners = []
-    multisig.transactions = []
     multisig.required = 0
 
     const contract = Multisig.bind(event.address)
@@ -86,27 +85,18 @@ export function handleSubmission(event: Submission): void {
   const contract = createAndReturnMultisigContract(event)
   const tx = createAndReturnMultisigTransaction(Address.fromString(contract.id), event.params.transactionId)
   tx.status = 'SUBMITTED'
-  tx.confirmations = []
   tx.submitter = createAndReturnUser(event.transaction.from, event.block.timestamp).id
+  tx.timestamp = event.block.timestamp.toI32()
+  tx.transaction = createAndReturnTransaction(event).id
   tx.save()
 }
 
 export function handleConfirmation(event: Confirmation): void {
-  const contract = createAndReturnMultisigContract(event)
-  const tx = createAndReturnMultisigTransaction(Address.fromString(contract.id), event.params.transactionId)
-  tx.confirmations.push(createAndReturnMultisigConfirmation(event).id)
+  createAndReturnMultisigConfirmation(event).id
 }
 
 export function handleRevocation(event: Revocation): void {
-  const contract = createAndReturnMultisigContract(event)
-  const tx = createAndReturnMultisigTransaction(Address.fromString(contract.id), event.params.transactionId)
-  const items = tx.confirmations
-  const index = items.indexOf(event.address.toHexString() + '-' + event.params.transactionId.toString() + '-' + event.params.sender.toHexString())
-  if (index > -1) {
-    items.splice(index, 1)
-  }
-  tx.confirmations = items
-  tx.save()
+  store.remove('MultisigConfirmation', event.address.toHexString() + '-' + event.params.transactionId.toString() + '-' + event.params.sender.toHexString())
 }
 
 export function handleExecution(event: Execution): void {
