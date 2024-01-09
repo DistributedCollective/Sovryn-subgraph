@@ -15,7 +15,7 @@ import { LiquidityPool, LiquidityPoolToken, Token, Transaction } from '../genera
 import { ConversionEventForSwap, createAndReturnSwap, updatePricing } from './utils/Swap'
 import { createAndReturnToken, decimalizeFromToken } from './utils/Token'
 import { createAndReturnTransaction } from './utils/Transaction'
-import { BigInt, dataSource, Address, BigDecimal, ethereum, log } from '@graphprotocol/graph-ts'
+import { BigInt, dataSource, Address, BigDecimal, ethereum } from '@graphprotocol/graph-ts'
 import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnPoolToken } from './utils/PoolToken'
 import { updateVolumes } from './utils/Volumes'
