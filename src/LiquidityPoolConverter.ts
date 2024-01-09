@@ -4,6 +4,7 @@ import {
   Activation as ActivationEvent,
   Conversion as ConversionEventV1,
   WithdrawFees as WithdrawFeesEvent,
+  ConversionFeeUpdate as ConversionFeeUpdateEvent,
 } from '../generated/templates/LiquidityPoolV1Converter/LiquidityPoolV1Converter'
 import {
   Conversion as ConversionEventV2,
@@ -14,7 +15,7 @@ import { LiquidityPool, LiquidityPoolToken, Token, Transaction } from '../genera
 import { ConversionEventForSwap, createAndReturnSwap, updatePricing } from './utils/Swap'
 import { createAndReturnToken, decimalizeFromToken } from './utils/Token'
 import { createAndReturnTransaction } from './utils/Transaction'
-import { BigInt, dataSource, Address, BigDecimal, ethereum } from '@graphprotocol/graph-ts'
+import { BigInt, dataSource, Address, BigDecimal, ethereum, log } from '@graphprotocol/graph-ts'
 import { createAndReturnSmartToken } from './utils/SmartToken'
 import { createAndReturnPoolToken } from './utils/PoolToken'
 import { updateVolumes } from './utils/Volumes'
@@ -245,5 +246,13 @@ export function handleWithdrawFees(event: WithdrawFeesEvent): void {
   if (liquidityPool !== null && token !== null) {
     const feeAmount = decimal.fromBigInt(event.params.protocolFeeAmount, token.decimals)
     decrementPoolBalance(liquidityPool, token, feeAmount)
+  }
+}
+
+export function handleConversionFeeUpdate(event: ConversionFeeUpdateEvent): void {
+  const liquidityPool = LiquidityPool.load(event.address.toHexString())
+  if (liquidityPool !== null) {
+    liquidityPool.conversionFee = event.params._newFee
+    liquidityPool.save()
   }
 }
