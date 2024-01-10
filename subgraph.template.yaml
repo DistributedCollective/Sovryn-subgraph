@@ -966,7 +966,7 @@ templates:
           handler: handleConversionV1
         - event: WithdrawFees(indexed address,indexed address,address,uint256,uint256)
           handler: handleWithdrawFees
-        - event: ConversionFeeUpdate(uint32, uint32)
+        - event: ConversionFeeUpdate(uint32,uint32)
           handler: handleConversionFeeUpdate
       file: ./src/LiquidityPoolConverter.ts
 
@@ -1004,7 +1004,7 @@ templates:
           handler: handleActivation
         - event: Conversion(indexed address,indexed address,indexed address,uint256,uint256,int256)
           handler: handleConversionV2
-        - event: ConversionFeeUpdate(uint32, uint32)
+        - event: ConversionFeeUpdate(uint32,uint32)
           handler: handleConversionFeeUpdate
       file: ./src/LiquidityPoolConverter.ts
 
