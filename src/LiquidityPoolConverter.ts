@@ -4,6 +4,7 @@ import {
   Activation as ActivationEvent,
   Conversion as ConversionEventV1,
   WithdrawFees as WithdrawFeesEvent,
+  ConversionFeeUpdate as ConversionFeeUpdateEvent,
 } from '../generated/templates/LiquidityPoolV1Converter/LiquidityPoolV1Converter'
 import {
   Conversion as ConversionEventV2,
@@ -245,5 +246,13 @@ export function handleWithdrawFees(event: WithdrawFeesEvent): void {
   if (liquidityPool !== null && token !== null) {
     const feeAmount = decimal.fromBigInt(event.params.protocolFeeAmount, token.decimals)
     decrementPoolBalance(liquidityPool, token, feeAmount)
+  }
+}
+
+export function handleConversionFeeUpdate(event: ConversionFeeUpdateEvent): void {
+  const liquidityPool = LiquidityPool.load(event.address.toHexString())
+  if (liquidityPool !== null) {
+    liquidityPool.conversionFee = event.params._newFee
+    liquidityPool.save()
   }
 }

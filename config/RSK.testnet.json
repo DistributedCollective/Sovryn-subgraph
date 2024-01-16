@@ -3,7 +3,7 @@
     "node": {
         "network": "testnet",
         "address": "https://testnet.sovryn.app/rpc",
-        "log_level": "debug",
+        "log_level": "info",
         "graph_graphql_query_timeout": 10,
         "graph_sql_statement_timeout": 10,
         "graph_graphql_max_depth": 16,
