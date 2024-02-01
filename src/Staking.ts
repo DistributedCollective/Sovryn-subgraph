@@ -6,13 +6,14 @@ import {
   StakingWithdrawn as StakingWithdrawnEvent,
   DelegateStakeChanged as DelegateStakeChangedEvent,
 } from '../generated/Staking/Staking'
-import { VestingContract, User, Transaction, FeeSharingTokensTransferred } from '../generated/schema'
+import { VestingContract, Transaction, FeeSharingTokensTransferred, DebugItem } from '../generated/schema'
 import { createAndReturnTransaction } from './utils/Transaction'
 import { createAndReturnUser } from './utils/User'
 import { DEFAULT_DECIMALS, ZERO_ADDRESS, decimal } from '@protofire/subgraph-toolkit'
-import { Address, BigDecimal, BigInt, ethereum } from '@graphprotocol/graph-ts'
+import { Address, BigDecimal, BigInt, dataSource, ethereum } from '@graphprotocol/graph-ts'
 import { genesisVestingStartBlock, genesisVestingEndBlock } from './blockNumbers/blockNumbers'
 import {
+  createAndReturnProtocolStats,
   decrementCurrentStakedByVestingSov,
   decrementCurrentVoluntarilyStakedSov,
   incrementCurrentStakedByVestingSov,
@@ -118,6 +119,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
       incrementVestingContractBalance(vestingContract, amount)
     }
     incrementVestingStakedAmount(vestingContract.user, event.params.lockedUntil, amount)
+    debugItem(event, 'Vesting/TokensStaked', amount, false)
   } else {
     const staker = event.params.staker.toHexString()
     createAndReturnUser(event.params.staker, event.block.timestamp)
@@ -132,6 +134,7 @@ export function handleTokensStaked(event: TokensStakedEvent): void {
     })
     incrementUserStakeHistory(event.params.staker, amount)
     incrementCurrentVoluntarilyStakedSov(amount)
+    debugItem(event, 'Staking/TokensStaked', amount, false)
   }
 }
 
@@ -184,8 +187,28 @@ class TokensWithdrawnParams {
 }
 
 function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams): void {
-  const user = User.load(params.staker.toHexString().toLowerCase())
   const vesting = VestingContract.load(params.staker.toHexString())
+
+  if (vesting != null) {
+    const isRevoked = adminContracts.includes(params.receiver.toHexString().toLowerCase()) && vesting.type == VestingContractType.Team
+    createAndReturnVestingHistoryItem({
+      staker: params.staker.toHexString(),
+      action: isRevoked ? VestingHistoryActionItem.TeamTokensRevoked : VestingHistoryActionItem.TokensWithdrawn,
+      amount: params.amount,
+      lockedUntil: BigInt.zero(),
+      totalStaked: BigDecimal.zero(),
+      delegatee: null,
+      event: params.event,
+    })
+    decrementVestingContractBalance(params.staker.toHexString(), params.amount)
+    decrementCurrentStakedByVestingSov(params.amount)
+
+    debugItem(params.event, 'Vesting/TokensWithdrawn', params.amount, true)
+    return
+  }
+
+  const user = createAndReturnUser(params.staker, params.event.block.timestamp)
+
   if (user != null) {
     const slashingEvent = FeeSharingTokensTransferred.load(params.transaction.id)
     const slashedAmount = slashingEvent == null ? BigDecimal.zero() : slashingEvent.amount
@@ -200,19 +223,22 @@ function handleStakingOrTokensWithdrawn(params: TokensWithdrawnParams): void {
     })
     decrementUserStakeHistory(params.receiver, params.amount, slashedAmount)
     decrementCurrentVoluntarilyStakedSov(params.amount.plus(slashedAmount))
+    debugItem(params.event, 'Staking/TokensWithdrawn', params.amount, true)
+    debugItem(params.event, 'Staking/TokensWithdrawn/Slashed', slashedAmount, true)
   }
-  if (vesting != null) {
-    const isRevoked = adminContracts.includes(params.receiver.toHexString().toLowerCase()) && vesting.type == VestingContractType.Team
-    createAndReturnVestingHistoryItem({
-      staker: params.staker.toHexString(),
-      action: isRevoked ? VestingHistoryActionItem.TeamTokensRevoked : VestingHistoryActionItem.TokensWithdrawn,
-      amount: params.amount,
-      lockedUntil: BigInt.zero(),
-      totalStaked: BigDecimal.zero(),
-      delegatee: null,
-      event: params.event,
-    })
-    decrementVestingContractBalance(params.staker.toHexString(), params.amount)
-    decrementCurrentStakedByVestingSov(params.amount)
-  }
+}
+
+function debugItem(event: ethereum.Event, type: string, amount: BigDecimal, isNegative: boolean): void {
+  const item = new DebugItem(event.transaction.hash.toString() + '/' + event.logIndex.toString() + '/' + type)
+  item.transaction = createAndReturnTransaction(event).id
+  item.timestamp = event.block.timestamp.toI32()
+  item.emittedBy = dataSource.address()
+  item.type = type
+  item.amount = amount
+  item.formattedAmount = isNegative ? BigDecimal.zero().minus(amount) : amount
+
+  const protocolStatsEntity = createAndReturnProtocolStats()
+  item.totalStaked = protocolStatsEntity.currentVoluntarilyStakedSov
+  item.totalVested = protocolStatsEntity.currentStakedByVestingSov
+  item.save()
 }

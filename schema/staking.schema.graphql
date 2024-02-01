@@ -201,3 +201,15 @@ type V2DelegateChanged @entity {
   previousDelegate: User
   timestamp: Int!
 }
+
+type DebugItem @entity {
+  id: ID!
+  transaction: Transaction!
+  timestamp: Int!
+  emittedBy: Bytes!
+  amount: BigDecimal
+  formattedAmount: BigDecimal
+  type: String
+  totalVested: BigDecimal
+  totalStaked: BigDecimal
+}
