@@ -165,40 +165,115 @@ type V2Stake @entity {
   timestamp: Int!
 }
 
+"""
+This event is emitted when tokens are staked, either by a user or by a vesting contract.
+"""
 type V2TokensStaked @entity {
   id: ID!
+  """
+  The user who staked the tokens (if tokens were staked by a vesting contract, user will be staking contract)
+  """
   user: User!
+  """
+  Amount of SOV staked in this event
+  """
   amount: BigDecimal!
+  """
+  The date when these tokens will unlock
+  """
   lockedUntil: Int!
+  """
+  The total amount staked for this specific user until this specific lockedUntil date. As of the time of this event.
+  """
   totalStaked: BigDecimal!
+  """
+  Timestamp of the transaction
+  """
   timestamp: Int!
 }
 
+"""
+Event is emitted when voluntary staked token lockedUntil date is extended
+"""
 type V2ExtendedStakingDuration @entity {
   id: ID!
+  """
+  The user who staked the tokens
+  """
   user: User!
+  """
+  LockedUntil date of original stake
+  """
   previousDate: Int!
+  """
+  New lockedUntil date
+  """
   newDate: Int!
+  """
+  Amount that was moved to the new lockedUntil date
+  """
   amountStaked: BigDecimal!
+  """
+  Timestamp of the transaction
+  """
   timestamp: Int!
 }
 
+"""
+Event is emitted when voluntary or vested staked tokens are withdrawn
+"""
 type V2StakingWithdrawn @entity {
   id: ID!
+  """
+  The user who staked the tokens (owner of tokens)
+  """
   user: User!
+  """
+  Address who received the tokens
+  """
   receiver: User
+  """
+  Amount of tokens withdrawn (does not include slashed amount)
+  """
   amount: BigDecimal!
+  """
+  lockedUntil date of the stake from which tokens were withdrawn
+  """
   until: Int!
+  """
+  Timestamp of the transaction
+  """
   timestamp: Int!
+  """
+  If this is true, tokens were withdrawn by governance (eg revoked vesting contract)
+  """
   isGovernance: Boolean!
 }
 
+"""
+Event is emitted when stake owner delegates voting power to another user
+"""
 type V2DelegateChanged @entity {
   id: ID!
+  """
+  The user who staked the tokens
+  """
   user: User!
+  """
+  lockedUntil date of the stake
+  """
   lockedUntil: Int!
+  """
+  Address of the new delegatee
+  """
   delegate: User
+  """
+  Address of the previous delegatee
+  """
   previousDelegate: User
+  """
+  Timestamp of the transaction
+  """
   timestamp: Int!
 }
 
