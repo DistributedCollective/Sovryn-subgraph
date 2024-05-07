@@ -30,6 +30,7 @@ export class StakeHistoryAction {
   static Unstake: string = 'Unstake'
   static WithdrawStaked: string = 'WithdrawStaked'
   static FeeWithdrawn: string = 'FeeWithdrawn'
+  static EarlyUnstakingPenalty: string = 'EarlyUnstakingPenalty'
 }
 
 export class VestingContractType {
