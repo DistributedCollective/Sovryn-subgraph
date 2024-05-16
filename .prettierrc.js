@@ -1,9 +1,12 @@
 module.exports = {
-  ...require('@protofire/subgraph-toolkit/prettier.config.js'),
-
   printWidth: 160,
-
   overrides: [
+    {
+      files: '*.graphql',
+      options: {
+        printWidth: 80,
+      },
+    },
     {
       files: '*.json',
       options: {
@@ -15,5 +18,16 @@ module.exports = {
         "trailingComma": false
       },
     },
+    {
+      files: '*.ts',
+      options: {
+        "tabWidth": 2,
+        "useTabs": false,
+        "semi": false,
+        "printWidth": 160,
+        "singleQuote": true,
+        "trailingComma": "all"
+      },
+    }
   ],
 }

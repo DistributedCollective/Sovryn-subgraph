@@ -71,7 +71,7 @@ You can also add to the keywords array if you want to filter the contracts by ke
 
 ## How to contribute
 
-To contribute, open a PR to development branch using a branch name prefaced with `feat/`, `fix/` or `hotfix/`, and request @omerzam or @BetsyBraddock as the reviewer.
+To contribute, open a PR to development branch using a branch name prefaced with `feat/`, `fix/` or `hotfix/`, and request @creed-victor as the reviewer.
 
 ## Code of Conduct
 

@@ -1,4 +1,4 @@
-import { V2Stake, V2TokensStaked, V2ExtendedStakingDuration, V2StakingWithdrawn, V2DelegateChanged } from '../../generated/schema'
+import { V2Stake, V2TokensStaked, V2ExtendedStakingDuration, V2StakingWithdrawn, V2DelegateChanged, FeeSharingTokensTransferred } from '../../generated/schema'
 import { DelegateChanged, ExtendedStakingDuration, StakingWithdrawn, TokensStaked } from '../../generated/Staking/Staking'
 import { decimal, DEFAULT_DECIMALS, ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
 import { BigDecimal, log } from '@graphprotocol/graph-ts'
@@ -76,6 +76,8 @@ export function createAndReturnV2ExtendedStakingDuration(event: ExtendedStakingD
 
 export function createAndReturnV2StakingWithdrawn(event: StakingWithdrawn): V2StakingWithdrawn {
   const id = event.transaction.hash.toHexString() + '-' + event.logIndex.toString()
+  const slashingEvent = FeeSharingTokensTransferred.load(event.transaction.hash.toHexString())
+  const slashedAmount = slashingEvent == null ? BigDecimal.zero() : slashingEvent.amount
 
   let withdrawn = V2StakingWithdrawn.load(id)
   if (withdrawn == null) {
@@ -83,6 +85,7 @@ export function createAndReturnV2StakingWithdrawn(event: StakingWithdrawn): V2St
     withdrawn.user = createAndReturnUser(event.params.staker, event.block.timestamp).id
     withdrawn.receiver = createAndReturnUser(event.params.receiver, event.block.timestamp).id
     withdrawn.amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
+    withdrawn.slashedAmount = slashedAmount
     withdrawn.until = event.params.until.toI32()
     withdrawn.timestamp = event.block.timestamp.toI32()
     withdrawn.isGovernance = event.params.isGovernance

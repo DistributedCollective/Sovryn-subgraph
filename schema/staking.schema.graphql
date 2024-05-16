@@ -106,6 +106,10 @@ enum StakeHistoryAction {
   When a user withdraws their share of the Protocol fees that is shared amongst stakers
   """
   FeeWithdrawn
+  """
+  When a user make an early unstake and the staked amount is slashed
+  """
+  EarlyUnstakingPenalty
 }
 
 """
@@ -248,6 +252,10 @@ type V2StakingWithdrawn @entity {
   If this is true, tokens were withdrawn by governance (eg revoked vesting contract)
   """
   isGovernance: Boolean!
+  """
+  Slashed amount when tokens are withdrawn before lockedUntil date
+  """
+  slashedAmount: BigDecimal!
 }
 
 """
