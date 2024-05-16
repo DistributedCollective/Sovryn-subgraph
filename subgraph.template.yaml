@@ -531,6 +531,29 @@ dataSources:
           handler: handleDelegateStakeChanged
       file: ./src/Staking.ts
 
+  # StakingOld
+  - kind: ethereum/contract
+    name: StakingOld
+    network: {{network}}
+    source:
+      address: '{{Staking.address}}'
+      abi: StakingOld
+      startBlock: {{Staking.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ExtendedStakingDuration
+      abis:
+        - name: StakingOld
+          file: ./abis/StakingOld.json
+      eventHandlers:
+        - event: ExtendedStakingDuration(indexed address,uint256,uint256)
+          handler: handleExtendedStakingDurationOld
+      file: ./src/Staking.ts
+
+  # StakingFish 
   - kind: ethereum/contract
     name: StakingFish
     network: {{network}}

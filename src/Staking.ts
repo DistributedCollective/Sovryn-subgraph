@@ -6,6 +6,7 @@ import {
   StakingWithdrawn as StakingWithdrawnEvent,
   DelegateStakeChanged as DelegateStakeChangedEvent,
 } from '../generated/Staking/Staking'
+import { ExtendedStakingDuration as ExtendedStakingDurationEventOld } from '../generated/StakingOld/StakingOld'
 import { VestingContract, Transaction, FeeSharingTokensTransferred, DebugItem } from '../generated/schema'
 import { createAndReturnTransaction } from './utils/Transaction'
 import { createAndReturnUser } from './utils/User'
@@ -29,6 +30,7 @@ import { createAndReturnVestingHistoryItem } from './utils/VestingHistoryItem'
 import {
   createAndReturnV2DelegateChanged,
   createAndReturnV2ExtendedStakingDuration,
+  createAndReturnV2ExtendedStakingDurationOld,
   createAndReturnV2StakingWithdrawn,
   createAndReturnV2TokensStaked,
 } from './utils/V2Stake'
@@ -66,6 +68,21 @@ export function handleDelegateStakeChanged(event: DelegateStakeChangedEvent): vo
 
 export function handleExtendedStakingDuration(event: ExtendedStakingDurationEvent): void {
   createAndReturnV2ExtendedStakingDuration(event)
+  const staker = event.params.staker.toHexString()
+  createAndReturnTransaction(event)
+  createAndReturnStakeHistoryItem({
+    event,
+    user: staker,
+    action: StakeHistoryAction.ExtendStake,
+    amount: BigDecimal.zero(),
+    token: ZERO_ADDRESS,
+    lockedUntil: event.params.newDate,
+    delegatee: ZERO_ADDRESS,
+  })
+}
+
+export function handleExtendedStakingDurationOld(event: ExtendedStakingDurationEventOld): void {
+  createAndReturnV2ExtendedStakingDurationOld(event)
   const staker = event.params.staker.toHexString()
   createAndReturnTransaction(event)
   createAndReturnStakeHistoryItem({
