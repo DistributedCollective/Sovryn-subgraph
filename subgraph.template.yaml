@@ -529,6 +529,11 @@ dataSources:
           handler: handleStakingWithdrawn
         - event: DelegateStakeChanged(indexed address,uint256,uint256,uint256)
           handler: handleDelegateStakeChanged
+      callHandlers:
+        - function: withdraw(uint96,uint256,address)
+          handler: handleWithdraw
+        - function: governanceWithdraw(uint96,uint256,address)
+          handler: handleGovernanceWithdraw
       file: ./src/Staking.ts
 
   - kind: ethereum/contract

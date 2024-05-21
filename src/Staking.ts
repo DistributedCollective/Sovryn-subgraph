@@ -5,6 +5,8 @@ import {
   TokensWithdrawn as TokensWithdrawnEvent,
   StakingWithdrawn as StakingWithdrawnEvent,
   DelegateStakeChanged as DelegateStakeChangedEvent,
+  WithdrawCall,
+  GovernanceWithdrawCall,
 } from '../generated/Staking/Staking'
 import { VestingContract, Transaction, FeeSharingTokensTransferred, DebugItem } from '../generated/schema'
 import { createAndReturnTransaction } from './utils/Transaction'
@@ -172,6 +174,18 @@ export function handleStakingWithdrawn(event: StakingWithdrawnEvent): void {
     totalStaked: BigDecimal.zero(),
     event: event,
   })
+}
+
+export function handleWithdraw(call: WithdrawCall): void {
+  console.log(call.inputs.amount.toString())
+  console.log(call.inputs.receiver.toString())
+  console.log(call.inputs.until.toString())
+}
+
+export function handleGovernanceWithdraw(call: GovernanceWithdrawCall): void {
+  console.log(call.inputs.amount.toString())
+  console.log(call.inputs.receiver.toString())
+  console.log(call.inputs.until.toString())
 }
 
 class TokensWithdrawnParams {
