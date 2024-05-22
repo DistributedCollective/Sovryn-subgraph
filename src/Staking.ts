@@ -159,7 +159,6 @@ export function handleTokensWithdrawn(event: TokensWithdrawnEvent): void {
 
 /** This is a copy of handleTokensWithdrawn. The event was renamed but params remained the same. */
 export function handleStakingWithdrawn(event: StakingWithdrawnEvent): void {
-  createAndReturnV2StakingWithdrawn(event)
   const transaction = createAndReturnTransaction(event)
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
   const id = event.transaction.hash.toHex() + event.logIndex.toHex()
@@ -177,15 +176,11 @@ export function handleStakingWithdrawn(event: StakingWithdrawnEvent): void {
 }
 
 export function handleWithdraw(call: WithdrawCall): void {
-  console.log(call.inputs.amount.toString())
-  console.log(call.inputs.receiver.toString())
-  console.log(call.inputs.until.toString())
+  createAndReturnV2StakingWithdrawn(call, false)
 }
 
 export function handleGovernanceWithdraw(call: GovernanceWithdrawCall): void {
-  console.log(call.inputs.amount.toString())
-  console.log(call.inputs.receiver.toString())
-  console.log(call.inputs.until.toString())
+  createAndReturnV2StakingWithdrawn(call, true)
 }
 
 class TokensWithdrawnParams {
