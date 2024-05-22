@@ -31,6 +31,7 @@ import { createAndReturnVestingHistoryItem } from './utils/VestingHistoryItem'
 import {
   createAndReturnV2DelegateChanged,
   createAndReturnV2ExtendedStakingDuration,
+  createAndReturnV2StakingGovernanceWithdrawn,
   createAndReturnV2StakingWithdrawn,
   createAndReturnV2TokensStaked,
 } from './utils/V2Stake'
@@ -176,11 +177,11 @@ export function handleStakingWithdrawn(event: StakingWithdrawnEvent): void {
 }
 
 export function handleWithdraw(call: WithdrawCall): void {
-  createAndReturnV2StakingWithdrawn(call, false)
+  createAndReturnV2StakingWithdrawn(call)
 }
 
 export function handleGovernanceWithdraw(call: GovernanceWithdrawCall): void {
-  createAndReturnV2StakingWithdrawn(call, true)
+  createAndReturnV2StakingGovernanceWithdrawn(call)
 }
 
 class TokensWithdrawnParams {

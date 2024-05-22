@@ -74,7 +74,7 @@ export function createAndReturnV2ExtendedStakingDuration(event: ExtendedStakingD
   return extended
 }
 
-export function createAndReturnV2StakingWithdrawn(event: WithdrawCall | GovernanceWithdrawCall, isGovernance: boolean): V2StakingWithdrawn {
+export function createAndReturnV2StakingWithdrawn(event: WithdrawCall): V2StakingWithdrawn {
   const id = event.transaction.hash.toHexString() + '-' + event.transaction.index.toString()
   const slashingEvent = FeeSharingTokensTransferred.load(event.transaction.hash.toHexString())
   const slashedAmount = slashingEvent == null ? BigDecimal.zero() : slashingEvent.amount
@@ -88,7 +88,37 @@ export function createAndReturnV2StakingWithdrawn(event: WithdrawCall | Governan
     withdrawn.slashedAmount = slashedAmount
     withdrawn.until = event.inputs.until.toI32()
     withdrawn.timestamp = event.block.timestamp.toI32()
-    withdrawn.isGovernance = isGovernance
+    withdrawn.isGovernance = false
+    withdrawn.save()
+  }
+
+  if (!withdrawn.isGovernance) {
+    const stakeId = event.from.toHexString() + '-' + event.inputs.until.toI32().toString()
+    const stake = V2Stake.load(stakeId)
+    if (stake != null) {
+      stake.amount = stake.amount.minus(decimal.fromBigInt(event.inputs.amount, DEFAULT_DECIMALS))
+      stake.save()
+    }
+  }
+
+  return withdrawn
+}
+
+export function createAndReturnV2StakingGovernanceWithdrawn(event: GovernanceWithdrawCall): V2StakingWithdrawn {
+  const id = event.transaction.hash.toHexString() + '-' + event.transaction.index.toString()
+  const slashingEvent = FeeSharingTokensTransferred.load(event.transaction.hash.toHexString())
+  const slashedAmount = slashingEvent == null ? BigDecimal.zero() : slashingEvent.amount
+
+  let withdrawn = V2StakingWithdrawn.load(id)
+  if (withdrawn == null) {
+    withdrawn = new V2StakingWithdrawn(id)
+    withdrawn.user = createAndReturnUser(event.from, event.block.timestamp).id
+    withdrawn.receiver = createAndReturnUser(event.inputs.receiver, event.block.timestamp).id
+    withdrawn.amount = decimal.fromBigInt(event.inputs.amount, DEFAULT_DECIMALS)
+    withdrawn.slashedAmount = slashedAmount
+    withdrawn.until = event.inputs.until.toI32()
+    withdrawn.timestamp = event.block.timestamp.toI32()
+    withdrawn.isGovernance = true
     withdrawn.save()
   }
 
