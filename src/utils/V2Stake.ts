@@ -1,5 +1,6 @@
 import { V2Stake, V2TokensStaked, V2ExtendedStakingDuration, V2StakingWithdrawn, V2DelegateChanged, FeeSharingTokensTransferred } from '../../generated/schema'
 import { DelegateChanged, ExtendedStakingDuration, StakingWithdrawn, TokensStaked } from '../../generated/Staking/Staking'
+import { ExtendedStakingDuration as ExtendedStakingDurationOld } from '../../generated/StakingOld/StakingOld'
 import { decimal, DEFAULT_DECIMALS, ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
 import { BigDecimal, log } from '@graphprotocol/graph-ts'
 import { createAndReturnUser } from './User'
@@ -69,6 +70,41 @@ export function createAndReturnV2ExtendedStakingDuration(event: ExtendedStakingD
     extended.newDate = event.params.newDate.toI32()
     extended.timestamp = event.block.timestamp.toI32()
     extended.amountStaked = decimal.fromBigInt(event.params.amountStaked, DEFAULT_DECIMALS)
+    extended.save()
+  }
+  return extended
+}
+
+export function createAndReturnV2ExtendedStakingDurationOld(event: ExtendedStakingDurationOld): V2ExtendedStakingDuration {
+  const previousId = event.params.staker.toHexString() + '-' + event.params.previousDate.toI32().toString()
+  const newId = event.params.staker.toHexString() + '-' + event.params.newDate.toI32().toString()
+
+  const previousStake = V2Stake.load(previousId)
+  if (previousStake != null) {
+    previousStake.amount = BigDecimal.zero()
+    previousStake.save()
+  }
+
+  let newStake = V2Stake.load(newId)
+  if (newStake == null) {
+    newStake = new V2Stake(newId)
+    newStake.user = createAndReturnUser(event.params.staker, event.block.timestamp).id
+    newStake.lockedUntil = event.params.newDate.toI32()
+    newStake.timestamp = event.block.timestamp.toI32()
+    newStake.amount = BigDecimal.zero()
+  }
+  newStake.save()
+
+  const id = event.transaction.hash.toHexString() + '-' + event.logIndex.toString()
+
+  let extended = V2ExtendedStakingDuration.load(id)
+  if (extended == null) {
+    extended = new V2ExtendedStakingDuration(id)
+    extended.user = createAndReturnUser(event.params.staker, event.block.timestamp).id
+    extended.previousDate = event.params.previousDate.toI32()
+    extended.newDate = event.params.newDate.toI32()
+    extended.timestamp = event.block.timestamp.toI32()
+    extended.amountStaked = BigDecimal.zero()
     extended.save()
   }
   return extended
