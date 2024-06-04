@@ -5,6 +5,8 @@ import {
   TokensWithdrawn as TokensWithdrawnEvent,
   StakingWithdrawn as StakingWithdrawnEvent,
   DelegateStakeChanged as DelegateStakeChangedEvent,
+  WithdrawCall,
+  GovernanceWithdrawCall,
 } from '../generated/Staking/Staking'
 import { ExtendedStakingDuration as ExtendedStakingDurationEventOld } from '../generated/StakingOld/StakingOld'
 import { VestingContract, Transaction, FeeSharingTokensTransferred, DebugItem } from '../generated/schema'
@@ -30,6 +32,7 @@ import { createAndReturnVestingHistoryItem } from './utils/VestingHistoryItem'
 import {
   createAndReturnV2DelegateChanged,
   createAndReturnV2ExtendedStakingDuration,
+  createAndReturnV2StakingGovernanceWithdrawn,
   createAndReturnV2ExtendedStakingDurationOld,
   createAndReturnV2StakingWithdrawn,
   createAndReturnV2TokensStaked,
@@ -174,7 +177,6 @@ export function handleTokensWithdrawn(event: TokensWithdrawnEvent): void {
 
 /** This is a copy of handleTokensWithdrawn. The event was renamed but params remained the same. */
 export function handleStakingWithdrawn(event: StakingWithdrawnEvent): void {
-  createAndReturnV2StakingWithdrawn(event)
   const transaction = createAndReturnTransaction(event)
   const amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
   const id = event.transaction.hash.toHex() + event.logIndex.toHex()
@@ -189,6 +191,14 @@ export function handleStakingWithdrawn(event: StakingWithdrawnEvent): void {
     totalStaked: BigDecimal.zero(),
     event: event,
   })
+}
+
+export function handleWithdraw(call: WithdrawCall): void {
+  createAndReturnV2StakingWithdrawn(call)
+}
+
+export function handleGovernanceWithdraw(call: GovernanceWithdrawCall): void {
+  createAndReturnV2StakingGovernanceWithdrawn(call)
 }
 
 class TokensWithdrawnParams {

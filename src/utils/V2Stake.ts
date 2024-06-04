@@ -1,5 +1,5 @@
 import { V2Stake, V2TokensStaked, V2ExtendedStakingDuration, V2StakingWithdrawn, V2DelegateChanged, FeeSharingTokensTransferred } from '../../generated/schema'
-import { DelegateChanged, ExtendedStakingDuration, StakingWithdrawn, TokensStaked } from '../../generated/Staking/Staking'
+import { DelegateChanged, ExtendedStakingDuration, GovernanceWithdrawCall, TokensStaked, WithdrawCall } from '../../generated/Staking/Staking'
 import { ExtendedStakingDuration as ExtendedStakingDurationOld } from '../../generated/StakingOld/StakingOld'
 import { decimal, DEFAULT_DECIMALS, ZERO_ADDRESS } from '@protofire/subgraph-toolkit'
 import { BigDecimal, log } from '@graphprotocol/graph-ts'
@@ -110,29 +110,59 @@ export function createAndReturnV2ExtendedStakingDurationOld(event: ExtendedStaki
   return extended
 }
 
-export function createAndReturnV2StakingWithdrawn(event: StakingWithdrawn): V2StakingWithdrawn {
-  const id = event.transaction.hash.toHexString() + '-' + event.logIndex.toString()
+export function createAndReturnV2StakingWithdrawn(event: WithdrawCall): V2StakingWithdrawn {
+  const id = event.transaction.hash.toHexString() + '-' + event.transaction.index.toString()
   const slashingEvent = FeeSharingTokensTransferred.load(event.transaction.hash.toHexString())
   const slashedAmount = slashingEvent == null ? BigDecimal.zero() : slashingEvent.amount
 
   let withdrawn = V2StakingWithdrawn.load(id)
   if (withdrawn == null) {
     withdrawn = new V2StakingWithdrawn(id)
-    withdrawn.user = createAndReturnUser(event.params.staker, event.block.timestamp).id
-    withdrawn.receiver = createAndReturnUser(event.params.receiver, event.block.timestamp).id
-    withdrawn.amount = decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS)
+    withdrawn.user = createAndReturnUser(event.from, event.block.timestamp).id
+    withdrawn.receiver = createAndReturnUser(event.inputs.receiver, event.block.timestamp).id
+    withdrawn.amount = decimal.fromBigInt(event.inputs.amount, DEFAULT_DECIMALS)
     withdrawn.slashedAmount = slashedAmount
-    withdrawn.until = event.params.until.toI32()
+    withdrawn.until = event.inputs.until.toI32()
     withdrawn.timestamp = event.block.timestamp.toI32()
-    withdrawn.isGovernance = event.params.isGovernance
+    withdrawn.isGovernance = false
     withdrawn.save()
   }
 
   if (!withdrawn.isGovernance) {
-    const stakeId = event.params.staker.toHexString() + '-' + event.params.until.toI32().toString()
+    const stakeId = event.from.toHexString() + '-' + event.inputs.until.toI32().toString()
     const stake = V2Stake.load(stakeId)
     if (stake != null) {
-      stake.amount = stake.amount.minus(decimal.fromBigInt(event.params.amount, DEFAULT_DECIMALS))
+      stake.amount = stake.amount.minus(decimal.fromBigInt(event.inputs.amount, DEFAULT_DECIMALS))
+      stake.save()
+    }
+  }
+
+  return withdrawn
+}
+
+export function createAndReturnV2StakingGovernanceWithdrawn(event: GovernanceWithdrawCall): V2StakingWithdrawn {
+  const id = event.transaction.hash.toHexString() + '-' + event.transaction.index.toString()
+  const slashingEvent = FeeSharingTokensTransferred.load(event.transaction.hash.toHexString())
+  const slashedAmount = slashingEvent == null ? BigDecimal.zero() : slashingEvent.amount
+
+  let withdrawn = V2StakingWithdrawn.load(id)
+  if (withdrawn == null) {
+    withdrawn = new V2StakingWithdrawn(id)
+    withdrawn.user = createAndReturnUser(event.from, event.block.timestamp).id
+    withdrawn.receiver = createAndReturnUser(event.inputs.receiver, event.block.timestamp).id
+    withdrawn.amount = decimal.fromBigInt(event.inputs.amount, DEFAULT_DECIMALS)
+    withdrawn.slashedAmount = slashedAmount
+    withdrawn.until = event.inputs.until.toI32()
+    withdrawn.timestamp = event.block.timestamp.toI32()
+    withdrawn.isGovernance = true
+    withdrawn.save()
+  }
+
+  if (!withdrawn.isGovernance) {
+    const stakeId = event.from.toHexString() + '-' + event.inputs.until.toI32().toString()
+    const stake = V2Stake.load(stakeId)
+    if (stake != null) {
+      stake.amount = stake.amount.minus(decimal.fromBigInt(event.inputs.amount, DEFAULT_DECIMALS))
       stake.save()
     }
   }
