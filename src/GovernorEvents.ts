@@ -134,9 +134,15 @@ export function handleProposalCreated(event: ProposalCreatedEvent): void {
 
   const contract = GovernorAlphaEvents.bind(event.address)
   const proposal = contract.try_proposals(event.params.id)
+
   if (!proposal.reverted) {
     proposalEntity.quorum = proposal.value.getQuorum()
     proposalEntity.majorityPercentage = proposal.value.getMajorityPercentage()
+    // set the quorum and majority percentage to 5 and 50 respectively if the governor is an admin
+    if (governor.type === GovernorType.Admin) {
+      proposalEntity.quorum = BigInt.fromI32(5)
+      proposalEntity.majorityPercentage = BigInt.fromI32(50)
+    }
   } else {
     proposalEntity.quorum = BigInt.zero()
     proposalEntity.majorityPercentage = BigInt.zero()
