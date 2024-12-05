@@ -134,7 +134,6 @@ export function handleProposalCreated(event: ProposalCreatedEvent): void {
 
   const contract = GovernorAlphaEvents.bind(event.address)
   const proposal = contract.try_proposals(event.params.id)
-
   if (!proposal.reverted) {
     proposalEntity.quorum = proposal.value.getQuorum()
     proposalEntity.majorityPercentage = proposal.value.getMajorityPercentage()
