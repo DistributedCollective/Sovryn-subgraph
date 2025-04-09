@@ -685,6 +685,29 @@ dataSources:
           handler: handleRewardWithdrawn
       file: ./src/StakingReward.ts
 
+  # Staking RewardOS
+  - kind: ethereum/contract
+    name: StakingRewardsOs
+    network: {{network}}
+    source:
+      address: '{{StakingRewardsOs.address}}'
+      abi: StakingRewardsOs
+      startBlock: {{StakingRewardsOs.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - OwnershipTransferred
+        - RewardWithdrawn
+      abis:
+        - name: StakingRewardsOs
+          file: ./abis/StakingRewardsOs.json
+      eventHandlers:
+        - event: RewardWithdrawn(indexed address,uint256)
+          handler: handleRewardWithdrawn
+      file: ./src/StakingReward.ts
+
   - kind: ethereum/contract
     name: OrderbookTestnet
     network: {{network}}

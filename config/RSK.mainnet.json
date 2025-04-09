@@ -105,6 +105,11 @@
         "address": "0x8304FB3614c728B712e94F9D4DF6719fede6517F",
         "startBlock": 3627767
     },
+    "StakingRewardsOs": {
+        "network": "mainnet",
+        "address": "0xb0e08B7e4498ecA6868781aC3B5086fF4F66be56",
+        "startBlock": 7428392
+    },
     "GovernorAlphaEvents": {
         "network": "mainnet",
         "address": "0xCe3a21a69c05CfE638B722f53593A047bdd6E9De",
