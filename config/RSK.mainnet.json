@@ -108,7 +108,7 @@
     "StakingRewardsOs": {
         "network": "mainnet",
         "address": "0xb0e08B7e4498ecA6868781aC3B5086fF4F66be56",
-        "startBlock": 7428392
+        "startBlock": 6228419
     },
     "GovernorAlphaEvents": {
         "network": "mainnet",
